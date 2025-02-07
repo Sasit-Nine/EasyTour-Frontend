@@ -12,3 +12,15 @@ mutation Mutation($input: UsersPermissionsLoginInput!) {
 //       "password": "123456"
 //     }
 // }
+export const QUERYUSERDATA = gql`
+query Query {
+  me {
+    username
+    role {
+      name
+    }
+    email
+    documentId
+  }
+}
+`
