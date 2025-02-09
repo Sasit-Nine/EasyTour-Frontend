@@ -11,6 +11,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Login from "../auth/LoginPage";
 import Register from "../auth/RegisterPage"
+import Payment from "./subpage/Payment"
 
 
 const CustomerApp = () => {
@@ -24,6 +25,7 @@ const CustomerApp = () => {
                         <Route path="/packages" element={<PackageList></PackageList>}></Route>
                         <Route path="/login" element={<Login></Login>}></Route>
                         <Route path="/register" element={<Register></Register>}></Route>
+                        <Route path="/payment" element={<Payment></Payment>}></Route>
                     </Routes>
             </div>
             <Footer></Footer>

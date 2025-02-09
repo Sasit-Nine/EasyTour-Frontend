@@ -14,6 +14,7 @@ const Navbar = () => {
                     <Link className='Text' to="/packages">Package</Link>
                     <Link className='Text' to="/login">Login</Link>
                     <Link className='Textregis' to="/register">Register</Link>
+                    <Link className='Text' to="/payment">Register</Link>
                 </div>
             </div>
         </nav>
