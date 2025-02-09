@@ -1,0 +1,49 @@
+* {
+    margin: 0;
+    padding: 0;
+
+}
+
+.img-background {
+    background-image: url('https://image.kkday.com/v2/image/get/h_300%2Cc_fill%2Cq_55%2Ct_webp/s1.kkday.com/product_30209/20190830025244_hYL3X/jpg');
+    background-position: center;
+    background-size: cover;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    display: grid;
+    gap:20px;
+    padding:20px;
+
+
+    .container {
+        .container-login {
+            width: 240px;
+            height: 150px;
+            background-color: #F8644Bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+
+
+            .part-input {
+                padding:20px;
+                
+                
+
+                .row input {
+                    background-color: rgb(255, 255, 255);
+                    color: black;
+                    border: none;
+                    height: 20px;
+                    margin-top:10px; 
+                    
+                }
+            }
+
+
+        }
+    }
+
+}

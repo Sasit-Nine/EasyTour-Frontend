@@ -1,0 +1,43 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+.Nav {
+    z-index: 1000;
+    position: sticky;
+    top: 0;
+}
+
+.Navbar {
+    display: flex;
+    padding: 10px 20px;
+    width: 100vw;
+    background-color: #F8644B;
+    justify-content: space-between;
+    align-items: stretch;
+    
+    
+
+    .Path {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center
+    }
+
+    .Text {
+        color: aliceblue;
+        font-size: 0.6rem
+    }
+
+    .Textregis {
+        color: rgb(0, 0, 0);
+        font-size: 0.6rem;
+        background-color: rgb(255, 254, 252);
+        border-radius: 4px;
+        padding: 2px;
+
+    }
+}
