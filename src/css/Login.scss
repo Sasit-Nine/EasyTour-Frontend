@@ -5,7 +5,7 @@
 }
 
 .img-background {
-    background-image: url('https://image.kkday.com/v2/image/get/h_300%2Cc_fill%2Cq_55%2Ct_webp/s1.kkday.com/product_30209/20190830025244_hYL3X/jpg');
+    background-image: url('../assets/evan-krause-BU6lABNbTpA-unsplash (1).jpg');
     background-position: center;
     background-size: cover;
     justify-content: center;
@@ -14,12 +14,13 @@
     display: grid;
     gap:20px;
     padding:20px;
+    height: 60vh;
 
 
     .container {
         .container-login {
-            width: 240px;
-            height: 150px;
+            width: 80vw;
+            height: 40vh;
             background-color: #F8644Bff;
             display: flex;
             align-items: center;
