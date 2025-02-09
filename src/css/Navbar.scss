@@ -12,11 +12,13 @@
 
 .Navbar {
     display: flex;
-    padding: 10px 20px;
+    padding: 50px;
     width: 100vw;
+    height: 10vh;
     background-color: #F8644B;
     justify-content: space-between;
-    align-items: stretch;
+    align-items: center;
+
     
     
 
@@ -29,7 +31,7 @@
 
     .Text {
         color: aliceblue;
-        font-size: 0.6rem
+        font-size: 1.8vh
     }
 
     .Textregis {
