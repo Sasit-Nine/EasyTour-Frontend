@@ -5,8 +5,7 @@ import CustomerApp from './customers-side/CustomerApp'
 function App() {
   return (
     <>
-      <CustomerApp>
-    </CustomerApp>
+      <CustomerApp></CustomerApp>
     </>
   )
 }
