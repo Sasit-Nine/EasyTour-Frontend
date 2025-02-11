@@ -75,6 +75,7 @@ query Query {
     documentId
     image {
       previewUrl
+      url
     }
   }
 }

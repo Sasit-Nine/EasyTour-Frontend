@@ -26,7 +26,7 @@ const CustomerApp = () => {
                         <Route path="/login" element={<Login></Login>}></Route>
                         <Route path="/register" element={<Register></Register>}></Route>
                         <Route path="/payment" element={<Payment></Payment>}></Route>
-                        <Route path="/package/:documentId" element={<PackageDetail></PackageDetail>}></Route>
+                        <Route path="/packages/:documentId" element={<PackageDetail></PackageDetail>}></Route>
                     </Routes>
             </div>
             <Footer></Footer>
