@@ -1,6 +1,8 @@
+import { useParams } from "react-router-dom";
+import React from "react";
 const PackageDetail = () => {
-    return <div>Package Detail Page</div>;
+    const {documentId} = useParams()
+    console.log(documentId)
 };
-
 export default PackageDetail;
 

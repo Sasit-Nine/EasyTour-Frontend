@@ -7,7 +7,7 @@
     background-image: url('../assets/mg-cthu--1h_NN3nqzI-unsplash.jpg');
     margin: 0;
     width: 100vw;
-    height: 50vh;
+    height: 65vh;
     background-position: center;
     background-size: cover;
     display: flex;
@@ -15,10 +15,11 @@
     align-items: center;
     text-align: center;
     line-height: 1;
+    filter: brightness(80%);
 
     .text-quotation {
         padding: 30px;
-        font-size: 1.5rem;
+        font-size: 7vh;
         color: white;
         filter: drop-shadow(0.5px 0.5px 2px rgba(0, 0, 0, 0.558))
     }

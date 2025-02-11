@@ -59,3 +59,23 @@ query Booking($documentId: ID!) {
 // {
 //   "documentId": "l1vee2vftw3a9yamgjiggalb"
 // }
+
+export const QUERY_PACKAGELIST = gql`
+query Query {
+  packages {
+    name
+    location {
+      district
+      province
+    }
+    price
+    start
+    end
+    duration
+    documentId
+    image {
+      previewUrl
+    }
+  }
+}
+`
