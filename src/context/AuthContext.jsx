@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
                             }
                         }
                     })
-                    setUser(userData.user)
+                    setUser(userData?.me)
                 } catch (error) {
                     console.log(error)
                 }
@@ -52,7 +52,8 @@ export const AuthProvider = ({ children }) => {
                     }
                 }
             })
-            setUser(userData?.user)
+            console.log(userData.me)
+            setUser(userData?.me)
         } catch (error) {
             console.log(error)
         }

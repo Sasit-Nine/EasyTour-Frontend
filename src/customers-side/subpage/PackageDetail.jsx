@@ -1,14 +1,17 @@
 import { data, useParams } from "react-router-dom";
 import React from "react";
 import { useQuery } from "@apollo/client";
-import { QUERY_PACKAGE } from "../../services/Graphql";
+import { QUERY_PACKAGE,MUTATION_BOOKING } from "../../services/Graphql";
 import { Card, Typography, Button, InputNumber, Row, Col, Image } from "antd";
 import '../../css/PackageDetail.scss'
 import dayjs from "dayjs";
 import { MapPin } from 'lucide-react';
-
+import { useAuth } from "../../context/AuthContext";
+import { useMutation } from "@apollo/client";
 
 const PackageDetail = () => {
+    const [BookingMutation,{error:errorBooking,loading:loadingBooking}] = useMutation(MUTATION_BOOKING)
+    const {user} = useAuth()
     const { Title } = Typography;
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const { documentId } = useParams()
@@ -24,10 +27,36 @@ const PackageDetail = () => {
     if (errorPackage) {
         return <p>{errorPackage}</p>
     }
-    console.log(dataPackage.package)
     const includesList = dataPackage.package.price_includes.split('\n');
-    const time = dataPackage.package.time; // "09:00:00.000"
+    const time = dataPackage.package.time; 
     const formattedTime = dayjs(time, 'HH:mm:ss.SSS').format('HH:mm');
+
+    
+    const handleBooking = async () => {
+        console.log(user.documentId)
+        console.log(documentId)
+        try{
+            const {data:BookingData} = await BookingMutation({
+                variables:{
+                    data:{
+                        total_price: 2000,
+                        customers: user.documentId,
+                        package: documentId,
+                        quantity: 1
+                    }
+                },
+                context:{
+                    headers: {
+                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                    },
+                }
+            })
+            console.log(BookingData)
+        }catch(error){
+            console.log(error)
+        }
+        
+    }
     return (
         <div className="box">
             <Row gutter={[16, 16]}>
@@ -77,7 +106,10 @@ const PackageDetail = () => {
                     </Row>
 
 
-                    <Button style={{ backgroundColor: '#F8644B', borderColor: '#F8644B', color: '#fff' ,padding: 30, marginTop: 10, width:'30%'}}>
+                    <Button 
+                        style={{ backgroundColor: '#F8644B', borderColor: '#F8644B', color: '#fff' ,padding: 30, marginTop: 10, width:'30%'}}
+                        onClick={handleBooking}
+                    >
                         Booking
                     </Button>
                 </Col>
