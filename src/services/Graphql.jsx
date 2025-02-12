@@ -80,3 +80,29 @@ query Query {
   }
 }
 `
+
+export const QUERY_PACKAGE = gql`
+query Query($documentId: ID!) {
+  package(documentId: $documentId) {
+    name
+    price
+    image {
+      url
+    }
+    start
+    end
+    max_people
+    duration
+    location {
+      province
+      google_place_id
+      district
+      subdistrict
+    }
+    time
+    note
+    price_includes
+    meeting_point
+    
+  }
+}`

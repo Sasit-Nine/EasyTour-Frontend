@@ -3,8 +3,7 @@
 
 
   color-scheme: light dark;
-  color: #ffffff;
-  background-color: #242424;
+  color: #000000;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -20,4 +19,3 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
-
