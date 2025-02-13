@@ -97,12 +97,24 @@ query Query($documentId: ID!) {
       province
       google_place_id
       district
-      subdistrict
     }
     time
     note
     price_includes
     meeting_point
-    
+    rating
+    package_details {
+      name
+      detail
+    }
+    description
   }
 }`
+
+export const QUERY_PAYMENT_INTENT_ID = gql`
+query Booking($documentId: ID!) {
+  booking(documentId: $documentId) {
+    payment_intent_id
+  }
+}
+`
