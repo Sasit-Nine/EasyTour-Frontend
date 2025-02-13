@@ -118,3 +118,13 @@ query Booking($documentId: ID!) {
   }
 }
 `
+
+export const QEURY_PROFILE = gql`
+query Me($documentId: ID!) {
+  usersPermissionsUser(documentId: $documentId) {
+    profile_picture {
+      url
+    }
+  }
+}
+`

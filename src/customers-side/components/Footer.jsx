@@ -11,7 +11,7 @@ const Footer = () => {
                 className="h-9"
               />
               <p className="text-sm/6 text-balance text-white">
-                Making the world a better place through constructing elegant hierarchies.
+              EXPLORE THE WHOLE WORLD<br/>AND ENJOY ITS BEAUTY
               </p>
               <div className="flex gap-x-6">
               </div>

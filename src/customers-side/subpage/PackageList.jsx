@@ -46,9 +46,9 @@ const PackageList = () => {
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <h2 className="text-2xl font-bold tracking-tight text-gray-900">แพ็คเกจท่องเที่ยว</h2>
 
-        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+        <div className="drop-shadow-xl mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
           {transformedPackages.map((product) => (
-            <div key={product.documentId} className="group relative cursor-pointer" onClick={()=>handleToPackageDetail(product.documentId)} >
+            <div key={product.documentId} className=" group relative cursor-pointer" onClick={()=>handleToPackageDetail(product.documentId)} >
               <img
                 src={`${strapiBaseURL}${product.url}`}
                 className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
@@ -63,45 +63,13 @@ const PackageList = () => {
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">{product.location}</p>
                 </div>
-                <p className="text-sm font-medium text-gray-900">{product.price}</p>
+                <p className="text-2xl font-bold text-[#F8644B]">{product.price} ฿</p>
               </div>
             </div>
           ))}
         </div>
       </div>
     </div>
-        // <div>
-        //   <div className="PackageList">
-        //     <Row gutter={16}>
-        //         {transformedPackages.map((pkg)=>(
-        //             <Col key={pkg.documentId} xs={24} sm={12} md={8} lg={6} xl={4}>
-        //                 <Card
-        //                     className="card"
-        //                     hoverable
-        //                     cover={<img src={`${strapiBaseURL}${pkg.url}`} />}
-        //                     onClick={()=> handleToPackageDetail(pkg.documentId)}
-        //                 >
-        //                     <Card.Meta
-        //                         title={pkg.name}
-        //                         description={
-        //                             <div>
-        //                                 <p>Price : ฿ {pkg.price}</p>
-        //                                 <p>Duration : {pkg.duration}</p>
-        //                                 <p>Location : {pkg.location}</p>
-        //                                 <p>
-        //                                     {pkg.start} - {pkg.end}
-        //                                 </p>
-        //                             </div>
-        //                         }
-        //                     >
-
-        //                     </Card.Meta>
-        //                 </Card>
-        //             </Col>
-        //         ))}
-        //     </Row>
-        //   </div>
-        // </div>
     )
 };
 

@@ -1,12 +1,30 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import planeImg from "../../assets/plane.png";
+import { QEURY_PROFILE } from "../../services/Graphql";
+import { useQuery } from "@apollo/client";
 
 const Navbar = () => {
+    const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const { user, logout } = useAuth();
     console.log(user)
+    const { data: urlProfile } = useQuery(QEURY_PROFILE, {
+        skip:(!user),
+        variables: {
+            "documentId": user?.documentId
+        },
+        context: {
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            },
+        }
+    })
+    console.log()
+
+
 
     return (
         <Disclosure as="nav" className="bg-[#F8644B] shadow-sm">
@@ -34,28 +52,39 @@ const Navbar = () => {
                     </div>
 
                     {/* Right Menu */}
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                        {/* Profile Dropdown */}
-                        <Menu as="div" className="relative ml-3">
-                            <div>
-                                <MenuButton className="relative flex rounded-full bg-white text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none">
-                                    <img alt="User" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" className="size-8 rounded-full" />
-                                </MenuButton>
-                            </div>
+                    {(user) ? (
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                            {/* Profile Dropdown */}
+                            <Menu as="div" className="relative ml-3">
+                                <div>
 
-                            <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5">
-                                <MenuItem>
+                                    <MenuButton className="relative flex rounded-full bg-white text-sm">
+                                        <img alt="User" src={`${strapiBaseURL}${urlProfile?.usersPermissionsUser?.profile_picture?.url}`} className="size-8 rounded-full" />
+                                    </MenuButton>
+                                </div>
+
+                                <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5">
+                                    {/* <MenuItem>
                                     <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/profile">Your Profile</Link>
                                 </MenuItem>
                                 <MenuItem>
                                     <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/settings">Settings</Link>
-                                </MenuItem>
-                                <MenuItem>
-                                    <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={logout}>Sign out</button>
-                                </MenuItem>
-                            </MenuItems>
-                        </Menu>
-                    </div>
+                                </MenuItem> */}
+                                    <MenuItem>
+                                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={logout}>Sign out</button>
+                                    </MenuItem>
+                                </MenuItems>
+                            </Menu>
+                        </div>
+                    ) : (
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                            {/* Desktop Menu */}
+                            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                                <Link className="inline-flex items-center px-3 pt-1 text-sm font-medium text-white hover:text-gray-200" to="/login">Login</Link>
+                                <Link className="inline-flex items-center px-3 pt-1 text-sm font-medium text-white hover:text-gray-200" to="/register">Register</Link>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

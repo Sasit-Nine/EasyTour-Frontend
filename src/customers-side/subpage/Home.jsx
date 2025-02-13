@@ -1,8 +1,12 @@
 import React from "react"
 import Welcome from "../components/Welcome"
+import FilterPackage from "../components/FilterPackage"
 const Home = () => {
     return (
-        <Welcome></Welcome>
+        <div>
+            <Welcome></Welcome>
+            <FilterPackage></FilterPackage>
+        </div>
     )
 }
 export default Home

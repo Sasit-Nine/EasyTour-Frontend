@@ -179,7 +179,7 @@ const PackageDetail = () => {
                                     <Disclosure key={detail.name} as="div">
                                         <h3>
                                             <DisclosureButton className="group relative flex w-full items-center justify-between py-6 text-left">
-                                                <span className="text-sm font-medium text-gray-900 group-data-open:text-indigo-600">
+                                                <span className="text-sm font-medium text-gray-900 group-data-open:text-[#f84b4b]">
                                                     {detail.name}
                                                 </span>
                                                 <span className="ml-6 flex items-center">
@@ -189,7 +189,7 @@ const PackageDetail = () => {
                                                     />
                                                     <MinusIcon
                                                         aria-hidden="true"
-                                                        className="hidden size-6 text-indigo-400 group-hover:text-indigo-500 group-data-open:block"
+                                                        className="hidden size-6 text-[#f84b4b]/90 group-hover:text-[#f84b4b] group-data-open:block"
                                                     />
                                                 </span>
                                             </DisclosureButton>
