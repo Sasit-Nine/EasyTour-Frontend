@@ -9,7 +9,6 @@ const Dashboard = () => {
   const bookingHistoryData = [
     { key: "1", bookingId: "T001", customerName: "John Doe", tourPackage: "Beach Tour", bookingDate: "2023-10-01", totalAmount: "5000" },
     { key: "2", bookingId: "T002", customerName: "Jane Smith", tourPackage: "Mountain Tour", bookingDate: "2023-10-02", totalAmount: "7500" },
-    // เพิ่มข้อมูลเพิ่มเติมถ้าจำเป็น
   ];
 
   const columns = [
@@ -20,50 +19,48 @@ const Dashboard = () => {
     { title: "Total Amount (THB)", dataIndex: "totalAmount" },
   ];
 
-  // ข้อมูลกราฟการจอง (Bookings Over Time)
   const data = [
-    { month: 'Jan', value: 300 },
-    { month: 'Feb', value: 450 },
-    { month: 'Mar', value: 500 },
-    { month: 'Apr', value: 650 },
-    { month: 'May', value: 700 },
-    { month: 'Jun', value: 800 },
+    { month: 'Jan', value: 250 },
+    { month: 'Feb', value: 400 },
+    { month: 'Mar', value: 450 },
+    { month: 'Apr', value: 600 },
+    { month: 'May', value: 650 },
+    { month: 'Jun', value: 750 },
   ];
 
-  // ข้อมูลกราฟรายรับ (Revenue Over Time)
   const revenueData = [
-    { month: 'Jan', value: 5000 },
-    { month: 'Feb', value: 7500 },
-    { month: 'Mar', value: 8000 },
-    { month: 'Apr', value: 9000 },
-    { month: 'May', value: 11000 },
-    { month: 'Jun', value: 12000 },
+    { month: 'Jan', value: 4000 },
+    { month: 'Feb', value: 7000 },
+    { month: 'Mar', value: 7500 },
+    { month: 'Apr', value: 8500 },
+    { month: 'May', value: 10000 },
+    { month: 'Jun', value: 11000 },
   ];
+
+  const chartConfig = {
+    data,
+    xField: 'month',
+    yField: 'value',
+    label: { position: 'middle' },
+    point: { size: 5, shape: 'circle' },
+    smooth: true,
+  };
 
   const revenueConfig = {
     data: revenueData,
     xField: 'month',
     yField: 'value',
-    label: {
-      position: 'middle',
-    },
-  };
-
-  const config = {
-    data,
-    xField: 'month',
-    yField: 'value',
-    label: {
-      position: 'middle',
-    },
+    label: { position: 'middle' },
+    point: { size: 5, shape: 'circle' },
+    smooth: true,
   };
 
   return (
     <div style={{ padding: "20px" }}>
-      <Title level={2}>Dashboard</Title>
-      <Row gutter={16}>
+      <Title level={2} style={{ textAlign: 'center', marginBottom: '30px' }}>Dashboard By Team-9</Title>
+      <Row gutter={[24, 24]}>
         <Col span={8}>
-          <Card bordered={false} style={{ textAlign: 'center' }}>
+          <Card bordered={false} hoverable>
             <Statistic
               title="Total Bookings"
               value={bookingHistoryData.length} 
@@ -73,7 +70,7 @@ const Dashboard = () => {
           </Card>
         </Col>
         <Col span={8}>
-          <Card bordered={false} style={{ textAlign: 'center' }}>
+          <Card bordered={false} hoverable>
             <Statistic
               title="Total Revenue"
               value={bookingHistoryData.reduce((sum, booking) => sum + parseFloat(booking.totalAmount), 0)} 
@@ -84,7 +81,7 @@ const Dashboard = () => {
           </Card>
         </Col>
         <Col span={8}>
-          <Card bordered={false} style={{ textAlign: 'center' }}>
+          <Card bordered={false} hoverable>
             <Statistic
               title="Pending Bookings"
               value={2} 
@@ -94,24 +91,21 @@ const Dashboard = () => {
           </Card>
         </Col>
       </Row>
-
-      {/* กราฟ Bookings Over Time และ Revenue Over Time อยู่ในแถวเดียวกัน */}
-      <Row gutter={16} style={{ marginTop: "20px" }}>
+      <Row gutter={[24, 24]} style={{ marginTop: "20px" }}>
         <Col span={12}>
-          <Card title="Bookings Over Time" bordered={false}>
-            <Line {...config} />
+          <Card title="Bookings Over Time" bordered={false} hoverable>
+            <Line {...chartConfig} />
           </Card>
         </Col>
         <Col span={12}>
-          <Card title="Revenue Over Time" bordered={false}>
+          <Card title="Revenue Over Time" bordered={false} hoverable>
             <Line {...revenueConfig} />
           </Card>
         </Col>
       </Row>
-
-      <Row gutter={16} style={{ marginTop: "20px" }}>
+      <Row gutter={[24, 24]} style={{ marginTop: "20px" }}>
         <Col span={24}>
-          <Card title="Recent 10 Tour Bookings" bordered={false}>
+          <Card title="Recent 10 Tour Bookings" bordered={false} hoverable>
             <Table columns={columns} dataSource={bookingHistoryData} pagination={false} />
           </Card>
         </Col>
