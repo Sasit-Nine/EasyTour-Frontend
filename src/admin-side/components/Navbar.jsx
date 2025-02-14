@@ -14,10 +14,14 @@ const menu = (
       },
       {
         key: "2",
-        label: <Link className='Text' to="/history">History</Link> // เปลี่ยนเป็น /history แทน /History
+        label: <Link className='Text' to="/customer_manage">Customer Manage</Link> // เปลี่ยนเป็น /history แทน /History
       },
       {
         key: "3",
+        label: <Link className='Text' to="/package_manage">Package Manage</Link> // เปลี่ยนเป็น /history แทน /History
+      },
+      {
+        key: "4",
         label: <Button onClick={() => { alert('Logged out'); }} className='Text'>Log out</Button>
       },
     ]}
