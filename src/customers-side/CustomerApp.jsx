@@ -2,11 +2,8 @@ import React from "react"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from "./subpage/Home";
 
-// import Booking from "./subpage/Booking";
 import PackageList from "./subpage/PackageList";
 import PackageDetail from "./subpage/PackageDetail";
-// import Payment from "./subpage/Payment";
-// import Status from "./subpage/Status";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Login from "../auth/LoginPage";

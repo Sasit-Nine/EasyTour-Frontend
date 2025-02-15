@@ -1,3 +1,9 @@
-.bgimage{
+.bgimage {
     background-image: url('../assets/mg-cthu--1h_NN3nqzI-unsplash.jpg');
+    background-size: cover; /* ทำให้รูปเต็มพื้นที่ โดยรักษาอัตราส่วน */
+    background-position: center; /* จัดตำแหน่งตรงกลาง */
+    background-repeat: no-repeat; /* ไม่ให้รูปซ้ำ */
+    width: 100%;
+    height: 70vh; /* ปรับให้เต็ม viewport */
+
 }
