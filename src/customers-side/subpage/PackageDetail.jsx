@@ -2,7 +2,6 @@ import { data, useParams } from "react-router-dom";
 import React from "react";
 import { useQuery } from "@apollo/client";
 import { QUERY_PACKAGE, MUTATION_BOOKING } from "../../services/Graphql";
-import '../../css/PackageDetail.scss'
 import dayjs from "dayjs";
 import { MapPin } from 'lucide-react';
 import { useAuth } from "../../context/AuthContext";
@@ -12,8 +11,6 @@ import {
     Disclosure,
     DisclosureButton,
     DisclosurePanel,
-    Radio,
-    RadioGroup,
     Tab,
     TabGroup,
     TabList,
@@ -22,12 +19,16 @@ import {
 } from '@headlessui/react'
 import { StarIcon } from '@heroicons/react/20/solid'
 import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
+import ModalBooking from "../components/ModalBooking";
+import { useNavigate } from "react-router-dom";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 const PackageDetail = () => {
+    const navigate = useNavigate()
+    const [isBooking,setisBooking] = useState(false)
     const [BookingMutation, { error: errorBooking, loading: loadingBooking }] = useMutation(MUTATION_BOOKING)
     const { user } = useAuth()
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
@@ -54,13 +55,14 @@ const PackageDetail = () => {
 
 
     const handleBooking = async () => {
-        console.log(user.documentId)
+        // setisBooking(true)
+        console.log(user?.documentId)
         console.log(documentId)
         try {
             const { data: BookingData } = await BookingMutation({
                 variables: {
                     data: {
-                        total_price: 2000,
+                        total_price: dataPackage.package.price,
                         customers: user.documentId,
                         package: documentId,
                         quantity: 1
@@ -72,12 +74,24 @@ const PackageDetail = () => {
                     },
                 }
             })
-            console.log(BookingData)
+            console.log(BookingData.createBooking.documentId)
+            const newBookingID = BookingData.createBooking.documentId.toString()
+            navigate('/payment',{
+                state: {bookingID:newBookingID}
+            })
         } catch (error) {
             console.log(error)
         }
+        
 
     }
+
+    const handleCloseBooking = () => {
+        console.log("Closing modal...");
+        console.log(isBooking)
+        setisBooking(false)
+    }
+
     return (
         <div className="bg-white">
             <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
@@ -153,8 +167,9 @@ const PackageDetail = () => {
 
                             <div className="mt-10 flex">
                                 <button
-                                    type="submit"
-                                    className="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-[#F8644B] px-8 py-3 text-base font-medium text-white hover:bg-[#f84b4b] focus:ring-2 focus:ring-[#f84b4b] focus:ring-offset-2 focus:ring-offset-gray-50 focus:outline-hidden sm:w-full"
+                                    type="button"
+                                    onClick={() => handleBooking()} 
+                                    className="cursor-pointer flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-[#F8644B] px-8 py-3 text-base font-medium text-white hover:bg-[#f84b4b] focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:outline-hidden sm:w-full hover:scale-105 active:scale-100 transition-transform duration-00"
                                 >
                                     Booking
                                 </button>
@@ -178,7 +193,7 @@ const PackageDetail = () => {
                                 {uniquePackageDetails.map((detail) => (
                                     <Disclosure key={detail.name} as="div">
                                         <h3>
-                                            <DisclosureButton className="group relative flex w-full items-center justify-between py-6 text-left">
+                                            <DisclosureButton className="cursor-pointer group relative flex w-full items-center justify-between py-6 text-left">
                                                 <span className="text-sm font-medium text-gray-900 group-data-open:text-[#f84b4b]">
                                                     {detail.name}
                                                 </span>
@@ -206,6 +221,7 @@ const PackageDetail = () => {
                     </div>
                 </div>
             </div>
+            {isBooking && <ModalBooking onClose={handleCloseBooking}></ModalBooking>}
         </div>
 
         // <div className="box">

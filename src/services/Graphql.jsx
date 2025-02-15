@@ -49,16 +49,14 @@ mutation Mutation($data: BookingInput!) {
 //   }
 // }
 
-export const MUTATION_PAYMENT_INTENTID = gql`
+export const QUERY_PAYMENT_DATA = gql`
 query Booking($documentId: ID!) {
   booking(documentId: $documentId) {
-    payment_intent_id
+    payment_intent_id,
+    client_secret
   }
 }
 `
-// {
-//   "documentId": "l1vee2vftw3a9yamgjiggalb"
-// }
 
 export const QUERY_PACKAGELIST = gql`
 query Query {
