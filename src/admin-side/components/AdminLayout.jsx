@@ -12,9 +12,20 @@ const AdminLayout = ({ children }) => {
       {/* Navbar */}
       <Navbar />
 
-      {/* Sider (เมนูข้างๆ) */}
-      <Layout>
-        <Sider width={200} style={{ background: "#fff", paddingTop: "16px" }}>
+      <Layout style={{ display: "flex", flexDirection: "row" }}>
+        {/* Sider (เมนูข้างๆ) */}
+        <Sider
+          width={200}
+          style={{
+            background: "#fff",
+            paddingTop: "16px",
+            position: "fixed",
+            top: "100px", // ปรับให้เมนูไม่ทับ Navbar
+            height: "calc(100vh - 64px)",
+            overflowY: "auto",
+            zIndex: 1000,
+          }}
+        >
           <Menu mode="inline" defaultSelectedKeys={["1"]} style={{ height: "100%", borderRight: 0 }}>
             <Menu.Item key="1" icon={<DashboardOutlined />}>
               <Link to="/dashboard">Dashboard</Link>
@@ -25,14 +36,11 @@ const AdminLayout = ({ children }) => {
             <Menu.Item key="3" icon={<UsergroupAddOutlined />}>
               <Link to="/customer_manage">Customer Manage</Link>
             </Menu.Item>
-            <Menu.Item key="4" icon={<AppstoreAddOutlined />}>
-              <Link to="/add_package">Add Package</Link>
-            </Menu.Item>
           </Menu>
         </Sider>
 
         {/* Content (พื้นที่แสดงเนื้อหาของแต่ละ Route) */}
-        <Layout style={{ padding: "0 24px 24px" }}>
+        <Layout style={{ flex: 1, padding: "0 24px 24px", marginLeft: 200, marginTop: "64px" }}>
           <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
             {children} {/* จะทำการแสดงผลของทุก Route ที่กำหนด */}
           </Content>
