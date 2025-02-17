@@ -13,10 +13,20 @@ const CustomerManage = () => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const updateStatus = (id, status) => {
-        setBookings((prev) =>
-            prev.map((booking) => (booking.id === id ? { ...booking, status } : booking))
-        );
+    const updateStatus = (id, newStatus) => {
+        Modal.confirm({
+            title: "Confirm Status Change",
+            content: `Are you sure you want to change the status to "${newStatus}"?`,
+            okText: "Yes",
+            cancelText: "No",
+            onOk: () => {
+                setBookings((prev) =>
+                    prev.map((booking) =>
+                        booking.id === id ? { ...booking, status: newStatus } : booking
+                    )
+                );
+            },
+        });
     };
 
     const showDetails = (record) => {

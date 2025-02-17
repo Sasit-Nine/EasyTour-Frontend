@@ -14,7 +14,7 @@ const menu = (
       },
       {
         key: "2",
-        label: <Link className='Text' to="/history">History</Link> // เปลี่ยนเป็น /history แทน /History
+        label: <Link className='Text' to="/customer_manage">History</Link> // เปลี่ยนเป็น /history แทน /History
       },
       {
         key: "3",
