@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Table, Select, Button, Modal } from "antd";
+import { Table, Select, Button, Modal, Typography, Card } from "antd";
 
 const { Option } = Select;
+const { Title, Text } = Typography;
 
 const CustomerManage = () => {
     const [bookings, setBookings] = useState([
@@ -13,20 +14,10 @@ const CustomerManage = () => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const updateStatus = (id, newStatus) => {
-        Modal.confirm({
-            title: "Confirm Status Change",
-            content: `Are you sure you want to change the status to "${newStatus}"?`,
-            okText: "Yes",
-            cancelText: "No",
-            onOk: () => {
-                setBookings((prev) =>
-                    prev.map((booking) =>
-                        booking.id === id ? { ...booking, status: newStatus } : booking
-                    )
-                );
-            },
-        });
+    const updateStatus = (id, status) => {
+        setBookings((prev) =>
+            prev.map((booking) => (booking.id === id ? { ...booking, status } : booking))
+        );
     };
 
     const showDetails = (record) => {
@@ -60,14 +51,21 @@ const CustomerManage = () => {
                     value={status}
                     onChange={(value) => updateStatus(record.id, value)}
                     style={{
-                        width: 120,
+                        width: 130,
                         fontWeight: "bold",
                         color: getStatusColor(status),
                     }}
+                    optionLabelProp="label"
                 >
-                    <Option value="Pending" style={{ color: "orange" }}>Pending</Option>
-                    <Option value="Approved" style={{ color: "green" }}>Approved</Option>
-                    <Option value="Rejected" style={{ color: "red" }}>Rejected</Option>
+                    <Option value="Pending" label={<Text style={{ color: "orange" }}>Pending</Text>}>
+                        <Text style={{ color: "orange" }}>Pending</Text>
+                    </Option>
+                    <Option value="Approved" label={<Text style={{ color: "green" }}>Approved</Text>}>
+                        <Text style={{ color: "green" }}>Approved</Text>
+                    </Option>
+                    <Option value="Rejected" label={<Text style={{ color: "red" }}>Rejected</Text>}>
+                        <Text style={{ color: "red" }}>Rejected</Text>
+                    </Option>
                 </Select>
             ),
         },
@@ -84,11 +82,11 @@ const CustomerManage = () => {
     ];
 
     return (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#f5f5f5", padding: "20px" }}>
-            <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)", width: "100%", maxWidth: "800px" }}>
-                <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold" }}>Customer Booking Management</h1>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#f0f2f5", padding: "20px" }}>
+            <Card style={{ maxWidth: "900px", width: "100%", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)" }}>
+                <Title level={2} style={{ textAlign: "center", marginBottom: "20px" }}>Customer Booking Management</Title>
                 <Table columns={columns} dataSource={bookings} pagination={false} rowKey="id" />
-            </div>
+            </Card>
 
             <Modal
                 title="Customer Details"
@@ -102,11 +100,11 @@ const CustomerManage = () => {
             >
                 {selectedBooking && (
                     <div>
-                        <p><strong>มากี่คน:</strong></p>
-                        <p><strong>จองกี่วัน:</strong></p>
-                        <p><strong>มากี่โมง:</strong></p>
-                        <p><strong>ไปที่ไหน:</strong> </p>
-                        <p><strong>Status:</strong> <span style={{ color: getStatusColor(selectedBooking.status) }}>{selectedBooking.status}</span></p>
+                        <p><strong>มากี่คน:</strong> -</p>
+                        <p><strong>จองกี่วัน:</strong> -</p>
+                        <p><strong>มากี่โมง:</strong> -</p>
+                        <p><strong>ไปที่ไหน:</strong> {selectedBooking.package}</p>
+                        <p><strong>Status:</strong> <Text style={{ color: getStatusColor(selectedBooking.status) }}>{selectedBooking.status}</Text></p>
                     </div>
                 )}
             </Modal>
