@@ -8,16 +8,33 @@ const CustomerManage = () => {
     const [bookings, setBookings] = useState([
         { id: 1, name: "Pratya", package: "น้ำตกทรายขาว", status: "Pending" },
         { id: 2, name: "Sasit", package: "วัดทรายขาว", status: "Pending" },
-        { id: 3, name: "Weeraphat", package: "หาดทรายขาว", status: "Approved" },
+        { id: 3, name: "Weeraphat", package: "หาดทรายขาว", status: "Pending" },
     ]);
 
+    const [approvedBookings, setApprovedBookings] = useState([]); // เก็บข้อมูลที่ Approved
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isHistoryModalVisible, setIsHistoryModalVisible] = useState(false); // State ของ History Modal
 
-    const updateStatus = (id, status) => {
-        setBookings((prev) =>
-            prev.map((booking) => (booking.id === id ? { ...booking, status } : booking))
-        );
+    const updateStatus = (id, newStatus) => {
+        Modal.confirm({
+            title: "Confirm Status Change",
+            content: `Are you sure you want to change the status to "${newStatus}"?`,
+            okText: "Yes",
+            cancelText: "No",
+            onOk: () => {
+                setBookings((prev) => {
+                    const updatedList = prev.filter((booking) => booking.id !== id);
+                    const approvedItem = prev.find((booking) => booking.id === id);
+                    
+                    if (approvedItem && newStatus === "Approved") {
+                        setApprovedBookings((prevApproved) => [...prevApproved, { ...approvedItem, status: newStatus }]);
+                    }
+                    
+                    return updatedList;
+                });
+            },
+        });
     };
 
     const showDetails = (record) => {
@@ -81,13 +98,33 @@ const CustomerManage = () => {
         },
     ];
 
+    const historyColumns = [
+        { title: "ID", dataIndex: "id", key: "id", align: "center" },
+        { title: "Customer Name", dataIndex: "name", key: "name" },
+        { title: "Package", dataIndex: "package", key: "package" },
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (status) => (
+                <Text style={{ color: getStatusColor(status), fontWeight: "bold" }}>
+                    {status}
+                </Text>
+            ),
+        },
+    ];
+
     return (
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#f0f2f5", padding: "20px" }}>
             <Card style={{ maxWidth: "900px", width: "100%", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)" }}>
-                <Title level={2} style={{ textAlign: "center", marginBottom: "20px" }}>Customer Booking Management</Title>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                    <Title level={2} style={{ margin: 0 }}>Customer Booking Management</Title>
+                    <Button type="primary" onClick={() => setIsHistoryModalVisible(true)}>History</Button>
+                </div>
                 <Table columns={columns} dataSource={bookings} pagination={false} rowKey="id" />
             </Card>
 
+            {/* Modal แสดงรายละเอียดลูกค้า */}
             <Modal
                 title="Customer Details"
                 open={isModalVisible}
@@ -108,8 +145,26 @@ const CustomerManage = () => {
                     </div>
                 )}
             </Modal>
+
+            {/* Modal แสดง History */}
+            <Modal
+                title="Approved History"
+                open={isHistoryModalVisible}
+                onCancel={() => setIsHistoryModalVisible(false)}
+                footer={[
+                    <Button key="close" onClick={() => setIsHistoryModalVisible(false)}>
+                        Close
+                    </Button>,
+                ]}
+            >
+                <Table
+                    columns={historyColumns}
+                    dataSource={approvedBookings}
+                    pagination={false}
+                    rowKey="id"
+                />
+            </Modal>
         </div>
     );
 };
-
 export default CustomerManage;
