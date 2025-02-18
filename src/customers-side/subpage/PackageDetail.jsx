@@ -20,16 +20,18 @@ import {
 import { StarIcon } from '@heroicons/react/20/solid'
 import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
 import ModalBooking from "../components/ModalBooking";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 const PackageDetail = () => {
+    const location = useLocation()
+    const package_id = location.state?.pkgID
+
     const navigate = useNavigate()
     const [isBooking,setisBooking] = useState(false)
-    const [BookingMutation, { error: errorBooking, loading: loadingBooking }] = useMutation(MUTATION_BOOKING)
     const { user } = useAuth()
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const { documentId } = useParams()
@@ -45,51 +47,27 @@ const PackageDetail = () => {
     if (errorPackage) {
         return <p>{errorPackage}</p>
     }
-    const includesList = dataPackage.package.price_includes.split('\n');
     const time = dataPackage.package.time;
     const formattedTime = dayjs(time, 'HH:mm:ss.SSS').format('HH:mm');
     const uniquePackageDetails = dataPackage.package.package_details.filter(
         (detail, index, self) =>
             index === self.findIndex((t) => t.name === detail.name && t.detail === detail.detail)
     );
-
+    
 
     const handleBooking = async () => {
         // setisBooking(true)
         console.log(user?.documentId)
         console.log(documentId)
-        try {
-            const { data: BookingData } = await BookingMutation({
-                variables: {
-                    data: {
-                        total_price: dataPackage.package.price,
-                        customers: user.documentId,
-                        package: documentId,
-                        quantity: 1
-                    }
-                },
-                context: {
-                    headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-                    },
-                }
-            })
-            console.log(BookingData.createBooking.documentId)
-            const newBookingID = BookingData.createBooking.documentId.toString()
-            navigate('/payment',{
-                state: {bookingID:newBookingID}
-            })
-        } catch (error) {
-            console.log(error)
-        }
-        
-
-    }
-
-    const handleCloseBooking = () => {
-        console.log("Closing modal...");
-        console.log(isBooking)
-        setisBooking(false)
+        console.log(package_id)
+        navigate('/booking',{
+            state: {
+                packageId: package_id,
+                packageDocumentId: documentId,
+                name:dataPackage?.package?.name,
+                url:`${strapiBaseURL}${dataPackage.package.image[0].url}`
+            }
+        })
     }
 
     return (
@@ -132,8 +110,13 @@ const PackageDetail = () => {
                         <h1 className="text-3xl font-bold tracking-tight text-gray-900">{dataPackage.package.name}</h1>
                         {/* Reviews */}
                         <div className="mt-3">
+                            <div className="mb-2.5 flex items-center space-x-1.5">
+                                <MapPin className="text-[#F8644B]"></MapPin>
+                                <p>น่าน</p>
+                            </div>
                             <h3 className="sr-only">Reviews</h3>
                             <div className="flex items-center">
+                                
                                 <div className="flex items-center">
                                     {[0, 1, 2, 3, 4].map((rating) => (
                                         <StarIcon
@@ -169,9 +152,9 @@ const PackageDetail = () => {
                                 <button
                                     type="button"
                                     onClick={() => handleBooking()} 
-                                    className="cursor-pointer flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-[#F8644B] px-8 py-3 text-base font-medium text-white hover:bg-[#f84b4b] focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:outline-hidden sm:w-full hover:scale-105 active:scale-100 transition-transform duration-00"
+                                    className="cursor-pointer flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-[#F8644B] px-8 py-3 text-lg font-medium text-white hover:bg-[#f84b4b] focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:outline-hidden sm:w-full hover:scale-105 active:scale-100 transition-transform duration-00"
                                 >
-                                    Booking
+                                    จองเลย
                                 </button>
 
                                 <button

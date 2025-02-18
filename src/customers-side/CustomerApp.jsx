@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import Login from "../auth/LoginPage";
 import Register from "../auth/RegisterPage"
 import Payment from "./subpage/Payment"
+import Booking from "./subpage/Booking";
 
 
 const CustomerApp = () => {
@@ -22,6 +23,7 @@ const CustomerApp = () => {
                         <Route path="/packages" element={<PackageList></PackageList>}></Route>
                         <Route path="/login" element={<Login></Login>}></Route>
                         <Route path="/register" element={<Register></Register>}></Route>
+                        <Route path="/booking" element={<Booking></Booking>}></Route>
                         <Route path="/payment" element={<Payment></Payment>}></Route>
                         <Route path="/packages/:documentId" element={<PackageDetail></PackageDetail>}></Route>
                     </Routes>

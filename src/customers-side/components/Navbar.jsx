@@ -17,7 +17,7 @@ const Navbar = () => {
             "documentId": user?.documentId
         },
         context: {
-            headers: {
+            headers: { 
                 Authorization: `Bearer ${sessionStorage.getItem('token')}`,
             },
         }
