@@ -6,7 +6,7 @@ import AdminApp from './admin-side/AdminApp'
 function App() {
   return (
     <>
-      <AdminApp></AdminApp> 
+      <CustomerApp></CustomerApp> 
     </>
   )
 }
