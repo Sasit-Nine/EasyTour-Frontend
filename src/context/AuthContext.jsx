@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(false)
         }
         loaderUser()
-    }, [fetchUserData])
+    }, [fetchUserData,user])
 
     const login = async (username, password) => {
         try {

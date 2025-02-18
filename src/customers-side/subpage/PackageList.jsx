@@ -32,15 +32,22 @@ const PackageList = () => {
     location: pkg.location.province,
     start: pkg.start,
     end: pkg.end,
-    url: pkg.image[0].url
+    url: pkg.image[0].url,
+    package_id: pkg.package_id
   })) || [];
 
-  const handleToPackageDetail = (documentId) => {
+  console.log(transformedPackages.package_id)
+  const handleToPackageDetail = (documentId,package_id) => {
     console.log(documentId)
-    navigate(`${documentId}`)
+    console.log(package_id)
+    
+    navigate(`${documentId}`,{
+      state:{
+        pkgID: package_id
+      }
+    })
   }
 
-  console.log(transformedPackages)
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
@@ -48,7 +55,7 @@ const PackageList = () => {
 
         <div className="drop-shadow-xl mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
           {transformedPackages.map((product) => (
-            <div key={product.documentId} className=" group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200" onClick={() => handleToPackageDetail(product.documentId)} >
+            <div key={product.documentId} className=" group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200" onClick={() => handleToPackageDetail(product.documentId,product.package_id)} >
               <img
                 src={`${strapiBaseURL}${product.url}`}
                 className="aspect-square w-full rounded-md bg-gray-200 object-cover lg:aspect-auto lg:h-80"

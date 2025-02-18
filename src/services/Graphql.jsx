@@ -26,17 +26,24 @@ query Query {
 }
 `
 export const MUTATION_BOOKING = gql`
-mutation Mutation($data: BookingInput!) {
+mutation CreateBooking($data: BookingInput!) {
   createBooking(data: $data) {
+    address
+    city
     customers {
       documentId
     }
-    total_price
+    fname
+    lname
     package {
       documentId
     }
+    province
     quantity
-    documentId
+    tel
+    total_price
+    district
+    booking_status
   }
 }
 `
@@ -75,6 +82,7 @@ query Query {
       previewUrl
       url
     }
+    package_id
   }
 }
 `
@@ -126,3 +134,4 @@ query Me($documentId: ID!) {
   }
 }
 `
+
