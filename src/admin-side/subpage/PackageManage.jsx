@@ -69,23 +69,23 @@ const PackageManage = () => {
           values.dateRange[1]?.format("YYYY-MM-DD"),
         ]
         : null,
-      isDraft,
+      isDraft: values.status === "Draft", // แก้ไขตรงนี้ให้ตั้งค่า isDraft ตาม status ที่เลือก
     };
-
+  
     const updatedPackages = isEditMode
       ? packages.map((pkg) => (pkg.key === editingPackage.key ? newPackage : pkg))
       : [newPackage, ...packages];
-
+  
     setPackages(updatedPackages);
     updateLocalStorage(updatedPackages);
     handleCancel();
-
+  
     if (isEditMode) {
       message.success(`แพ็คเกจ "${values.packageName}" ถูกแก้ไขเรียบร้อยแล้ว!`);
     } else {
       message.success(`แพ็คเกจ "${values.packageName}" ถูกเพิ่มลงระบบเรียบร้อย!`);
     }
-  };
+  };  
 
   const handleDelete = (key) => {
     const deletedPackage = packages.find((pkg) => pkg.key === key);
