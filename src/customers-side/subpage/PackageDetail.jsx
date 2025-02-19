@@ -19,7 +19,6 @@ import {
 } from '@headlessui/react'
 import { StarIcon } from '@heroicons/react/20/solid'
 import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
-import ModalBooking from "../components/ModalBooking";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function classNames(...classes) {

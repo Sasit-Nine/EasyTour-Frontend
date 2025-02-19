@@ -44,6 +44,8 @@ mutation CreateBooking($data: BookingInput!) {
     total_price
     district
     booking_status
+    documentId
+    booking_id
   }
 }
 `
@@ -131,6 +133,14 @@ query Me($documentId: ID!) {
     profile_picture {
       url
     }
+  }
+}
+`
+
+export const QEURY_BOOKINGID = gql`
+query Booking($documentId: ID!) {
+  booking(documentId: $documentId) {
+    booking_id
   }
 }
 `

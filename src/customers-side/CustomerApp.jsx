@@ -10,6 +10,7 @@ import Login from "../auth/LoginPage";
 import Register from "../auth/RegisterPage"
 import Payment from "./subpage/Payment"
 import Booking from "./subpage/Booking";
+import CheckoutSuccess from "./subpage/CheckoutSuccess";
 
 
 const CustomerApp = () => {
@@ -26,6 +27,7 @@ const CustomerApp = () => {
                         <Route path="/booking" element={<Booking></Booking>}></Route>
                         <Route path="/payment" element={<Payment></Payment>}></Route>
                         <Route path="/packages/:documentId" element={<PackageDetail></PackageDetail>}></Route>
+                        <Route path="/checkout-success" element={<CheckoutSuccess></CheckoutSuccess>}></Route>
                     </Routes>
             </div>
             <Footer></Footer>

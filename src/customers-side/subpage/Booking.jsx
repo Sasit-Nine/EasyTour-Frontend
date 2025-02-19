@@ -1,13 +1,14 @@
 import React, { useState } from "react"
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
-import { useMutation } from "@apollo/client";
-import { MUTATION_BOOKING } from "../../services/Graphql";
+import { useMutation, useLazyQuery } from "@apollo/client";
+import { MUTATION_BOOKING,QEURY_BOOKINGID } from "../../services/Graphql";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 const Booking = () => {
-  const [BookingMutation, { error: errorBooking, loading: loadingBooking }] = useMutation(MUTATION_BOOKING)
+  const [BookingMutation] = useMutation(MUTATION_BOOKING)
+  const [BookingQuery] = useLazyQuery(QEURY_BOOKINGID)
   const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
   const location = useLocation()
   const packageId = location.state.packageId
@@ -29,9 +30,6 @@ const Booking = () => {
   console.log(user?.documentId)
 
   const handleBooking = async (e) => {
-    // setisBooking(true)
-    
-    // console.log(documentId)
     e.preventDefault();
     console.log(fname,lname,tel,address,city,district,province,zipCode)
     try {
@@ -57,13 +55,23 @@ const Booking = () => {
           },
         }
       })
-      console.log(BookingData)
-    } catch (error) {
-      console.log(error)
-    }
-    try{
+
+      const {data:BookingID} = await BookingQuery({
+        variables:{
+          documentId:BookingData?.createBooking?.documentId
+        },
+        context: {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          },
+        }
+      })
+      const bkID = BookingID?.booking?.booking_id
+      console.log(bkID)
+
       const response = await axios.post(`${strapiBaseURL}/api/payment/checkout`,{
-        packageId : packageId
+        packageId : packageId,
+        BookingId : bkID
       })
       console.log('Response:', response.data.url)
       if(response?.data?.url){
@@ -71,8 +79,8 @@ const Booking = () => {
       }else{
         alert('Error Payment')
       }
-    }catch(error){
-      console.error('Error:', error)
+    } catch (error) {
+      console.log(error)
     }
   }
 
@@ -97,7 +105,7 @@ const Booking = () => {
                   type="text"
                   autoComplete="given-name"
                   onChange={(e) => setFname(e.target.value)}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-sm/6"
                 />
               </div>
             </div>
@@ -113,7 +121,7 @@ const Booking = () => {
                   type="text"
                   autoComplete="family-name"
                   onChange={(e)=>setLname(e.target.value)}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-sm/6"
                 />
               </div>
             </div>
@@ -129,7 +137,7 @@ const Booking = () => {
                   type="tel"
                   autoComplete="tel"
                   onChange={(e)=>setTel(e.target.value)}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-sm/6"
                 />
               </div>
             </div>
@@ -145,7 +153,7 @@ const Booking = () => {
                   type="text"
                   autoComplete="street-address"
                   onChange={(e)=>setAddress(e.target.value)}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-sm/6"
                 />
               </div>
             </div>
@@ -161,7 +169,7 @@ const Booking = () => {
                   type="text"
                   autoComplete="address-level2"
                   onChange={(e)=>setCity(e.target.value)}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-sm/6"
                 />
               </div>
             </div>
@@ -177,7 +185,7 @@ const Booking = () => {
                   type="text"
                   autoComplete="address-level1"
                   onChange={(e)=>setDistrict(e.target.value)}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-sm/6"
                 />
               </div>
             </div>
@@ -193,7 +201,7 @@ const Booking = () => {
                   type="text"
                   autoComplete="address-level1"
                   onChange={(e)=>setProvince(e.target.value)}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-sm/6"
                 />
               </div>
             </div>
@@ -209,7 +217,7 @@ const Booking = () => {
                   type="text"
                   autoComplete="postal-code"
                   onChange={(e)=>setZipcode(e.target.value)}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-sm/6"
                 />
               </div>
             </div>
