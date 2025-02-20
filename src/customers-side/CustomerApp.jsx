@@ -2,7 +2,7 @@ import React from "react"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from "./subpage/Home";
 
-import PackageList from "./subpage/PackageList";
+// import PackageList from "./subpage/PackageList";
 import PackageDetail from "./subpage/PackageDetail";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -11,6 +11,7 @@ import Register from "../auth/RegisterPage"
 import Payment from "./subpage/Payment"
 import Booking from "./subpage/Booking";
 import CheckoutSuccess from "./subpage/CheckoutSuccess";
+import FilterPackage from "./components/FilterPackage";
 
 
 const CustomerApp = () => {
@@ -21,7 +22,7 @@ const CustomerApp = () => {
             <div>
                     <Routes>
                         <Route path="/" element={<Home></Home>}></Route>
-                        <Route path="/packages" element={<PackageList></PackageList>}></Route>
+                        <Route path="/packages" element={<FilterPackage></FilterPackage>}></Route>
                         <Route path="/login" element={<Login></Login>}></Route>
                         <Route path="/register" element={<Register></Register>}></Route>
                         <Route path="/booking" element={<Booking></Booking>}></Route>
