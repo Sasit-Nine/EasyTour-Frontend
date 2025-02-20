@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from "react";
 const AuthContext = createContext()
 import {
@@ -23,7 +24,7 @@ export const AuthProvider = ({ children }) => {
                             }
                         }
                     })
-                    setUser(userData.user)
+                    setUser(userData?.me)
                 } catch (error) {
                     console.log(error)
                 }
@@ -31,7 +32,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(false)
         }
         loaderUser()
-    }, [fetchUserData])
+    }, [fetchUserData,user])
 
     const login = async (username, password) => {
         try {
@@ -52,7 +53,8 @@ export const AuthProvider = ({ children }) => {
                     }
                 }
             })
-            setUser(userData?.user)
+            console.log(userData.me)
+            setUser(userData?.me)
         } catch (error) {
             console.log(error)
         }
@@ -79,3 +81,4 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
     return useContext(AuthContext)
 }
+

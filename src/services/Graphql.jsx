@@ -1,3 +1,4 @@
+
 import {gql} from '@apollo/client'
 export const LOGINMUTATION = gql`
 mutation Mutation($input: UsersPermissionsLoginInput!) {
@@ -26,17 +27,26 @@ query Query {
 }
 `
 export const MUTATION_BOOKING = gql`
-mutation Mutation($data: BookingInput!) {
+mutation CreateBooking($data: BookingInput!) {
   createBooking(data: $data) {
+    address
+    city
     customers {
       documentId
     }
-    total_price
+    fname
+    lname
     package {
       documentId
     }
+    province
     quantity
+    tel
+    total_price
+    district
+    booking_status
     documentId
+    booking_id
   }
 }
 `
@@ -49,16 +59,14 @@ mutation Mutation($data: BookingInput!) {
 //   }
 // }
 
-export const MUTATION_PAYMENT_INTENTID = gql`
+export const QUERY_PAYMENT_DATA = gql`
 query Booking($documentId: ID!) {
   booking(documentId: $documentId) {
-    payment_intent_id
+    payment_intent_id,
+    client_secret
   }
 }
 `
-// {
-//   "documentId": "l1vee2vftw3a9yamgjiggalb"
-// }
 
 export const QUERY_PACKAGELIST = gql`
 query Query {
@@ -77,6 +85,64 @@ query Query {
       previewUrl
       url
     }
+    package_id
   }
 }
 `
+
+export const QUERY_PACKAGE = gql`
+query Query($documentId: ID!) {
+  package(documentId: $documentId) {
+    name
+    price
+    image {
+      url
+    }
+    start
+    end
+    max_people
+    duration
+    location {
+      province
+      google_place_id
+      district
+    }
+    time
+    note
+    price_includes
+    meeting_point
+    rating
+    package_details {
+      name
+      detail
+    }
+    description
+  }
+}`
+
+export const QUERY_PAYMENT_INTENT_ID = gql`
+query Booking($documentId: ID!) {
+  booking(documentId: $documentId) {
+    payment_intent_id
+  }
+}
+`
+
+export const QEURY_PROFILE = gql`
+query Me($documentId: ID!) {
+  usersPermissionsUser(documentId: $documentId) {
+    profile_picture {
+      url
+    }
+  }
+}
+`
+
+export const QEURY_BOOKINGID = gql`
+query Booking($documentId: ID!) {
+  booking(documentId: $documentId) {
+    booking_id
+  }
+}
+`
+
