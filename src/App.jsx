@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Dashboard from "./admin-side/subpage/Dashboard";
 import PackageManage from "./admin-side/subpage/PackageManage";
 import CustomerManage from "./admin-side/subpage/CustomerManage";
-import AddPackage from "./admin-side/subpage/AddPackage";
 
 function App() {
   return (
@@ -17,7 +16,6 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/package_manage" element={<PackageManage />} />
           <Route path="/customer_manage" element={<CustomerManage />} />
-          <Route path="/add_package" element={<AddPackage />} />
         </Routes>
       </AdminLayout>
     </Router>

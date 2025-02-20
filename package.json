@@ -12,10 +12,13 @@
   "dependencies": {
     "@ant-design/charts": "^2.2.6",
     "@apollo/client": "^3.12.11",
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
     "@stripe/react-stripe-js": "^3.1.1",
     "@stripe/stripe-js": "^5.6.0",
     "antd": "^5.24.0",
     "axios": "^1.7.9",
+    "dayjs": "^1.11.13",
     "graphql": "^16.10.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -24,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@tailwindcss/vite": "^4.0.7",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
@@ -32,6 +36,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
+    "tailwindcss": "^4.0.7",
     "vite": "^6.1.0"
   }
 }
