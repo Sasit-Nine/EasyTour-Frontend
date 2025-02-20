@@ -1,20 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, Select, Button, Modal, Typography, Card } from "antd";
+import { useBooking } from "../../context/requestBooking"; // รับข้อมูลจองจาก Context
 
 const { Option } = Select;
 const { Title, Text } = Typography;
 
 const CustomerManage = () => {
-    const [bookings, setBookings] = useState([
-        { id: 1, name: "Pratya", package: "น้ำตกทรายขาว", status: "Pending" },
-        { id: 2, name: "Sasit", package: "วัดทรายขาว", status: "Pending" },
-        { id: 3, name: "Weeraphat", package: "หาดทรายขาว", status: "Pending" },
-    ]);
-
-    const [historyBookings, setHistoryBookings] = useState([]); 
+    const { bookings } = useBooking(); // รับข้อมูลจองจาก Context
+    const [localBookings, setLocalBookings] = useState(bookings);
+    const [historyBookings, setHistoryBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isHistoryModalVisible, setIsHistoryModalVisible] = useState(false);
+
+    useEffect(() => {
+        setLocalBookings(bookings); // อัปเดตเมื่อมีการจองใหม่
+    }, [bookings]);
 
     const updateStatus = (id, newStatus, isHistory = false) => {
         Modal.confirm({
@@ -24,23 +25,16 @@ const CustomerManage = () => {
             cancelText: "No",
             onOk: () => {
                 if (isHistory) {
-                    setHistoryBookings((prevHistory) =>
-                        prevHistory.map((booking) =>
-                            booking.id === id ? { ...booking, status: newStatus } : booking
-                        )
+                    setHistoryBookings((prev) =>
+                        prev.map((booking) => booking.id === id ? { ...booking, status: newStatus } : booking)
                     );
                 } else {
-                    setBookings((prev) => {
+                    setLocalBookings((prev) => {
                         const updatedList = prev.filter((booking) => booking.id !== id);
                         const changedItem = prev.find((booking) => booking.id === id);
-
                         if (changedItem) {
-                            setHistoryBookings((prevHistory) => [
-                                ...prevHistory, 
-                                { ...changedItem, status: newStatus }
-                            ]);
+                            setHistoryBookings((prevHistory) => [...prevHistory, { ...changedItem, status: newStatus }]);
                         }
-
                         return updatedList;
                     });
                 }
@@ -101,7 +95,7 @@ const CustomerManage = () => {
                     <Title level={2} style={{ margin: 0 }}>Customer Booking Management</Title>
                     <Button type="primary" onClick={() => setIsHistoryModalVisible(true)}>History</Button>
                 </div>
-                <Table columns={columns} dataSource={bookings} pagination={false} rowKey="id" />
+                <Table columns={columns} dataSource={localBookings} pagination={false} rowKey="id" />
             </Card>
 
             <Modal
@@ -112,9 +106,9 @@ const CustomerManage = () => {
             >
                 {selectedBooking && (
                     <div>
-                        <p><strong>มากี่คน:</strong> -</p>
-                        <p><strong>จองกี่วัน:</strong> -</p>
-                        <p><strong>มากี่โมง:</strong> -</p>
+                        <p><strong>มากี่คน:</strong> {selectedBooking.package}</p>
+                        <p><strong>จองกี่วัน:</strong> {selectedBooking.package}</p>
+                        <p><strong>มากี่โมง:</strong> {selectedBooking.package}</p>
                         <p><strong>ไปที่ไหน:</strong> {selectedBooking.package}</p>
                         <p><strong>Status:</strong> <Text style={{ color: getStatusColor(selectedBooking.status) }}>{selectedBooking.status}</Text></p>
                     </div>
@@ -126,7 +120,7 @@ const CustomerManage = () => {
                 open={isHistoryModalVisible}
                 onCancel={() => setIsHistoryModalVisible(false)}
                 footer={<Button onClick={() => setIsHistoryModalVisible(false)}>Close</Button>}
-                width={1000} // ขยายความกว้างของ Modal
+                width={1000}
             >
                 <Table
                     columns={columns.map((col) =>
