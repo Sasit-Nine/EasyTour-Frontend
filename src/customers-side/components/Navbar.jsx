@@ -8,23 +8,21 @@ import { QEURY_PROFILE } from "../../services/Graphql";
 import { useQuery } from "@apollo/client";
 
 const Navbar = () => {
-    const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
+    const strapiBaseURL = import.meta.env.VITE_STRAPI_URL;
     const { user, logout } = useAuth();
-    console.log(user)
+    const token = sessionStorage.getItem("token"); // ดึง token มาใช้แทน hardcoded ค่าใน useQuery()
+
     const { data: urlProfile } = useQuery(QEURY_PROFILE, {
-        skip:(!user),
+        skip: (!user?.documentId), // ตรวจสอบว่า user มี documentId ก่อน query
         variables: {
             "documentId": user?.documentId
         },
         context: {
             headers: { 
-                Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                Authorization: token ? `Bearer ${token}` : "", // ตรวจสอบ token ก่อนใช้
             },
         }
-    })
-    console.log()
-
-
+    });
 
     return (
         <Disclosure as="nav" className="bg-[#F8644B] shadow-sm">
@@ -53,23 +51,21 @@ const Navbar = () => {
                     </div>
 
                     {/* Right Menu */}
-                    {(user) ? (
+                    {user ? (
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                             {/* Profile Dropdown */}
                             <Menu as="div" className="relative ml-3">
                                 <div>
                                     <MenuButton className="relative flex rounded-full bg-white text-sm focus:ring-offset-2 focus:outline-none border-3 border-white hover:scale-110 active:scale-100 transition-transform duration-200 cursor-pointer">
-                                        <img alt="User" src={`${strapiBaseURL}${urlProfile?.usersPermissionsUser?.profile_picture?.url}`} className="size-10 rounded-full" />
+                                        <img 
+                                            alt="User" 
+                                            src={`${strapiBaseURL}${urlProfile?.usersPermissionsUser?.profile_picture?.url || ""}`} 
+                                            className="size-10 rounded-full" 
+                                        />
                                     </MenuButton>
                                 </div>
 
                                 <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5">
-                                    {/* <MenuItem>
-                                    <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/profile">Your Profile</Link>
-                                </MenuItem>
-                                <MenuItem>
-                                    <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/settings">Settings</Link>
-                                </MenuItem> */}
                                     <MenuItem>
                                         <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-700" onClick={logout}>Sign out</button>
                                     </MenuItem>

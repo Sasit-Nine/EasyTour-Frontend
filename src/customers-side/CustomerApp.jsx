@@ -15,7 +15,7 @@ import CheckoutSuccess from "./subpage/CheckoutSuccess";
 
 const CustomerApp = () => {
     return ( 
-        <Router>
+       
         <div>
             <Navbar></Navbar>
             <div>
@@ -32,7 +32,7 @@ const CustomerApp = () => {
             </div>
             <Footer></Footer>
         </div>
-        </Router>
+       
     )
 }
 

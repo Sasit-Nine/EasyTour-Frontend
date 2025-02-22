@@ -2,6 +2,7 @@ import React from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { QUERY_PACKAGELIST } from "../../services/Graphql";
 import { useNavigate } from "react-router-dom";
+import { MapPin } from "lucide-react";
 const PackageList = () => {
   const navigate = useNavigate()
   const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
@@ -50,10 +51,7 @@ const PackageList = () => {
 
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900">แพ็คเกจท่องเที่ยว</h2>
-
-        <div className="drop-shadow-xl mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+        <div className="drop-shadow-xl grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-1">
           {transformedPackages.map((product) => (
             <div key={product.documentId} className=" group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200" onClick={() => handleToPackageDetail(product.documentId,product.package_id)} >
               <img
@@ -62,21 +60,23 @@ const PackageList = () => {
               />
               <div className="mt-4 flex justify-between">
                 <div>
-                  <h3 className="text-sm text-gray-700">
+                  <h3 className="text-lg text-gray-700">
                     <a href={product.href}>
                       <span aria-hidden="true" className="absolute inset-0" />
                       {product.name}
                     </a>
                   </h3>
-                  <p className="mt-1 text-sm text-gray-500">{product.location}</p>
+                  <div className="flex items-center space-x-1.5">
+                    <MapPin className="text-[#F8644B]"></MapPin>
+                    <p className="mt-1 text-sm text-gray-500">{product.location}</p>
+                  </div>
                 </div>
-                <p className="text-2xl font-bold text-[#F8644B]">{product.price} ฿</p>
+                <p className="text-3xl font-bold text-[#F8644B]">{product.price} ฿</p>
               </div>
             </div>
           ))}
         </div>
       </div>
-    </div>
   )
 };
 

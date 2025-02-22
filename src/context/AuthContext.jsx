@@ -1,37 +1,42 @@
-
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext, useMemo } from "react";
 import { LOGINMUTATION, QUERYUSERDATA } from "../services/Graphql";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
-const AuthContext = createContext();
+const AuthContext = createContext({
+  user: null,
+  loading: true,
+  login: async () => {},
+  logout: () => {},
+  loginLoading: false,
+  loginError: null,
+  fetchUserError: null,
+});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [loginMutation, { loading: loginLoading, error: loginError }] = useMutation(LOGINMUTATION);
-  const [fetchUserData, { loading: fetchUserLoading, error: fetchUserError }] = useLazyQuery(QUERYUSERDATA);
+  const [token, setToken] = useState(() => localStorage.getItem("token") || null);
+
+  // Fetch user data when token is available
+  const { data, loading: fetchUserLoading, error: fetchUserError, refetch } = useQuery(QUERYUSERDATA, {
+    context: {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    },
+    fetchPolicy: "network-only", // Always fetch fresh data
+    skip: !token, // Skip query if no token
+    onCompleted: (data) => {
+      setUser(data?.me || null);
+    },
+  });
 
   useEffect(() => {
-    const loaderUser = async () => {
-      const token = sessionStorage.getItem("token");
-      if (token) {
-        try {
-          const { data: userData } = await fetchUserData({
-            context: {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          });
-          setUser(userData?.me);
-        } catch (error) {
-          console.log("Error fetching user data:", error);
-        }
-      }
-      setLoading(false);
-    };
-    loaderUser();
-  }, [fetchUserData]); 
+    if (!token) {
+      setUser(null); // Reset user if token is removed
+    }
+  }, [token]);
+
+  const [loginMutation, { loading: loginLoading, error: loginError }] = useMutation(LOGINMUTATION);
 
   const login = async (username, password) => {
     try {
@@ -45,42 +50,36 @@ export const AuthProvider = ({ children }) => {
       });
 
       const jwt = jwtData?.login?.jwt;
-      sessionStorage.setItem("token", jwt);
+      if (!jwt) throw new Error("Login failed: No token received");
 
-      const { data: userData } = await fetchUserData({
-        context: {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        },
-      });
-      setUser(userData?.me);
+      localStorage.setItem("token", jwt);
+      setToken(jwt);
+
+      // Refetch user data
+      await refetch();
     } catch (error) {
-      console.log("Login error:", error);
+      console.error("Login error:", error);
     }
   };
 
   const logout = () => {
-    sessionStorage.removeItem("token");
+    localStorage.removeItem("token");
+    setToken(null);
     setUser(null);
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        logout,
-        loginLoading,
-        loginError,
-        fetchUserError,
-        fetchUserLoading,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  // Prevent unnecessary re-renders
+  const value = useMemo(() => ({
+    user,
+    loading: fetchUserLoading,
+    login,
+    logout,
+    loginLoading,
+    loginError,
+    fetchUserError,
+  }), [user, fetchUserLoading, loginLoading, loginError, fetchUserError]);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
