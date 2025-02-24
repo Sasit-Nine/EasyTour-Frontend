@@ -47,8 +47,9 @@ const Navbar = () => {
 
                         {/* Desktop Menu */}
                         <div className="hidden sm:ml-10 sm:flex sm:space-x-3">
-                            <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/">Home</Link>
-                            <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/packages">Package</Link>
+                            <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/">หน้าหลัก</Link>
+                            <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/packages">แพ็กเกจทัวร์</Link>
+                            {(user)&&(<Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/status">สถานะและประวัติการจอง</Link>)}
                         </div>
                     </div>
 
@@ -71,7 +72,7 @@ const Navbar = () => {
                                     <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/settings">Settings</Link>
                                 </MenuItem> */}
                                     <MenuItem>
-                                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-700" onClick={logout}>Sign out</button>
+                                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-700" onClick={logout}>ออกจากระบบ</button>
                                     </MenuItem>
                                 </MenuItems>
                             </Menu>
@@ -80,8 +81,8 @@ const Navbar = () => {
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                             {/* Desktop Menu */}
                             <div className="hidden sm:ml-6 sm:flex sm:space-x-3">
-                                <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/login">Login</Link>
-                                <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/register">Register</Link>
+                                <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/login">เข้าสู่ระบบ</Link>
+                                <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/register">สมัครสมาชิก</Link>
                             </div>
                         </div>
                     )}
@@ -92,10 +93,10 @@ const Navbar = () => {
             <DisclosurePanel className="sm:hidden">
                 <div className="space-y-1 pt-2 pb-4">
                     <DisclosureButton as="div" className="block border-l-4 border-white bg-white/10 py-2 pr-4 pl-3 text-base font-medium text-white">
-                        <Link className="block" to="/">Home</Link> 
+                        <Link className="block" to="/">หน้าหลัก</Link> 
                     </DisclosureButton>
                     <DisclosureButton as="div" className="block border-l-4 border-transparent py-2 pr-4 pl-3 text-base font-medium text-white hover:bg-white/20">
-                        <Link className="block" to="/packages">Package</Link>
+                        <Link className="block" to="/packages">แพ็กเกจทัวร์</Link>
                     </DisclosureButton>
                 </div>
             </DisclosurePanel>
