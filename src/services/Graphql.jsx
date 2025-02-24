@@ -68,12 +68,13 @@ query Booking($documentId: ID!) {
 `
 
 export const QUERY_PACKAGELIST = gql`
-query Query {
-  packages {
+query Query($filters: PackageFiltersInput) {
+  packages(filters: $filters) {
     name
     location {
       district
       province
+      sector
     }
     price
     start
@@ -105,6 +106,7 @@ query Query($documentId: ID!) {
       province
       google_place_id
       district
+      sector
     }
     time
     note

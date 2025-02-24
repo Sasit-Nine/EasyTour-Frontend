@@ -1,29 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { QUERY_PACKAGELIST } from "../../services/Graphql";
 import { useNavigate } from "react-router-dom";
 import { MapPin } from "lucide-react";
-const PackageList = () => {
+import { motion } from "framer-motion";
+import PropTypes from "prop-types";
+import { debounce } from "lodash";
+
+const PackageList = ({filters}) => {
   const navigate = useNavigate()
   const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
-  const { data: dataPackage, loading: loadingPackage, error: errorPackage } = useQuery(QUERY_PACKAGELIST, {
+  const [debounceFilters,setDebounceFilters] = useState(filters)
+  useEffect(()=>{
+    const handler = debounce(() => {
+      setDebounceFilters(filters)
+    },500)
+    handler()
+    return () => handler.cancel()
+  },[filters])
+
+  const { data: dataPackage, loading: loadingPackage, error: errorPackage, refetch } = useQuery(QUERY_PACKAGELIST, {
     variables: {
       filters: {
         status_package: {
           eq: "PUBLISH"
-        }
+        },
+        ...(debounceFilters.category.length > 0 && { type: { in: debounceFilters.category } }),
+        // ...(debounceFilters.duration.length > 0 && { duration: { in: debounceFilters.duration } }),
+        ...(debounceFilters.sector.length > 0 && { location: { sector: { in: debounceFilters.sector } } }),
       }
     }
   })
-  if (loadingPackage) {
-    return <p>Loading packages...</p>;
-  }
 
+  useEffect(()=>{
+    refetch()
+  },[debounceFilters, refetch])
+  
+  if (loadingPackage) {
+    return (
+      <div className="flex justify-center items-center space-x-2">
+        <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce"></div>
+        <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce200"></div>
+        <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce400"></div>
+      </div>
+    );
+  }
+  
   if (errorPackage) {
-    console.log()
     return <p>Error loading packages: {errorPackage.message}</p>;
   }
-  console.log(dataPackage)
   const transformedPackages = dataPackage?.packages?.map((pkg, index) => ({
     index: index,
     documentId: pkg.documentId,
@@ -50,13 +75,23 @@ const PackageList = () => {
   }
 
   return (
-    <div className="bg-white">
-        <div className="drop-shadow-xl grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-1">
+    <motion.div
+            key={debounceFilters.category.join(",")}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y:0}}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }} 
+    >
+    <div className="bg-white w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-8">
           {transformedPackages.map((product) => (
-            <div key={product.documentId} className=" group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200" onClick={() => handleToPackageDetail(product.documentId,product.package_id)} >
+            <div 
+            key={product.documentId} 
+            className="group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200 lg:w-2xs mb-8" 
+            onClick={() => handleToPackageDetail(product.documentId,product.package_id)} >
               <img
                 src={`${strapiBaseURL}${product.url}`}
-                className="aspect-square w-full rounded-md bg-gray-200 object-cover lg:aspect-auto lg:h-80"
+                className="aspect-square rounded-md bg-gray-200 object-cover lg:aspect-auto lg:h-80"
               />
               <div className="mt-4 flex justify-between">
                 <div>
@@ -77,6 +112,7 @@ const PackageList = () => {
           ))}
         </div>
       </div>
+      </motion.div>
   )
 };
 
