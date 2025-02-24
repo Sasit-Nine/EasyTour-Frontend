@@ -146,3 +146,23 @@ query Booking($documentId: ID!) {
 }
 `
 
+export const QUERY_BOOKING = gql`
+query Bookings($filters: BookingFiltersInput) {
+  bookings(filters: $filters) {
+    fname
+    lname
+    package {
+      thumbnail {
+        url
+      }
+      name
+      type
+    }
+    quantity
+    total_price
+    payment {
+      stripe_receipt_url
+    }
+  }
+}
+`
