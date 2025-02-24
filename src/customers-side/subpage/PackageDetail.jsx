@@ -22,6 +22,7 @@ import { StarIcon } from '@heroicons/react/20/solid'
 import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import Review from "../components/Review";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -32,7 +33,6 @@ const PackageDetail = () => {
     const package_id = location.state?.pkgID
 
     const navigate = useNavigate()
-    const [isBooking, setisBooking] = useState(false)
     const { user } = useAuth()
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const { documentId } = useParams()
@@ -47,7 +47,8 @@ const PackageDetail = () => {
         return <p>Loading</p>
     }
     if (errorPackage) {
-        return <p>{errorPackage}</p>
+        console.error("GraphQL Error:", errorPackage);
+        return <p>เกิดข้อผิดพลาดในการโหลดข้อมูล: {errorPackage.message}</p>;
     }
     dayjs.extend(customParseFormat)
     const time = dataPackage.package.time;
@@ -228,11 +229,12 @@ const PackageDetail = () => {
                                 </div>
                             </section>
                         </div>
-                    </div>
+                    </div> 
                 </div>
+                <Review></Review>
             </div>
+            
         </motion.div>
     )
 };
 export default PackageDetail;
-
