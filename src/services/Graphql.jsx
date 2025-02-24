@@ -110,7 +110,6 @@ query Query($documentId: ID!) {
     }
     time
     note
-    price_includes
     meeting_point
     rating
     package_details {
