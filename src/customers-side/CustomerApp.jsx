@@ -12,6 +12,7 @@ import Payment from "./subpage/Payment"
 import Booking from "./subpage/Booking";
 import CheckoutSuccess from "./subpage/CheckoutSuccess";
 import FilterPackage from "./components/FilterPackage";
+import Status from "./subpage/Status";
 
 
 const CustomerApp = () => {
@@ -29,6 +30,7 @@ const CustomerApp = () => {
                         <Route path="/payment" element={<Payment></Payment>}></Route>
                         <Route path="/packages/:documentId" element={<PackageDetail></PackageDetail>}></Route>
                         <Route path="/checkout-success" element={<CheckoutSuccess></CheckoutSuccess>}></Route>
+                        <Route path="/status" element={<Status></Status>}></Route>
                     </Routes>
             </div>
             <Footer></Footer>

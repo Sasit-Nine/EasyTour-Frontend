@@ -73,12 +73,16 @@ const PackageDetail = () => {
         })
     }
 
+    const handleLogin = async () => {
+        navigate('/login')
+    }
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y:0}}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.6, ease: "easeOut" }} 
         >
             <div className="bg-white">
                 <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
@@ -173,7 +177,7 @@ const PackageDetail = () => {
                                 <div className="mt-10 flex">
                                     <button
                                         type="button"
-                                        onClick={() => handleBooking()}
+                                        onClick={() => (user)?handleBooking():handleLogin()}
                                         className="cursor-pointer flex max-w-xs flex-1 items-center justify-center rounded-xl border border-transparent bg-[#F8644B] px-8 py-3 text-lg font-medium text-white hover:bg-[#f84b4b] focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:outline-hidden sm:w-full hover:scale-105 active:scale-100 transition-transform duration-00"
                                     >
                                         จองเลย
