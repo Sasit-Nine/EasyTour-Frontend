@@ -162,7 +162,10 @@ query Bookings($filters: BookingFiltersInput) {
     total_price
     payment {
       stripe_receipt_url
+      status_payment
     }
+    booking_status
+    updatedAt
   }
 }
 `
