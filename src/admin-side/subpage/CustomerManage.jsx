@@ -54,6 +54,7 @@ const CustomerManage = () => {
                             : "Rejected",
                 paymentStatus: bk.payment_status,
                 date: dayjs(bk.updatedAt).format("DD/MM/YYYY HH:mm:ss"),
+                bookingTime: dayjs(bk.createdAt).format("DD/MM/YYYY HH:mm:ss"), // Add booking time
             }));
             setLocalBookings(transformedBookings);
         }
@@ -323,6 +324,10 @@ const CustomerManage = () => {
                             <Text style={{ color: getPaymentStatusColor(selectedBooking.paymentStatus) }}>
                                 {selectedBooking.paymentStatus}
                             </Text>
+                        </p>
+                        <p>
+                            <strong>Booking Time:</strong>{" "}
+                            <Text>{selectedBooking.bookingTime}</Text>
                         </p>
                     </div>
                 )}

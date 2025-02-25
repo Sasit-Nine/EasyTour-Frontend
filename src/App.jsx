@@ -7,7 +7,7 @@ import { BookingProvider } from "./context/requestBooking";
 function App() {
   return (
     <BookingProvider>
-      <AdminApp></AdminApp> 
+      <CustomerApp></CustomerApp> 
     </BookingProvider>
   )
 }

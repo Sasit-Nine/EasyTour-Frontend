@@ -52,8 +52,8 @@ const Booking = () => {
 
     // บันทึกข้อมูลการจองลงใน context
     addBooking(newBooking);
-    // เปลี่ยนหน้าไปยัง CustomerManage
-    navigate("/customer_manage");
+    // เปลี่ยนหน้าไปยัง Status
+    navigate("/status");
   };
 
   return (

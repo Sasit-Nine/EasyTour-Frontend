@@ -146,26 +146,34 @@ export const QEURY_BOOKINGID = gql`
 
 // Query สำหรับดึงข้อมูล Booking หลายรายการ (ใช้ filters)
 export const QUERY_BOOKING = gql`
-  query Bookings($filters: BookingFiltersInput) {
+  query GetBookings($filters: BookingFiltersInput) {
     bookings(filters: $filters) {
       fname
       lname
       package {
+        name
+        type
         thumbnail {
           url
         }
-        name
-        type
       }
-      quantity
-      total_price
       payment {
         stripe_receipt_url
         status_payment
       }
-      booking_status
+      total_price
+      quantity
       updatedAt
-      documentId
+      booking_status
+    }
+  }
+`;
+
+export const UPDATE_BOOKING_STATUS = gql`
+  mutation UpdateBookingStatus($id: ID!, $status: String!) {
+    updateBookingStatus(id: $id, status: $status) {
+      id
+      booking_status
     }
   }
 `;
