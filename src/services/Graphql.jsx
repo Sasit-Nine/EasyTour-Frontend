@@ -166,6 +166,18 @@ query Bookings($filters: BookingFiltersInput) {
     }
     booking_status
     updatedAt
+    tel
+    province
+    city
+    address
+    district
+    documentId
   }
 }
 `
+export const MUTATION_APPROVE = gql`
+mutation Mutation($documentId: ID!, $data: BookingInput!) {
+  updateBooking(documentId: $documentId, data: $data) {
+    booking_status
+  }
+}`
