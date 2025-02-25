@@ -8,16 +8,8 @@ import AddPackage from "./subpage/AddPackage"; // เพิ่ม AddPackage ท
 
 const AdminApp = () => {
   return (
-    <Router>
       <AdminLayout>
-        <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/package_manage" element={<PackageManage />} />
-          <Route path="/customer_manage" element={<CustomerManage />} />
-          <Route path="/add_package" element={<AddPackage />} />
-        </Routes>
       </AdminLayout>
-    </Router>
   );
 };
 
