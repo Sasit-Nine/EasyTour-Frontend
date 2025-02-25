@@ -29,6 +29,7 @@ function classNames(...classes) {
 }
 
 const PackageDetail = () => {
+    const [quantity,setQuantity] = useState(1)
     const location = useLocation()
     const package_id = location.state?.pkgID
 
@@ -58,7 +59,6 @@ const PackageDetail = () => {
             index === self.findIndex((t) => t.name === detail.name && t.detail === detail.detail)
     );
 
-
     const handleBooking = async () => {
         // setisBooking(true)
         console.log(user?.documentId)
@@ -69,14 +69,17 @@ const PackageDetail = () => {
                 packageId: package_id,
                 packageDocumentId: documentId,
                 name: dataPackage?.package?.name,
-                url: `${strapiBaseURL}${dataPackage.package.image[0].url}`
+                url: `${strapiBaseURL}${dataPackage.package.image[0].url}`,
+                quantity: quantity,
+                price: dataPackage.package.price
             }
         })
     }
 
     const handleLogin = async () => {
         navigate('/login')
-    }
+    }   
+
 
     return (
         <motion.div
@@ -176,6 +179,16 @@ const PackageDetail = () => {
                             <form className="mt-6">
 
                                 <div className="mt-10 flex">
+
+                                    <div className="border-2 w-20 mr-3 rounded-xl border-[#f84b4b] flex items-center justify-center gap-1">
+                                        <button className="text-gray-500" onClick={(e) => { e.preventDefault(); setQuantity(prev => Math.max(1,prev - 1))}}>-</button>
+                                        <div className="items-center justify-center flex flex-col">
+                                            <p className="text-gray-900 text-xs/2">Trav.</p>
+                                            <p className="text-lg">{quantity}</p>
+                                        </div>
+                                        <button className="text-gray-500" onClick={(e) => { e.preventDefault(); setQuantity(quantity + 1)}}>+</button>
+                                    </div>
+
                                     <button
                                         type="button"
                                         onClick={() => (user)?handleBooking():handleLogin()}

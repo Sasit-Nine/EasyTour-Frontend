@@ -14,6 +14,8 @@ const Booking = () => {
   const packageId = location.state.packageId
   const name = location.state.name
   const url = location.state.url
+  const quantity = location.state.quantity
+  const price = location.state.price
   const packageDocumentId = location.state.packageDocumentId
   const { user } = useAuth();
 
@@ -43,8 +45,8 @@ const Booking = () => {
             city: city,
             district: district,
             province: province,
-            total_price: 5000,
-            quantity: 1,
+            total_price: price,
+            quantity: quantity,
             tel: tel,
             address: address
           }
@@ -71,7 +73,8 @@ const Booking = () => {
 
       const response = await axios.post(`${strapiBaseURL}/api/payment/checkout`,{
         packageId : packageId,
-        BookingId : bkID
+        BookingId : bkID,
+        Quantity : quantity
       })
       console.log('Response:', response.data.url)
       if(response?.data?.url){
