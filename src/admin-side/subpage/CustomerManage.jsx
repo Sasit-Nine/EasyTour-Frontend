@@ -52,6 +52,7 @@ const CustomerManage = () => {
                         : bk.booking_status === "success"
                             ? "Approved"
                             : "Rejected",
+                paymentStatus: bk.payment_status,
                 date: dayjs(bk.updatedAt).format("DD/MM/YYYY HH:mm:ss"),
             }));
             setLocalBookings(transformedBookings);
@@ -101,6 +102,22 @@ const CustomerManage = () => {
         });
     };
 
+    const updatePaymentStatus = (id, newStatus, isHistory = false) => {
+        if (isHistory) {
+            setHistoryBookings((prev) =>
+                prev.map((booking) =>
+                    booking.id === id ? { ...booking, paymentStatus: newStatus } : booking
+                )
+            );
+        } else {
+            setLocalBookings((prev) =>
+                prev.map((booking) =>
+                    booking.id === id ? { ...booking, paymentStatus: newStatus } : booking
+                )
+            );
+        }
+    };
+
     const handleRejection = () => {
         setLocalBookings((prev) => {
             const updatedList = prev.filter((booking) => booking.id !== rejectingId);
@@ -147,6 +164,17 @@ const CustomerManage = () => {
         }
     };
 
+    const getPaymentStatusColor = (status) => {
+        switch (status) {
+            case "Paid":
+                return "green";
+            case "Unpaid":
+                return "red";
+            default:
+                return "black";
+        }
+    };
+
     const columns = [
         { title: "ID", dataIndex: "id", key: "id", align: "center" },
         { title: "Customer Name", dataIndex: "fullName", key: "fullName" },
@@ -169,6 +197,25 @@ const CustomerManage = () => {
                     </Option>
                     <Option value="Rejected">
                         <Text style={{ color: "red" }}>Rejected</Text>
+                    </Option>
+                </Select>
+            ),
+        },
+        {
+            title: "Payment Status",
+            dataIndex: "paymentStatus",
+            key: "paymentStatus",
+            render: (paymentStatus, record) => (
+                <Select
+                    value={paymentStatus}
+                    onChange={(value) => updatePaymentStatus(record.id, value)}
+                    style={{ width: 130, fontWeight: "bold", color: getPaymentStatusColor(paymentStatus) }}
+                >
+                    <Option value="Paid">
+                        <Text style={{ color: "green" }}>Paid</Text>
+                    </Option>
+                    <Option value="Unpaid">
+                        <Text style={{ color: "red" }}>Unpaid</Text>
                     </Option>
                 </Select>
             ),
@@ -271,6 +318,12 @@ const CustomerManage = () => {
                                 {selectedBooking.status}
                             </Text>
                         </p>
+                        <p>
+                            <strong>Payment Status:</strong>{" "}
+                            <Text style={{ color: getPaymentStatusColor(selectedBooking.paymentStatus) }}>
+                                {selectedBooking.paymentStatus}
+                            </Text>
+                        </p>
                     </div>
                 )}
             </Modal>
@@ -284,28 +337,45 @@ const CustomerManage = () => {
             >
                 <Table
                     columns={columns.map((col) =>
-                        col.key === "status"
+                        col.key === "status" || col.key === "paymentStatus"
                             ? {
                                 ...col,
-                                render: (status, record) => (
+                                render: (value, record) => (
                                     <Select
-                                        value={status}
-                                        onChange={(value) => updateStatus(record.id, value, true)}
+                                        value={value}
+                                        onChange={(newValue) =>
+                                            col.key === "status"
+                                                ? updateStatus(record.id, newValue, true)
+                                                : updatePaymentStatus(record.id, newValue, true)
+                                        }
                                         style={{
                                             width: 130,
                                             fontWeight: "bold",
-                                            color: getStatusColor(status),
+                                            color: col.key === "status" ? getStatusColor(value) : getPaymentStatusColor(value),
                                         }}
                                     >
-                                        <Option value="Pending">
-                                            <Text style={{ color: "orange" }}>Pending</Text>
-                                        </Option>
-                                        <Option value="Approved">
-                                            <Text style={{ color: "green" }}>Approved</Text>
-                                        </Option>
-                                        <Option value="Rejected">
-                                            <Text style={{ color: "red" }}>Rejected</Text>
-                                        </Option>
+                                        {col.key === "status" ? (
+                                            <>
+                                                <Option value="Pending">
+                                                    <Text style={{ color: "orange" }}>Pending</Text>
+                                                </Option>
+                                                <Option value="Approved">
+                                                    <Text style={{ color: "green" }}>Approved</Text>
+                                                </Option>
+                                                <Option value="Rejected">
+                                                    <Text style={{ color: "red" }}>Rejected</Text>
+                                                </Option>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Option value="Paid">
+                                                    <Text style={{ color: "green" }}>Paid</Text>
+                                                </Option>
+                                                <Option value="Unpaid">
+                                                    <Text style={{ color: "red" }}>Unpaid</Text>
+                                                </Option>
+                                            </>
+                                        )}
                                     </Select>
                                 ),
                             }
