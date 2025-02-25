@@ -75,7 +75,8 @@ const CustomerManage = () => {
     useEffect(() => {
         if (data && data.bookings) {
             console.log(data)
-            const transformedBookings = data.bookings.map((bk, index) => ({
+            const transformedBookings = data.bookings.map((bk) => ({
+                id: bk.documentId,
                 fullName: `${bk.fname} ${bk.lname}`,
                 packageName: bk.package?.name,
                 tel: bk.tel,
@@ -154,120 +155,17 @@ const CustomerManage = () => {
     const showDetails = (record) => {
         setIsModalVisible(true);
         setSelectedBooking(record);
-        setIsModalVisible(true);
     };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case "Approved":
-                return "green";
-            case "Pending":
-                return "orange";
-            case "Rejected":
-                return "red";
-            default:
-                return "black";
-        }
-    };
-
-    const getPaymentStatusColor = (status) => {
-        switch (status) {
-            case "Paid":
-                return "green";
-            case "Unpaid":
-                return "red";
-            default:
-                return "black";
-        }
-    };
-
-    const columns = [
-        { title: "ID", dataIndex: "id", key: "id", align: "center" },
-        { title: "Customer Name", dataIndex: "fullName", key: "fullName" },
-        { title: "Package", dataIndex: "packageName", key: "packageName" },
-        {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
-            render: (status, record) => (
-                <Select
-                    value={status}
-                    onChange={(value) => updateStatus(record.id, value)}
-                    style={{ width: 130, fontWeight: "bold", color: getStatusColor(status) }}
-                >
-                    <Option value="Pending">
-                        <Text style={{ color: "orange" }}>Pending</Text>
-                    </Option>
-                    <Option value="Approved">
-                        <Text style={{ color: "green" }}>Approved</Text>
-                    </Option>
-                    <Option value="Rejected">
-                        <Text style={{ color: "red" }}>Rejected</Text>
-                    </Option>
-                </Select>
-            ),
-        },
-        {
-            title: "Payment Status",
-            dataIndex: "paymentStatus",
-            key: "paymentStatus",
-            render: (paymentStatus, record) => (
-                <Select
-                    value={paymentStatus}
-                    onChange={(value) => updatePaymentStatus(record.id, value)}
-                    style={{ width: 130, fontWeight: "bold", color: getPaymentStatusColor(paymentStatus) }}
-                >
-                    <Option value="Paid">
-                        <Text style={{ color: "green" }}>Paid</Text>
-                    </Option>
-                    <Option value="Unpaid">
-                        <Text style={{ color: "red" }}>Unpaid</Text>
-                    </Option>
-                </Select>
-            ),
-        },
-        {
-            title: "Actions",
-            key: "actions",
-            align: "center",
-            render: (_, record) => (
-                <Button type="primary" onClick={() => showDetails(record)}>
-                    View Details
-                </Button>
-            ),
-        },
-    ];
-
-    const people = [
-        {
-          name: 'Lindsay Walton',
-          title: 'Front-end Developer',
-          department: 'Optimization',
-          email: 'lindsay.walton@example.com',
-          role: 'Member',
-          image:
-            'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        },
-        // More people...
-    ]
 
     console.log(localBookings)
     return (
         <div className="px-4 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
                 <div className="sm:flex-auto">
-                    <h1 className="text-base font-semibold text-gray-900">Users</h1>
+                    <h1 className="text-2xl font-medium text-gray-900">จัดการลูกค้า</h1>
                     <p className="mt-2 text-sm text-gray-700">
                         A list of all the users in your account including their name, title, email and role.
                     </p>
-                </div>
-                <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                    <button
-                        type="button"
-                        className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    >
-                        Add user
-                    </button>
                 </div>
             </div>
             <div className="mt-8 flow-root">
@@ -276,6 +174,9 @@ const CustomerManage = () => {
                         <table className="min-w-full divide-y divide-gray-300">
                             <thead>
                                 <tr>
+                                    <th scope="col" className="py-3.5 pr-3 pl-4 text-left text-base font-semibold text-gray-900 sm:pl-0">
+                                        ลำดับการจอง
+                                    </th>
                                     <th scope="col" className="py-3.5 pr-3 pl-4 text-left text-base font-semibold text-gray-900 sm:pl-0">
                                         ชื่อลูกค้า
                                     </th>
@@ -294,29 +195,45 @@ const CustomerManage = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
-                                {localBookings.map((person,index) => (
+                                {localBookings.map((person, index) => (
                                     <tr key={index}>
-                                        <td className="py-5 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-0">
+                                        <td className="py-5 pr-3 pl-4 text-base whitespace-nowrap sm:pl-0">
+                                            <div className="flex items-center">
+                                                <div className="ml-4">
+                                                    <div className="font-medium text-gray-900">{index + 1}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-5 pr-3 pl-4 text-base whitespace-nowrap sm:pl-0">
                                             <div className="flex items-center">
                                                 <div className="ml-4">
                                                     <div className="font-medium text-gray-900">{person.fullName}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-3 py-5 text-sm whitespace-nowrap text-gray-500">
+                                        <td className="px-3 py-5 text-base whitespace-nowrap text-gray-500">
                                             <div className="text-gray-900">{person.packageName}</div>
                                         </td>
-                                        <td className="px-3 py-5 text-sm whitespace-nowrap text-gray-500">
-                                            <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">
+                                        <td className="px-3 py-5 text-base whitespace-nowrap text-gray-500">
+                                            <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-base font-normal text-green-700 ring-1 ring-green-600/20 ring-inset">
                                                 {person.paymentStatus}
-
                                             </span>
                                         </td>
-                                        <td className="px-3 py-5 text-sm whitespace-nowrap text-gray-500">{person.role}</td>
-                                        <td className="relative py-5 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
-                                            <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                                                Edit<span className="sr-only">, {person.name}</span>
-                                            </a>
+                                        <td className="px-3 py-5 text-base whitespace-nowrap text-gray-500">
+                                            {(person.status === "pending") ? 'รอการอนุมัติ' : (person.status === 'success') ? 'อนุมัติการจอง' : 'ปฏิเสธการจอง'}
+                                        </td>
+                                        <td className="relative py-5 pr-4 pl-3 text-right text-base font-medium whitespace-nowrap sm:pr-0">
+                                            <div className="flex gap-3">
+                                                <a onClick={() => handleApprove(person.id)} className="text-green-600 hover:text-green-900 cursor-pointer">
+                                                    อนุมัติ
+                                                </a>
+                                                <a onClick={() => handleApprove(person.id)} className="text-red-600 hover:text-green-900 cursor-pointer">
+                                                    ปฏิเสธ
+                                                </a>
+                                                <a onClick={() => showDetails(person)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer">
+                                                    ดูเพิ่มเติม
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -325,7 +242,13 @@ const CustomerManage = () => {
                     </div>
                 </div>
             </div>
+            <ViewDetail
+                visible={isModalVisible}
+                onCancel={() => setIsModalVisible(false)}
+                booking={selectedBooking}
+            ></ViewDetail>
         </div>
+
         // <div
         //     style={{
         //         display: "flex",
