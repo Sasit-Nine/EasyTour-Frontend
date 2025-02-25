@@ -62,12 +62,13 @@ export default function Login() {
                             <div>
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div>
-                                        <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
+                                        <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
                                             Username
                                         </label>
                                         <div className="mt-2">
                                             <input
                                                 id="username"
+                                                type="text"
                                                 name="username"
                                                 required
                                                 autoComplete="username"

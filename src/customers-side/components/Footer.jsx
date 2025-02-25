@@ -46,8 +46,8 @@ const Footer = () => {
               </div>
             </div>
           </div>
-          <div className="mt-16 border-t border-white/10 pt-8 sm:mt-20 lg:mt-24">
-            <p className="text-sm/6 text-white  ">&copy; 2024 Your Company, Inc. All rights reserved.</p>
+          <div className="mt-16 border-t border-white/10 pt-8 sm:mt-20 lg:mt-24 ">
+            <p className="text-sm/6 text-white text-center">&copy; 2024 Your Company, Inc. All rights reserved.</p>
           </div>
         </div>
       </footer>
