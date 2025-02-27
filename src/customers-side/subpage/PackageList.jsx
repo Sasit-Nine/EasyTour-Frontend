@@ -26,7 +26,7 @@ const PackageList = ({filters}) => {
           eq: "PUBLISH"
         },
         ...(debounceFilters.category.length > 0 && { type: { in: debounceFilters.category } }),
-        // ...(debounceFilters.duration.length > 0 && { duration: { in: debounceFilters.duration } }),
+        ...(debounceFilters.duration.length > 0 && { with_accommodation: { in: debounceFilters.duration } }),
         ...(debounceFilters.sector.length > 0 && { location: { sector: { in: debounceFilters.sector } } }),
       }
     }

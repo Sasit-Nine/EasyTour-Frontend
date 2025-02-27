@@ -17,6 +17,7 @@ const Booking = () => {
   const quantity = location.state.quantity
   const price = location.state.price
   const packageDocumentId = location.state.packageDocumentId
+  const timetable = location.state.timetable
   const { user } = useAuth();
 
   const [fname,setFname] = useState('')
@@ -45,10 +46,11 @@ const Booking = () => {
             city: city,
             district: district,
             province: province,
-            total_price: price,
+            total_price: price*quantity,
             quantity: quantity,
             tel: tel,
-            address: address
+            address: address,
+            timetable: timetable
           }
         },
         context: {

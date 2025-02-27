@@ -21,10 +21,8 @@ const filters = [
     id: 'duration',
     name: 'ระยะเวลา',
     options: [
-      { value: '1-day', label: 'วันเดียว' },
-      { value: '2-3-days', label: '2-3 วัน' },
-      { value: '4-7-days', label: '4-7 วัน' },
-      { value: 'more-than-7-days', label: 'มากกว่า 7 วัน' },
+      { value: false, label: 'แพ็กเกจทัวร์วันเดียว' },
+      { value: true, label: 'แพ็กเกจทัวร์พร้อมที่พัก' },
     ],
   },
   {
