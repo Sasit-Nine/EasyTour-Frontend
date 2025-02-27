@@ -181,27 +181,6 @@ mutation Mutation($documentId: ID!, $data: BookingInput!) {
   }
 }`
 
-export const QUERY_MESSAGES = gql`
-    query Messages($customerId: ID!) {
-        messages(customerId: $customerId) {
-            id
-            sender
-            content
-            timestamp
-        }
-    }
-`;
-
-export const MUTATION_SEND_MESSAGE = gql`
-    mutation SendMessage($customerId: ID!, $content: String!) {
-        sendMessage(customerId: $customerId, content: $content) {
-            id
-            sender
-            content
-            timestamp
-        }
-    }
-`;
 
 export const QUERY_ALL_CHATS = gql`
   query GetAllChats {

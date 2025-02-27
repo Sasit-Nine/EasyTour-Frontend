@@ -24,7 +24,7 @@ import {
   ChatBubbleOvalLeftEllipsisIcon, // Import chat icon
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import ContentLayout from './ContentLayout'
+import ContentLayout from './ContentLayout.jsx'
 import LogoPicture from '../../assets/plane_orange.png'
 import { useAuth } from '../../context/AuthContext'
 import { QEURY_PROFILE } from '../../services/Graphql'
@@ -45,7 +45,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const AdminLayout = () => {
+const AdminLayout = ({ children }) => {
   const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
   const { user, logout } = useAuth();
   console.log(user)

@@ -1,67 +1,92 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-const AuthContext = createContext()
+import { useLazyQuery, useMutation } from "@apollo/client";
 import {
     LOGINMUTATION,
     QUERYUSERDATA
-}
-    from "../services/Graphql";
-import { useLazyQuery, useMutation } from "@apollo/client";
+} from "../services/Graphql";
+
+const AuthContext = createContext();
+
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [loginMutation, { loading: loginLoading, error: loginError }] = useMutation(LOGINMUTATION)
-    const [fetchUserData, { loading: fetchUserLoading, error: fetchUserError }] = useLazyQuery(QUERYUSERDATA)
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loginMutation, { loading: loginLoading, error: loginError }] = useMutation(LOGINMUTATION);
+    const [fetchUserData, { loading: fetchUserLoading, error: fetchUserError }] = useLazyQuery(QUERYUSERDATA);
+
     useEffect(() => {
-        const loaderUser = async () => {
-            const token = sessionStorage.getItem("token")
-            if (token) {
-                try {
-                    const { data: userData } = await fetchUserData({
-                        context: {
-                            headers: {
-                                Authorization: `Bearer ${token}`
-                            }
-                        }
-                    })
-                    setUser(userData?.me)
-                } catch (error) {
-                    console.log(error)
-                }
+        const loadUser = async () => {
+            const token = sessionStorage.getItem("token");
+            if (!token) {
+                setLoading(false);
+                return;
             }
-            setLoading(false)
-        }
-        loaderUser()
-    }, [fetchUserData,user])
+
+            try {
+                const { data: userData } = await fetchUserData({
+                    context: {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                });
+                
+                if (userData?.me) {
+                    setUser(userData.me);
+                }
+            } catch (error) {
+                console.error("Error loading user:", error);
+                sessionStorage.removeItem("token"); // Clear invalid token
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadUser();
+    }, [fetchUserData]); // Removed user from dependency array
 
     const login = async (username, password) => {
         try {
-            const { data: jwtdata } = await loginMutation({
+            const { data: jwtData } = await loginMutation({
                 variables: {
                     input: {
                         identifier: username,
                         password: password
                     }
                 }
-            })
-            const jwt = jwtdata?.login?.jwt
-            sessionStorage.setItem("token", jwt)
+            });
+
+            const jwt = jwtData?.login?.jwt;
+            if (!jwt) {
+                throw new Error("No JWT token received");
+            }
+
+            sessionStorage.setItem("token", jwt);
+            
             const { data: userData } = await fetchUserData({
                 context: {
                     headers: {
                         Authorization: `Bearer ${jwt}`
                     }
                 }
-            })
-            console.log(userData.me)
-            setUser(userData?.me)
+            });
+
+            if (!userData?.me) {
+                throw new Error("Could not fetch user data");
+            }
+
+            setUser(userData.me);
+            return { success: true };
         } catch (error) {
-            console.log(error)
+            console.error("Login error:", error);
+            return { success: false, error };
         }
-    }
+    };
+
     const logout = () => {
-        sessionStorage.removeItem("token")
-        setUser(null)
-    }
+        sessionStorage.removeItem("token");
+        setUser(null);
+    };
+
     return (
         <AuthContext.Provider value={{
             user,
@@ -75,8 +100,7 @@ export const AuthProvider = ({ children }) => {
         }}>
             {children}
         </AuthContext.Provider>
-    )
-}
-export const useAuth = () => {
-    return useContext(AuthContext)
-}
+    );
+};
+
+export const useAuth = () => useContext(AuthContext);
