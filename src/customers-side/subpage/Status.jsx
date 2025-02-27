@@ -19,33 +19,33 @@ const Status = () => {
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const { user } = useAuth();
     console.log(user?.username)
-    const {data:BookingData,loading:BookingLoading,error:ErrorBooking} = useQuery(QUERY_BOOKING,{
-        variables:{
-            filters:{
-                customers:{
-                    username:{
-                        eq:user?.username
+    const { data: BookingData, loading: BookingLoading, error: ErrorBooking } = useQuery(QUERY_BOOKING, {
+        variables: {
+            filters: {
+                customers: {
+                    username: {
+                        eq: user?.username
                     }
                 }
             }
         },
-        context:{
-            headers: { 
+        context: {
+            headers: {
                 Authorization: `Bearer ${sessionStorage.getItem('token')}`,
             },
         }
     })
-    if(BookingLoading){
-        return(
+    if (BookingLoading) {
+        return (
             <div className="flex justify-center items-center space-x-2">
-            <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce"></div>
-            <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce200"></div>
-            <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce400"></div>
-        </div>
+                <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce"></div>
+                <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce200"></div>
+                <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce400"></div>
+            </div>
         )
     }
-    if(ErrorBooking){
-        return(
+    if (ErrorBooking) {
+        return (
             <p>Error {ErrorBooking}</p>
         )
     }
@@ -62,20 +62,21 @@ const Status = () => {
         total_price: bk.total_price,
         quantity: bk.quantity,
         date: dayjs(bk.updatedAt).format('DD/MM/YYYY HH:mm:ss'),
-        payment_status: (bk.payment?.status_payment === 'Success')?'ชำระเงินสำเร็จ':'ชำระเงินล้มเหลว',
-        booking_status: (bk.booking_status === 'pending')?'รอการตรวจสอบ':(bk.booking_status === 'success')?'อนุมัติการจอง':'การจองล้มเหลว'
+        payment_status: (bk.payment?.status_payment === 'Success') ? 'ชำระเงินสำเร็จ' : 'ชำระเงินล้มเหลว',
+        booking_status: (bk.booking_status === 'pending') ? 'รอการตรวจสอบ' : (bk.booking_status === 'success') ? 'อนุมัติการจอง' : 'การจองล้มเหลว',
+        timetable: `${dayjs(bk.timetable.start).format('DD-MM-YYYY')} - ${dayjs(bk.timetable.end).format('DD-MM-YYYY')}`
     })) || [];
     console.log(transformedPackages)
-    
+
 
     return (
         <div className='p-5 sm:p-15 lg:p-20 xl:p-30'>
             <div className="border-b border-gray-200 pb-10">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">สถานะและประวัติการจอง</h1>
-            <p className="mt-4 text-lg text-gray-500">
-                คุณสามารถตรวจสอบรายละเอียดเกี่ยวกับสถานะการจองและประวัติการเดินทางทั้งหมดที่คุณได้ทำการจองไว้ ผ่านทางหน้านี้
-            </p>
-          </div>
+                <h1 className="text-4xl font-bold tracking-tight text-gray-900">สถานะและประวัติการจอง</h1>
+                <p className="mt-4 text-lg text-gray-500">
+                    คุณสามารถตรวจสอบรายละเอียดเกี่ยวกับสถานะการจองและประวัติการเดินทางทั้งหมดที่คุณได้ทำการจองไว้ ผ่านทางหน้านี้
+                </p>
+            </div>
             <ul role="list" className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:grid-cols-3 xl:gap-x-8 mt-10">
                 {transformedPackages.map((booking) => (
                     <li key={booking.index} className="overflow-hidden rounded-xl border border-gray-200">
@@ -121,18 +122,18 @@ const Status = () => {
                             <div className="flex justify-between gap-x-4 py-3">
                                 <dt className="text-gray-500 text-lg">สถานะการชำระเงิน</dt>
                                 <dd className="text-gray-700">
-                                    {(booking.payment_status)==="ชำระเงินสำเร็จ"?(
-                                        <p className='text-lg text-green-600 font-medium'>{`${booking.payment_status}`}</p>):
+                                    {(booking.payment_status) === "ชำระเงินสำเร็จ" ? (
+                                        <p className='text-lg text-green-600 font-medium'>{`${booking.payment_status}`}</p>) :
                                         <p className='text-lg text-red-600 font-medium'>{`${booking.payment_status}`}</p>
                                     }
-                                    
+
                                 </dd>
                             </div>
                             <div className="flex justify-between gap-x-4 py-3">
                                 <dt className="text-gray-500 text-lg">สถานะอนุมัติการจอง</dt>
                                 <dd className="text-gray-700">
-                                    {(booking.booking_status)==="อนุมัติการจอง"?(
-                                        <p className='text-lg text-green-600 font-medium'>{`${booking.booking_status}`}</p>):
+                                    {(booking.booking_status) === "อนุมัติการจอง" ? (
+                                        <p className='text-lg text-green-600 font-medium'>{`${booking.booking_status}`}</p>) :
                                         <p className='text-lg text-yellow-600 font-medium'>{`${booking.booking_status}`}</p>
                                     }
                                 </dd>
@@ -155,6 +156,21 @@ const Status = () => {
                                 <dt className="text-gray-500 text-lg">เวลาที่จอง</dt>
                                 <dd className="text-gray-700">
                                     <p className='text-lg'>{`${booking.date}`}</p>
+                                </dd>
+                            </div>
+                            {(booking.timetable) &&
+                                <div className="flex justify-between gap-x-4 py-3">
+                                    <dt className="text-gray-500 text-lg">รอบทัวร์</dt>
+                                    <dd className="text-gray-700">
+                                        <p className='text-lg'>{booking.timetable}</p>
+                                    </dd>
+                                </div>
+                            }
+
+                            <div className="flex justify-between gap-x-4 py-3">
+                                <dt className="text-gray-500 text-lg">ใบเสร็จ</dt>
+                                <dd className="text-gray-700">
+                                    <p className='text-lg text-green-600 cursor-pointer' onClick={() => { window.open(booking.payment_reciept) }}>รับใบเสร็จ</p>
                                 </dd>
                             </div>
                         </dl>

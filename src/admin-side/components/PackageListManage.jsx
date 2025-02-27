@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { debounce } from "lodash";
 
-const PackageList = ({filters}) => {
+const PackageListManage = ({filters}) => {
   const navigate = useNavigate()
   const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
   const [debounceFilters,setDebounceFilters] = useState(filters)
@@ -25,9 +25,9 @@ const PackageList = ({filters}) => {
         status_package: {
           eq: "PUBLISH"
         },
-        ...(debounceFilters.category.length > 0 && { type: { in: debounceFilters.category } }),
-        ...(debounceFilters.duration.length > 0 && { with_accommodation: { in: debounceFilters.duration } }),
-        ...(debounceFilters.sector.length > 0 && { location: { sector: { in: debounceFilters.sector } } }),
+        // ...(debounceFilters.category.length > 0 && { type: { in: debounceFilters.category } }),
+        // ...(debounceFilters.duration.length > 0 && { with_accommodation: { in: debounceFilters.duration } }),
+        // ...(debounceFilters.sector.length > 0 && { location: { sector: { in: debounceFilters.sector } } }),
       }
     }
   })
@@ -76,7 +76,7 @@ const PackageList = ({filters}) => {
 
   return (
     <motion.div
-            key={debounceFilters.category.join(",")}
+            // key={debounceFilters.category.join(",")}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y:0}}
             exit={{ opacity: 0 }}
@@ -116,4 +116,4 @@ const PackageList = ({filters}) => {
   )
 };
 
-export default PackageList;
+export default PackageListManage;
