@@ -27,16 +27,16 @@ describe('Login Component', () => {
     });
 
     test('renders login form correctly', () => {
-        expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/Username/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/Password/i)).toBeInTheDocument();
         expect(screen.getByText('เข้าสู่ระบบ')).toBeInTheDocument();
     });
 
     // กำหนดจำนวนครั้งที่ต้องการทดสอบ
     test.each(new Array(20).fill(null))('allows user to type and submit form - Test run #%#', async () => {
         // พิมพ์ Username และ Password
-        fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'user' } });
-        fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: '123456' } });
+        fireEvent.change(screen.getByPlaceholderText(/Username/i), { target: { value: 'user' } });
+        fireEvent.change(screen.getByPlaceholderText(/Password/i), { target: { value: '123456' } });
 
         // คลิกปุ่มเข้าสู่ระบบ
         fireEvent.click(screen.getByText('เข้าสู่ระบบ'));

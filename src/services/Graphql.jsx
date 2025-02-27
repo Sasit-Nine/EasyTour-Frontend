@@ -1,4 +1,18 @@
 import {gql} from '@apollo/client'
+export const REGISTERMUTATION = gql`
+mutation Register($input: UsersPermissionsRegisterInput!) {
+  register(input: $input) {
+    jwt
+    user {
+      username
+      email
+    }
+  }
+}
+`
+
+
+
 export const LOGINMUTATION = gql`
 mutation Mutation($input: UsersPermissionsLoginInput!) {
   login(input: $input) {
@@ -6,6 +20,8 @@ mutation Mutation($input: UsersPermissionsLoginInput!) {
   }
 }
 `
+
+
 // {
 //     "input": {
 //       "identifier": "customer1",
@@ -68,12 +84,13 @@ query Booking($documentId: ID!) {
 `
 
 export const QUERY_PACKAGELIST = gql`
-query Query {
-  packages {
+query Query($filters: PackageFiltersInput) {
+  packages(filters: $filters) {
     name
     location {
       district
       province
+      sector
     }
     price
     start
@@ -105,10 +122,10 @@ query Query($documentId: ID!) {
       province
       google_place_id
       district
+      sector
     }
     time
     note
-    price_includes
     meeting_point
     rating
     package_details {
@@ -145,3 +162,26 @@ query Booking($documentId: ID!) {
 }
 `
 
+export const QUERY_BOOKING = gql`
+query Bookings($filters: BookingFiltersInput) {
+  bookings(filters: $filters) {
+    fname
+    lname
+    package {
+      thumbnail {
+        url
+      }
+      name
+      type
+    }
+    quantity
+    total_price
+    payment {
+      stripe_receipt_url
+      status_payment
+    }
+    booking_status
+    updatedAt
+  }
+}
+`

@@ -3,6 +3,7 @@ import { Dialog, DialogBackdrop, DialogPanel, Disclosure, DisclosureButton, Disc
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PlusIcon } from '@heroicons/react/20/solid'
 import PackageList from '../subpage/PackageList'
+import { motion } from "framer-motion";
 
 const filters = [
   {
@@ -23,15 +24,42 @@ const filters = [
       { value: '1-day', label: 'วันเดียว' },
       { value: '2-3-days', label: '2-3 วัน' },
       { value: '4-7-days', label: '4-7 วัน' },
-      { value: '4-7-days', label: 'มากกว่า 7 วัน' },
+      { value: 'more-than-7-days', label: 'มากกว่า 7 วัน' },
+    ],
+  },
+  {
+    id: 'sector',
+    name: 'ภาค',
+    options: [
+      { value: 'north', label: 'ภาคเหนือ' },
+      { value: 'south', label: 'ภาคใต้' },
+      { value: 'east', label: 'ภาคตะวันออก' },
+      { value: 'west', label: 'ภาคตะวันตก' },
+      { value: 'northwest', label: 'ภาคตะวันออกเฉียงเหนือ' },
+      { value: 'central', label: 'ภาคกลาง' },
     ],
   },
 ]
 
-const FilterPackage =() => {
+const FilterPackage = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [selectFilters,setSelectFilters] = useState({
+    category: [],
+    duration: [],
+    sector: []
+  })
+
+  const handleFilterChange = (filterId,value) => {
+    setSelectFilters((prevFilter)=>{
+      const newValues = prevFilter[filterId].includes(value)
+        ? prevFilter[filterId].filter((v) => v !== value)
+        : [...prevFilter[filterId],value]
+      return{...prevFilter,[filterId]:newValues}
+    })
+  }
 
   return (
+
     <div className="bg-white">
       <div>
         {/* Mobile filter dialog */}
@@ -84,8 +112,9 @@ const FilterPackage =() => {
                                     defaultValue={option.value}
                                     id={`${section.id}-${optionIdx}-mobile`}
                                     name={`${section.id}[]`}
+                                    onChange={() => handleFilterChange(section.id, option.value)}
                                     type="checkbox"
-                                    className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                                    className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                                   />
                                   <svg
                                     fill="none"
@@ -133,7 +162,7 @@ const FilterPackage =() => {
           </div>
 
           <div className="pt-12 lg:grid lg:grid-cols-3 lg:gap-x-8 xl:grid-cols-4">
-            <aside className='mb-6'>
+            <aside className='mb-6 col-span-1'>
               <h2 className="sr-only">Filters</h2>
 
               <button
@@ -160,8 +189,9 @@ const FilterPackage =() => {
                                     defaultValue={option.value}
                                     id={`${section.id}-${optionIdx}`}
                                     name={`${section.id}[]`}
+                                    onChange={() => handleFilterChange(section.id, option.value)}
                                     type="checkbox"
-                                    className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                                    className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                                   />
                                   <svg
                                     fill="none"
@@ -197,7 +227,9 @@ const FilterPackage =() => {
                 </form>
               </div>
             </aside>
-            <div><PackageList></PackageList></div>
+            <div className="col-span-2 xl:col-span-3">
+              <PackageList filters={selectFilters}></PackageList>
+            </div>
           </div>
         </main>
       </div>
