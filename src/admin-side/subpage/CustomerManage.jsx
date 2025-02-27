@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Table, Select, Button, Modal, Typography, Card, Input } from "antd";
+import { Table, Button, Modal, Input } from "antd";
 import { useMutation, useQuery } from "@apollo/client";
 import { QUERY_BOOKING, MUTATION_APPROVE } from "../../services/Graphql";
 import dayjs from "dayjs";
 import ViewDetail from "../components/ViewDetail";
-
-const { Option } = Select;
-const { Title, Text } = Typography;
 
 const CustomerManage = () => {
     const [APPROVE_MUTATION] = useMutation(MUTATION_APPROVE)
@@ -25,39 +22,74 @@ const CustomerManage = () => {
         },
     });
 
-    const handleApprove = (documentId) => {
-        APPROVE_MUTATION({
-            variables: {
-                documentId: documentId,
-                data: {
-                    booking_status: "success",
-                }
-            },
-            context: {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-                },
+    const handleApprove = (documentId, isHistory = false) => {
+        Modal.confirm({
+            title: "Confirm Approval",
+            content: "Are you sure you want to approve this booking?",
+            okText: "Yes",
+            cancelText: "No",
+            onOk: () => {
+                APPROVE_MUTATION({
+                    variables: {
+                        documentId: documentId,
+                        data: {
+                            booking_status: "success",
+                        }
+                    },
+                    context: {
+                        headers: {
+                            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        },
+                    }
+                }).then(() => {
+                    refetch()
+                    if (isHistory) {
+                        setHistoryBookings(historyBookings.map(booking => 
+                            booking.id === documentId ? { ...booking, status: "success" } : booking
+                        ));
+                    } else {
+                        const approvedBooking = localBookings.find(booking => booking.id === documentId);
+                        setLocalBookings(localBookings.filter(booking => booking.id !== documentId));
+                        setHistoryBookings([...historyBookings, { ...approvedBooking, status: "success" }]);
+                    }
+                })
             }
-        }).then(() => {
-            refetch()
-        })
+        });
     }
-    const handleRejection = (documentId) => {
-        APPROVE_MUTATION({
-            variables: {
-                documentId: documentId,
-                data: {
-                    booking_status: "failed",
-                }
-            },
-            context: {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-                },
+
+    const handleRejection = (documentId, isHistory = false) => {
+        Modal.confirm({
+            title: "Confirm Rejection",
+            content: "Are you sure you want to reject this booking?",
+            okText: "Yes",
+            cancelText: "No",
+            onOk: () => {
+                APPROVE_MUTATION({
+                    variables: {
+                        documentId: documentId,
+                        data: {
+                            booking_status: "failed",
+                        }
+                    },
+                    context: {
+                        headers: {
+                            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        },
+                    }
+                }).then(() => {
+                    refetch()
+                    if (isHistory) {
+                        setHistoryBookings(historyBookings.map(booking => 
+                            booking.id === documentId ? { ...booking, status: "failed" } : booking
+                        ));
+                    } else {
+                        const rejectedBooking = localBookings.find(booking => booking.id === documentId);
+                        setLocalBookings(localBookings.filter(booking => booking.id !== documentId));
+                        setHistoryBookings([...historyBookings, { ...rejectedBooking, status: "failed" }]);
+                    }
+                })
             }
-        }).then(() => {
-            refetch()
-        })
+        });
     }
 
     const [localBookings, setLocalBookings] = useState([]);
@@ -65,16 +97,10 @@ const CustomerManage = () => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isHistoryModalVisible, setIsHistoryModalVisible] = useState(false);
-    const [isReasonModalVisible, setIsReasonModalVisible] = useState(false);
-    const [rejectingId, setRejectingId] = useState(null);
-    const [rejectionReason, setRejectionReason] = useState("");
-    const [isHistoryReasonModalVisible, setIsHistoryReasonModalVisible] = useState(false);
-    const [historyRejectingId, setHistoryRejectingId] = useState(null);
-    const [historyRejectionReason, setHistoryRejectionReason] = useState("");
+    const [searchText, setSearchText] = useState("");
 
     useEffect(() => {
         if (data && data.bookings) {
-            console.log(data)
             const transformedBookings = data.bookings.map((bk) => ({
                 id: bk.documentId,
                 fullName: `${bk.fname} ${bk.lname}`,
@@ -85,11 +111,11 @@ const CustomerManage = () => {
                 district: bk.district,
                 province: bk.province,
                 zipCode: bk.zipCode,
-                Reciep: bk.payment.stripe_receipt_url,
+                Reciep: bk.payment?.stripe_receipt_url || "N/A", // Added null check here
                 total_price: bk.total_price,
                 quantity: bk.quantity,
                 status: bk.booking_status,
-                paymentStatus: bk.payment.status_payment,
+                paymentStatus: bk.payment?.status_payment || "N/A", // Added null check here
                 date: dayjs(bk.updatedAt).format("DD/MM/YYYY HH:mm:ss"),
                 bookingTime: dayjs(bk.createdAt).format("DD/MM/YYYY HH:mm:ss"),
             }));
@@ -100,72 +126,38 @@ const CustomerManage = () => {
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error.message}</p>;
 
-    // const updateStatus = (id, newStatus, isHistory = false) => {
-    //     Modal.confirm({
-    //         title: "Confirm Status Change",
-    //         content: `Are you sure you want to change the status to "${newStatus}"?`,
-    //         okText: "Yes",
-    //         cancelText: "No",
-    //         onOk: () => {
-    //             if (newStatus === "Rejected") {
-    //                 if (isHistory) {
-    //                     setHistoryRejectingId(id);
-    //                     setIsHistoryReasonModalVisible(true);
-    //                 } else {
-    //                     setRejectingId(id);
-    //                     setIsReasonModalVisible(true);
-    //                 }
-    //             } else {
-    //                 if (isHistory) {
-    //                     setHistoryBookings((prev) =>
-    //                         prev.map((booking) =>
-    //                             booking.id === id ? { ...booking, status: newStatus } : booking
-    //                         )
-    //                     );
-    //                 } else {
-    //                     setLocalBookings((prev) => {
-    //                         const updatedList = prev.filter((booking) => booking.id !== id);
-    //                         const changedItem = prev.find((booking) => booking.id === id);
-    //                         if (changedItem) {
-    //                             setHistoryBookings((prevHistory) => [
-    //                                 ...prevHistory,
-    //                                 { ...changedItem, status: newStatus },
-    //                             ]);
-    //                         }
-    //                         return updatedList;
-    //                     });
-    //                 }
-    //             }
-    //         },
-    //     });
-    // };
-
-    const handleHistoryRejection = () => {
-        setHistoryBookings((prev) =>
-            prev.map((booking) =>
-                booking.id === historyRejectingId
-                    ? { ...booking, status: "Rejected", reason: historyRejectionReason }
-                    : booking
-            )
-        );
-        setIsHistoryReasonModalVisible(false);
-        setHistoryRejectionReason("");
-    };
-
     const showDetails = (record) => {
         setIsModalVisible(true);
         setSelectedBooking(record);
     };
 
-    console.log(localBookings)
+    const handleSearch = (e) => {
+        setSearchText(e.target.value);
+    };
+
+    const filteredBookings = localBookings.filter((booking) => 
+        booking.fullName.toLowerCase().includes(searchText.toLowerCase())
+    );
+
     return (
         <div className="px-4 sm:px-6 lg:px-8">
-            <div className="sm:flex sm:items-center">
+            <div className="sm:flex sm:items-center justify-between">
                 <div className="sm:flex-auto">
                     <h1 className="text-2xl font-medium text-gray-900">จัดการลูกค้า</h1>
                     <p className="mt-2 text-sm text-gray-700">
                         A list of all the users in your account including their name, title, email and role.
+                        <Input.Search 
+                            placeholder="Search by customer name"
+                            value={searchText}
+                            onChange={handleSearch}
+                            style={{ width: 500, marginLeft: '10px' }}
+                        />
                     </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                    <Button type="primary" onClick={() => setIsHistoryModalVisible(true)}>
+                        History
+                    </Button>
                 </div>
             </div>
             <div className="mt-8 flow-root">
@@ -195,7 +187,7 @@ const CustomerManage = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
-                                {localBookings.map((person, index) => (
+                                {filteredBookings.map((person, index) => (
                                     <tr key={index}>
                                         <td className="py-5 pr-3 pl-4 text-base whitespace-nowrap sm:pl-0">
                                             <div className="flex items-center">
@@ -227,7 +219,7 @@ const CustomerManage = () => {
                                                 <a onClick={() => handleApprove(person.id)} className="text-green-600 hover:text-green-900 cursor-pointer">
                                                     อนุมัติ
                                                 </a>
-                                                <a onClick={() => handleApprove(person.id)} className="text-red-600 hover:text-green-900 cursor-pointer">
+                                                <a onClick={() => handleRejection(person.id)} className="text-red-600 hover:text-red-900 cursor-pointer">
                                                     ปฏิเสธ
                                                 </a>
                                                 <a onClick={() => showDetails(person)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer">
@@ -247,208 +239,70 @@ const CustomerManage = () => {
                 onCancel={() => setIsModalVisible(false)}
                 booking={selectedBooking}
             ></ViewDetail>
+            <Modal
+                title="Booking History"
+                visible={isHistoryModalVisible}
+                onCancel={() => setIsHistoryModalVisible(false)}
+                footer={<Button onClick={() => setIsHistoryModalVisible(false)}>Close</Button>}
+                width={1000}
+            >
+                <Table
+                    columns={[
+                        {
+                            title: "ลำดับการจอง",
+                            dataIndex: "id",
+                            key: "id",
+                            render: (text, record, index) => <span>{index + 1}</span>
+                        },
+                        {
+                            title: "ชื่อลูกค้า",
+                            dataIndex: "fullName",
+                            key: "fullName"
+                        },
+                        {
+                            title: "แพ็กเกจที่จอง",
+                            dataIndex: "packageName",
+                            key: "packageName"
+                        },
+                        {
+                            title: "สถานะการชำระเงิน",
+                            dataIndex: "paymentStatus",
+                            key: "paymentStatus"
+                        },
+                        {
+                            title: "สถานะการอนุมัติการจอง",
+                            dataIndex: "status",
+                            key: "status",
+                            render: (text) => (
+                                <span className={text === "success" ? "text-green-600" : text === "failed" ? "text-red-600" : ""}>
+                                    {text === "success" ? 'อนุมัติการจอง' : text === "failed" ? 'ปฏิเสธการจอง' : text}
+                                </span>
+                            )
+                        },
+                        {
+                            title: "Action",
+                            key: "action",
+                            render: (text, record) => (
+                                <div className="flex gap-3">
+                                    <a onClick={() => handleApprove(record.id, true)} className="text-green-600 hover:text-green-900 cursor-pointer">
+                                        อนุมัติ
+                                    </a>
+                                    <a onClick={() => handleRejection(record.id, true)} className="text-red-600 hover:text-red-900 cursor-pointer">
+                                        ปฏิเสธ
+                                    </a>
+                                    <a onClick={() => showDetails(record)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer">
+                                        ดูเพิ่มเติม
+                                    </a>
+                                </div>
+                            )
+                        }
+                    ]}
+                    dataSource={historyBookings}
+                    pagination={false}
+                    rowKey="id"
+                />
+            </Modal>
         </div>
-
-        // <div
-        //     style={{
-        //         display: "flex",
-        //         justifyContent: "center",
-        //         alignItems: "center",
-        //         minHeight: "100vh",
-        //         background: "#f0f2f5",
-        //         padding: "20px",
-        //     }}
-        // >
-        //     <Card
-        //         style={{
-        //             maxWidth: "900px",
-        //             width: "100%",
-        //             padding: "20px",
-        //             borderRadius: "10px",
-        //             boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-        //         }}
-        //     >
-        //         <div
-        //             style={{
-        //                 display: "flex",
-        //                 justifyContent: "space-between",
-        //                 alignItems: "center",
-        //                 marginBottom: "20px",
-        //             }}
-        //         >
-        //             <Title level={2} style={{ margin: 0 }}>
-        //                 Customer Booking Management
-        //             </Title>
-        //             <Button type="primary" onClick={() => setIsHistoryModalVisible(true)}>
-        //                 History
-        //             </Button>
-        //         </div>
-        //         <Table columns={columns} dataSource={localBookings} pagination={false} rowKey="id" />
-        //     </Card>
-
-        //     <Modal
-        //         title="Customer Details"
-        //         open={isModalVisible}
-        //         onCancel={() => setIsModalVisible(false)}
-        //         footer={<Button onClick={() => setIsModalVisible(false)}>Close</Button>}
-        //     >
-        //         {selectedBooking && (
-        //             <div>
-        //                 <p>
-        //                     <strong>Customer Name:</strong> {selectedBooking.fullName}
-        //                 </p>
-        //                 <p>
-        //                     <strong>Tel:</strong> {selectedBooking.tel}
-        //                 </p>
-        //                 <p>
-        //                     <strong>Address:</strong> {selectedBooking.address}
-        //                 </p>
-        //                 <p>
-        //                     <strong>City:</strong> {selectedBooking.city}
-        //                 </p>
-        //                 <p>
-        //                     <strong>District:</strong> {selectedBooking.district}
-        //                 </p>
-        //                 <p>
-        //                     <strong>Province:</strong> {selectedBooking.province}
-        //                 </p>
-        //                 <p>
-        //                     <strong>Zip Code:</strong> {selectedBooking.zipCode}
-        //                 </p>
-        //                 <p>
-        //                     <strong>Package Name:</strong> {selectedBooking.packageName}
-        //                 </p>
-        //                 {selectedBooking.packageDetails && selectedBooking.packageDetails.length > 0 && (
-        //                     <div>
-        //                         <h3>Package Details</h3>
-        //                         {selectedBooking.packageDetails.map((detail, index) => (
-        //                             <p key={index}>
-        //                                 <strong>{detail.name}:</strong> {detail.detail}
-        //                             </p>
-        //                         ))}
-        //                     </div>
-        //                 )}
-        //                 <p>
-        //                     <strong>Status:</strong>{" "}
-        //                     <Text style={{ color: getStatusColor(selectedBooking.status) }}>
-        //                         {selectedBooking.status}
-        //                     </Text>
-        //                 </p>
-        //                 <p>
-        //                     <strong>Payment Status:</strong>{" "}
-        //                     <Text style={{ color: getPaymentStatusColor(selectedBooking.paymentStatus) }}>
-        //                         {selectedBooking.paymentStatus}
-        //                     </Text>
-        //                 </p>
-        //                 <p>
-        //                     <strong>Booking Time:</strong>{" "}
-        //                     <Text>{selectedBooking.bookingTime}</Text>
-        //                 </p>
-        //             </div>
-        //         )}
-        //     </Modal>
-
-        //     <Modal
-        //         title="Booking History"
-        //         open={isHistoryModalVisible}
-        //         onCancel={() => setIsHistoryModalVisible(false)}
-        //         footer={<Button onClick={() => setIsHistoryModalVisible(false)}>Close</Button>}
-        //         width={1000}
-        //     >
-        //         <Table
-        //             columns={columns.map((col) =>
-        //                 col.key === "status" || col.key === "paymentStatus"
-        //                     ? {
-        //                         ...col,
-        //                         render: (value, record) => (
-        //                             <Select
-        //                                 value={value}
-        //                                 onChange={(newValue) =>
-        //                                     col.key === "status"
-        //                                         ? updateStatus(record.id, newValue, true)
-        //                                         : updatePaymentStatus(record.id, newValue, true)
-        //                                 }
-        //                                 style={{
-        //                                     width: 130,
-        //                                     fontWeight: "bold",
-        //                                     color: col.key === "status" ? getStatusColor(value) : getPaymentStatusColor(value),
-        //                                 }}
-        //                             >
-        //                                 {col.key === "status" ? (
-        //                                     <>
-        //                                         <Option value="Pending">
-        //                                             <Text style={{ color: "orange" }}>Pending</Text>
-        //                                         </Option>
-        //                                         <Option value="Approved">
-        //                                             <Text style={{ color: "green" }}>Approved</Text>
-        //                                         </Option>
-        //                                         <Option value="Rejected">
-        //                                             <Text style={{ color: "red" }}>Rejected</Text>
-        //                                         </Option>
-        //                                     </>
-        //                                 ) : (
-        //                                     <>
-        //                                         <Option value="Paid">
-        //                                             <Text style={{ color: "green" }}>Paid</Text>
-        //                                         </Option>
-        //                                         <Option value="Unpaid">
-        //                                             <Text style={{ color: "red" }}>Unpaid</Text>
-        //                                         </Option>
-        //                                     </>
-        //                                 )}
-        //                             </Select>
-        //                         ),
-        //                     }
-        //                     : col
-        //             )}
-        //             dataSource={historyBookings}
-        //             pagination={false}
-        //             rowKey="id"
-        //         />
-        //     </Modal>
-
-        //     <Modal
-        //         title="Rejection Reason"
-        //         open={isReasonModalVisible}
-        //         onCancel={() => setIsReasonModalVisible(false)}
-        //         footer={[
-        //             <Button key="cancel" onClick={() => setIsReasonModalVisible(false)}>
-        //                 Cancel
-        //             </Button>,
-        //             <Button key="submit" type="primary" onClick={handleRejection} disabled={!rejectionReason}>
-        //                 Submit
-        //             </Button>,
-        //         ]}
-        //     >
-        //         <Input.TextArea
-        //             rows={4}
-        //             value={rejectionReason}
-        //             onChange={(e) => setRejectionReason(e.target.value)}
-        //             placeholder="Please provide a reason for rejection"
-        //         />
-        //     </Modal>
-
-        //     <Modal
-        //         title="Rejection Reason"
-        //         open={isHistoryReasonModalVisible}
-        //         onCancel={() => setIsHistoryReasonModalVisible(false)}
-        //         footer={[
-        //             <Button key="cancel" onClick={() => setIsHistoryReasonModalVisible(false)}>
-        //                 Cancel
-        //             </Button>,
-        //             <Button key="submit" type="primary" onClick={handleHistoryRejection} disabled={!historyRejectionReason}>
-        //                 Submit
-        //             </Button>,
-        //         ]}
-        //     >
-        //         <Input.TextArea
-        //             rows={4}
-        //             value={historyRejectionReason}
-        //             onChange={(e) => setHistoryRejectionReason(e.target.value)}
-        //             placeholder="Please provide a reason for rejection"
-        //         />
-        //     </Modal>
-        // </div>
     );
 };
 

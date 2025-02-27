@@ -13,7 +13,7 @@ import Booking from "./subpage/Booking";
 import CheckoutSuccess from "./subpage/CheckoutSuccess";
 import FilterPackage from "./components/FilterPackage";
 import Status from "./subpage/Status";
-
+import AdminChat from "./subpage/AdminChat";
 
 const CustomerApp = () => {
     return ( 

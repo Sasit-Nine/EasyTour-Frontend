@@ -4,6 +4,8 @@ import Dashboard from "../subpage/Dashboard";
 import PackageManage from "../subpage/PackageManage";
 import CustomerManage from "../subpage/CustomerManage";
 import AddPackage from "../subpage/AddPackage";
+import AdminChat from "../subpage/AdminChat"; // เพิ่ม AdminChat component
+
 const ContentLayout = () => {
     return(
         <Router>
@@ -12,6 +14,7 @@ const ContentLayout = () => {
                 <Route path="/package_manage" element={<PackageManage />} />
                 <Route path="/customer_manage" element={<CustomerManage />} />
                 <Route path="/add_package" element={<AddPackage />} />
+                <Route path="/admin_chat" element={<AdminChat />} />
             </Routes>
         </Router>
     )

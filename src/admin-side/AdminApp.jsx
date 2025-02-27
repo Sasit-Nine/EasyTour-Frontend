@@ -5,6 +5,7 @@ import Dashboard from "./subpage/Dashboard";
 import PackageManage from "./subpage/PackageManage";
 import CustomerManage from "./subpage/CustomerManage";
 import AddPackage from "./subpage/AddPackage"; // เพิ่ม AddPackage ที่นี่
+import AdminChat from "./subpage/AdminChat"; // เพิ่ม AdminChat component
 
 const AdminApp = () => {
   return (

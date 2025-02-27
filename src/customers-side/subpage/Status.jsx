@@ -1,50 +1,42 @@
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { EllipsisHorizontalIcon } from '@heroicons/react/20/solid'
-import { QUERY_BOOKING, UPDATE_BOOKING_STATUS } from '../../services/Graphql'
-import { useQuery, useMutation } from '@apollo/client'
-import { useAuth } from '../../context/AuthContext'
-import dayjs from 'dayjs'
-import { useBooking } from "../../context/requestBooking";
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
+import { QUERY_BOOKING } from '../../services/Graphql';
+import { useQuery } from '@apollo/client';
+import { useAuth } from '../../context/AuthContext';
+import { useLocation } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
 
 const Status = () => {
-  const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
-  const { user } = useAuth()
-  const { bookings } = useBooking();
-  console.log(user?.username)
+  const strapiBaseURL = import.meta.env.VITE_STRAPI_URL;
+  const { user } = useAuth();
+  const location = useLocation();
+  const bookingId = location.state?.bookingId;
 
-  const { data: BookingData, loading: BookingLoading, error: ErrorBooking, refetch } = useQuery(QUERY_BOOKING, {
+  const { data: BookingData, loading: BookingLoading, error: ErrorBooking } = useQuery(QUERY_BOOKING, {
     variables: {
       filters: {
         customers: {
           username: {
-            eq: user?.username
-          }
-        }
-      }
+            eq: user?.username,
+          },
+        },
+        ...(bookingId && {
+          booking_id: {
+            eq: bookingId,
+          },
+        }),
+      },
     },
     context: {
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem('token')}`,
       },
-    }
-  })
-
-  const [updateBookingStatus] = useMutation(UPDATE_BOOKING_STATUS, {
-    onCompleted: () => {
-      refetch();
     },
-    onError: (error) => {
-      console.error("Error updating booking status:", error);
-    }
   });
-
-  const handleConfirmBooking = (id) => {
-    updateBookingStatus({ variables: { id, status: 'success' } });
-  }
 
   if (BookingLoading) {
     return (
@@ -53,54 +45,48 @@ const Status = () => {
         <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce200"></div>
         <div className="w-4 h-4 bg-[#F8644B] rounded-full animate-bounce400"></div>
       </div>
-    )
+    );
   }
 
   if (ErrorBooking) {
-    return <p>Error {ErrorBooking}</p>
+    return <p>Error {ErrorBooking}</p>;
   }
 
-  console.log(BookingData)
-
-  const transformedPackages = BookingData?.bookings?.map((bk, index) => ({
-    index: index,
-    id: bk.id,
-    fname: bk.fname,
-    lname: bk.lname,
-    package_name: bk.package?.name,
-    package_type: bk.package?.type,
-    package_url: bk.package?.thumbnail?.url,
-    payment_reciept: bk.payment?.stripe_receipt_url,
-    total_price: bk.total_price,
-    quantity: bk.quantity,
-    date: dayjs(bk.updatedAt).format('DD/MM/YYYY HH:mm:ss'),
-    payment_status: bk.payment?.status_payment === 'Success' ? 'ชำระเงินสำเร็จ' : 'ชำระเงินล้มเหลว',
-    // ปรับ mapping สถานะให้แสดงเป็น "รอการตรวจสอบ", "อนุมัติ", "ปฏิเสธ"
-    booking_status:
-      bk.booking_status === 'pending'
-        ? 'รอการตรวจสอบ'
-        : bk.booking_status === 'success'
-        ? 'อนุมัติ'
-        : 'ปฏิเสธ'
-  })) || []
-
-  const allBookings = [...transformedPackages, ...bookings];
-
-  console.log(transformedPackages)
+  const transformedPackages =
+    BookingData?.bookings?.map((bk, index) => ({
+      index: index,
+      fname: bk.fname,
+      lname: bk.lname,
+      package_name: bk.package?.name,
+      package_type: bk.package?.type,
+      package_url: bk.package?.thumbnail?.url,
+      payment_reciept: bk.payment?.stripe_receipt_url,
+      total_price: bk.total_price,
+      quantity: bk.quantity,
+      date: dayjs(bk.updatedAt).format('DD/MM/YYYY HH:mm:ss'),
+      payment_status: bk.payment?.status_payment === 'Success' ? 'ชำระเงินสำเร็จ' : 'ชำระเงินล้มเหลว',
+      // ปรับ mapping สถานะให้แสดงเป็น "รอการตรวจสอบ", "อนุมัติ", "ปฏิเสธ"
+      booking_status:
+        bk.booking_status === 'pending'
+          ? 'รอการตรวจสอบ'
+          : bk.booking_status === 'success'
+          ? 'อนุมัติ'
+          : 'ปฏิเสธ',
+    })) || [];
 
   // กำหนดสีของสถานะให้ตรงกับข้อความภาษาไทยที่ปรับใหม่
   const getStatusColor = (status) => {
     switch (status) {
-      case "อนุมัติ":
-        return "green"
-      case "รอการตรวจสอบ":
-        return "orange"
-      case "ปฏิเสธ":
-        return "red"
+      case 'อนุมัติ':
+        return 'green';
+      case 'รอการตรวจสอบ':
+        return 'orange';
+      case 'ปฏิเสธ':
+        return 'red';
       default:
-        return "black"
+        return 'black';
     }
-  }
+  };
 
   return (
     <div className="p-5 sm:p-15 lg:p-20 xl:p-30">
@@ -110,11 +96,8 @@ const Status = () => {
           คุณสามารถตรวจสอบรายละเอียดเกี่ยวกับสถานะการจองและประวัติการเดินทางทั้งหมดที่คุณได้ทำการจองไว้ ผ่านทางหน้านี้
         </p>
       </div>
-      <ul
-        role="list"
-        className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:grid-cols-3 xl:gap-x-8 mt-10"
-      >
-        {allBookings.map((booking) => (
+      <ul role="list" className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:grid-cols-3 xl:gap-x-8 mt-10">
+        {transformedPackages.map((booking) => (
           <li key={booking.index} className="overflow-hidden rounded-xl border border-gray-200">
             {/* ส่วนบนของการ์ด: แสดงรูปภาพและชื่อแพ็คเกจ */}
             <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
@@ -133,12 +116,9 @@ const Status = () => {
                   className="absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 ring-1 shadow-lg ring-gray-900/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                 >
                   <MenuItem>
-                    <button
-                      onClick={() => handleConfirmBooking(booking.id)}
-                      className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden"
-                    >
-                      ยืนยันการจอง
-                    </button>
+                    <a href="#" className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden">
+                      ยกเลิก<span className="sr-only">,</span>
+                    </a>
                   </MenuItem>
                 </MenuItems>
               </Menu>
@@ -196,7 +176,7 @@ const Status = () => {
         ))}
       </ul>
     </div>
-  )
-}
+  );
+};
 
 export default Status;

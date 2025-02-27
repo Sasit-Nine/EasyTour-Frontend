@@ -3,7 +3,8 @@ import './App.css'
 import CustomerApp from './customers-side/CustomerApp'
 import AdminApp from './admin-side/AdminApp'
 import { useAuth } from './context/AuthContext'
-
+import CustomerChat from './components/CustomerChat';
+import AdminChat from './components/AdminChat';
 function App() {
   const { user } = useAuth();
 

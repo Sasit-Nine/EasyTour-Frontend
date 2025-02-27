@@ -80,31 +80,6 @@ export const QUERY_PACKAGELIST = gql`
       }
       package_id
     }
-<<<<<<< HEAD
-    quantity
-    total_price
-    payment {
-      stripe_receipt_url
-      status_payment
-    }
-    booking_status
-    updatedAt
-    tel
-    province
-    city
-    address
-    district
-    documentId
-  }
-}
-`
-export const MUTATION_APPROVE = gql`
-mutation Mutation($documentId: ID!, $data: BookingInput!) {
-  updateBooking(documentId: $documentId, data: $data) {
-    booking_status
-  }
-}`
-=======
   }
 `;
 
@@ -171,35 +146,108 @@ export const QEURY_BOOKINGID = gql`
 
 // Query สำหรับดึงข้อมูล Booking หลายรายการ (ใช้ filters)
 export const QUERY_BOOKING = gql`
-  query GetBookings($filters: BookingFiltersInput) {
-    bookings(filters: $filters) {
-      fname
-      lname
-      package {
-        name
-        type
-        thumbnail {
-          url
+query Bookings($filters: BookingFiltersInput) {
+  bookings(filters: $filters) {
+    fname
+    lname
+    package {
+      thumbnail {
+        url
+      }
+      name
+      type
+    }
+    quantity
+    total_price
+    payment {
+      stripe_receipt_url
+      status_payment
+    }
+    booking_status
+    updatedAt
+    tel
+    province
+    city
+    address
+    district
+    documentId
+  }
+}
+`
+export const MUTATION_APPROVE = gql`
+mutation Mutation($documentId: ID!, $data: BookingInput!) {
+  updateBooking(documentId: $documentId, data: $data) {
+    booking_status
+  }
+}`
+
+export const QUERY_MESSAGES = gql`
+    query Messages($customerId: ID!) {
+        messages(customerId: $customerId) {
+            id
+            sender
+            content
+            timestamp
         }
-      }
-      payment {
-        stripe_receipt_url
-        status_payment
-      }
-      total_price
-      quantity
-      updatedAt
-      booking_status
+    }
+`;
+
+export const MUTATION_SEND_MESSAGE = gql`
+    mutation SendMessage($customerId: ID!, $content: String!) {
+        sendMessage(customerId: $customerId, content: $content) {
+            id
+            sender
+            content
+            timestamp
+        }
+    }
+`;
+
+export const QUERY_ALL_CHATS = gql`
+  query GetAllChats {
+    customers {
+      id
+      name
+      email
+      phone
+      profilePic
+      lastMessage
+      lastMessageTime
+      unreadCount
     }
   }
 `;
 
-export const UPDATE_BOOKING_STATUS = gql`
-  mutation UpdateBookingStatus($id: ID!, $status: String!) {
-    updateBookingStatus(id: $id, status: $status) {
+// Query to get messages for a specific customer
+export const QUERY_MESSAGES = gql`
+  query GetMessages($customerId: ID!) {
+    messages(customerId: $customerId) {
       id
-      booking_status
+      sender
+      content
+      timestamp
+      read
     }
   }
 `;
->>>>>>> 7780eb94f62319a65e764025c359daa5bc993de1
+
+// Mutation to send a message
+export const MUTATION_SEND_MESSAGE = gql`
+  mutation SendMessage($customerId: ID!, $content: String!) {
+    sendMessage(customerId: $customerId, content: $content) {
+      id
+      sender
+      content
+      timestamp
+    }
+  }
+`;
+
+// Mutation to mark messages as read
+export const MUTATION_MARK_AS_READ = gql`
+  mutation MarkAsRead($customerId: ID!) {
+    markAsRead(customerId: $customerId) {
+      success
+    }
+  }
+`;

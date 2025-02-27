@@ -21,6 +21,7 @@ import {
   HomeIcon,
   UsersIcon,
   XMarkIcon,
+  ChatBubbleOvalLeftEllipsisIcon, // Import chat icon
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import ContentLayout from './ContentLayout'
@@ -33,6 +34,7 @@ const navigation = [
   { name: 'ภาพรวม', href: '/', icon: HomeIcon, current: false },
   { name: 'จัดการแพ็กเกจ', href: '/package_manage', icon: FolderIcon, current: false },
   { name: 'จัดการลูกค้า', href: '/customer_manage', icon: UsersIcon, current: false },
+  { name: 'แชทกับลูกค้า', href: '/admin_chat', icon: ChatBubbleOvalLeftEllipsisIcon, current: false }, // Add chat to navigation
 ]
 const userNavigation = [
   { name: 'Your profile', href: '#' },
@@ -68,7 +70,7 @@ const AdminLayout = () => {
         ```
         <html class="h-full bg-white">
         <body class="h-full">
-        ```
+        ```<div className="flex items-center gap-x-4 lg:gap-x-6">
       */}
       <div>
         <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-50 lg:hidden">
@@ -200,23 +202,18 @@ const AdminLayout = () => {
             <div aria-hidden="true" className="h-6 w-px bg-gray-200 lg:hidden" />
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-              <form action="#" method="GET" className="grid flex-1 grid-cols-1">
-                <input
-                  name="search"
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                  className="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm/6"
-                />
-                <MagnifyingGlassIcon
-                  aria-hidden="true"
-                  className="pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400"
-                />
-              </form>
-              <div className="flex items-center gap-x-4 lg:gap-x-6">
+              <div className="flex items-center gap-x-4 lg:gap-x-6 ml-auto">
                 <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">View notifications</span>
                   <BellIcon aria-hidden="true" className="size-6" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.location.href = '/admin_chat'}
+                  className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
+                >
+                  <span className="sr-only">View chat</span>
+                  <ChatBubbleOvalLeftEllipsisIcon aria-hidden="true" className="size-6" />
                 </button>
 
                 {/* Separator */}
@@ -251,59 +248,3 @@ const AdminLayout = () => {
   )
 }
 export default AdminLayout
-
-
-
-// import React from "react";
-// import { Layout, Menu } from "antd";
-// import { Link } from "react-router-dom"; // ใช้สำหรับการเชื่อมโยง
-// import { DashboardOutlined, AppstoreAddOutlined, UsergroupAddOutlined } from "@ant-design/icons";
-// import Navbar from "./Navbar"; // เพิ่ม Navbar ที่คุณจะใช้
-
-// const { Sider, Content } = Layout;
-
-// const AdminLayout = ({ children }) => {
-//   return (
-//     <Layout style={{ minHeight: "100vh" }}>
-//       {/* Navbar */}
-//       <Navbar />
-
-//       <Layout style={{ display: "flex", flexDirection: "row" }}>
-//         {/* Sider (เมนูข้างๆ) */}
-//         <Sider
-//           width={200}
-//           style={{
-//             background: "#fff",
-//             paddingTop: "16px",
-//             position: "fixed",
-//             top: "100px", // ปรับให้เมนูไม่ทับ Navbar
-//             height: "calc(100vh - 64px)",
-//             overflowY: "auto",
-//             zIndex: 1000,
-//           }}
-//         >
-//           <Menu mode="inline" defaultSelectedKeys={["1"]} style={{ height: "100%", borderRight: 0 }}>
-//             <Menu.Item key="1" icon={<DashboardOutlined />}>
-//               <Link to="/dashboard">Dashboard</Link>
-//             </Menu.Item>
-//             <Menu.Item key="2" icon={<AppstoreAddOutlined />}>
-//               <Link to="/package_manage">Package Manage</Link>
-//             </Menu.Item>
-//             <Menu.Item key="3" icon={<UsergroupAddOutlined />}>
-//               <Link to="/customer_manage">Customer Manage</Link>
-//             </Menu.Item>
-//           </Menu>
-//         </Sider>
-
-//         {/* Content (พื้นที่แสดงเนื้อหาของแต่ละ Route) */}
-//         <Layout style={{ flex: 1, padding: "0 24px 24px", marginLeft: 200, marginTop: "64px" }}>
-//           <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
-//             {children} {/* จะทำการแสดงผลของทุก Route ที่กำหนด */}
-//           </Content>
-//         </Layout>
-//       </Layout>
-//     </Layout>
-//   );
-// };
-
-// export default AdminLayout;
