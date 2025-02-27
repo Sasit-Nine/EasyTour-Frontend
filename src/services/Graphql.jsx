@@ -46,6 +46,9 @@ mutation CreateBooking($data: BookingInput!) {
     booking_status
     documentId
     booking_id
+    timetable {
+      documentId
+    }
   }
 }
 `
@@ -77,8 +80,6 @@ query Query($filters: PackageFiltersInput) {
       sector
     }
     price
-    start
-    end
     duration
     documentId
     image {
@@ -98,8 +99,6 @@ query Query($documentId: ID!) {
     image {
       url
     }
-    start
-    end
     max_people
     duration
     location {
@@ -109,14 +108,20 @@ query Query($documentId: ID!) {
       sector
     }
     time
-    note
     meeting_point
     rating
-    package_details {
-      name
-      detail
-    }
     description
+    detail {
+      documentId
+      accommodation
+      price_includes
+      tourist_attraction
+    }
+    timetables {
+      documentId
+      start
+      end
+    }
   }
 }`
 
@@ -166,6 +171,10 @@ query Bookings($filters: BookingFiltersInput) {
     }
     booking_status
     updatedAt
+    timetable{
+      start
+      end
+    }
   }
 }
 `
