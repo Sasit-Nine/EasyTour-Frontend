@@ -1,17 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PlusIcon } from '@heroicons/react/20/solid'
 import PackageList from '../subpage/PackageList'
 import { motion } from "framer-motion";
+import { useLocation } from 'react-router-dom'
 
 const filters = [
   {
     id: 'category',
     name: 'หมวดหมู่',
     options: [
-      { value: 'Nature & Mountain Tour', label: 'ธรรมชาติและภูเขา' },
-      { value: 'Cultural & Historical Tour', label: 'วัฒนธรรมและประวัติศาสตร์' },
+      { value: 'Nature And Mountain Tour', label: 'ธรรมชาติและภูเขา' },
+      { value: 'Cultural And Historical Tour', label: 'วัฒนธรรมและประวัติศาสตร์' },
       { value: 'Adventure Tour', label: 'ผจญภัยและกิจกรรมกลางแจ้ง' },
       { value: 'Family Tour', label: 'ครอบครัว' },
       { value: 'Honeymoon & Romantic Tour', label: 'ฮันนีมูนและโรแมนติก' },
@@ -40,12 +41,26 @@ const filters = [
 ]
 
 const FilterPackage = () => {
+  const location = useLocation()
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [selectFilters,setSelectFilters] = useState({
     category: [],
     duration: [],
     sector: []
   })
+  if (location.state) {
+    console.log(location.state)
+  }
+
+  useEffect(() => {
+    if (location.state && location.state.categorie) {
+      console.log(location.state.categorie)
+      setSelectFilters((prevFilters) => ({
+        ...prevFilters,
+        category: [location.state.categorie] 
+      }));
+    }
+  }, [location.state])
 
   const handleFilterChange = (filterId,value) => {
     setSelectFilters((prevFilter)=>{

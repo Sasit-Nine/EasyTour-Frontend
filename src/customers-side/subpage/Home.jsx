@@ -75,11 +75,17 @@ const category = [
 ]
 
 
+
+
 const Home = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
   const [selectedTypes, setSelectedTypes] = useState(types[0])
   const [selectedCategory, setSelectedCategory] = useState(category[0])
+
+  const handleNavigate = (categorie) => {
+    navigate('/packages', {state: {categorie}})
+  }
 
   return (
     <div className="bg-white">
@@ -228,6 +234,7 @@ const Home = () => {
                     <a
                       key={category.name}
                       href={category.href}
+                      onClick={() => handleNavigate(category.value)}
                       className="relative flex h-80 w-56 flex-col overflow-hidden rounded-lg p-6 xl:w-auto hover:scale-105 active:scale-100 transition-transform duration-100"
                     >
                       <span aria-hidden="true" className="absolute inset-0">

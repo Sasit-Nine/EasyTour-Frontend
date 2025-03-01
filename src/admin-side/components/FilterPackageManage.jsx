@@ -1,6 +1,7 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ChevronDownIcon, FunnelIcon } from '@heroicons/react/20/solid'
 import PackageListManage from './PackageListManage'
+import { useNavigate } from 'react-router-dom'
 
 const filters = [
     {
@@ -35,11 +36,6 @@ const filters = [
       ],
     },
 ]
-const sortOptions = [
-    { name: 'Most Popular', href: '#', current: true },
-    { name: 'Best Rating', href: '#', current: false },
-    { name: 'Newest', href: '#', current: false },
-]
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -47,6 +43,7 @@ function classNames(...classes) {
 
 
 const FilterPackageManage = () => {
+    const navigate = useNavigate()
     return (
         <div className="bg-white">
             <div className="px-4 py-5 text-left sm:px-6 lg:px-8">
@@ -99,7 +96,7 @@ const FilterPackageManage = () => {
                                                         id={`price-${optionIdx}`}
                                                         name="price[]"
                                                         type="checkbox"
-                                                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                                                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                                                     />
                                                     <svg
                                                         fill="none"
@@ -143,7 +140,7 @@ const FilterPackageManage = () => {
                                                         id={`color-${optionIdx}`}
                                                         name="color[]"
                                                         type="checkbox"
-                                                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                                                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                                                     />
                                                     <svg
                                                         fill="none"
@@ -189,7 +186,7 @@ const FilterPackageManage = () => {
                                                         id={`size-${optionIdx}`}
                                                         name="size[]"
                                                         type="checkbox"
-                                                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                                                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                                                     />
                                                     <svg
                                                         fill="none"
@@ -271,40 +268,15 @@ const FilterPackageManage = () => {
                     <div className="mx-auto flex max-w-7xl justify-end px-4 sm:px-6 lg:px-8">
                         <Menu as="div" className="relative inline-block">
                             <div className="flex">
-                                <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-                                    Sort
-                                    <ChevronDownIcon
-                                        aria-hidden="true"
-                                        className="-mr-1 ml-1 size-5 shrink-0 text-gray-400 group-hover:text-gray-500"
-                                    />
-                                </MenuButton>
+                                <button onClick={()=>navigate('/add_package')} className="bg-[#F8644B] p-3 text-white rounded-xl cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100">
+                                    เพิ่มแพ็กเกจทัวร์
+                                </button>
                             </div>
-
-                            <MenuItems
-                                transition
-                                className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white ring-1 shadow-2xl ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-                            >
-                                <div className="py-1">
-                                    {sortOptions.map((option) => (
-                                        <MenuItem key={option.name}>
-                                            <a
-                                                href={option.href}
-                                                className={classNames(
-                                                    option.current ? 'font-medium text-gray-900' : 'text-gray-500',
-                                                    'block px-4 py-2 text-sm data-focus:bg-gray-100 data-focus:outline-hidden',
-                                                )}
-                                            >
-                                                {option.name}
-                                            </a>
-                                        </MenuItem>
-                                    ))}
-                                </div>
-                            </MenuItems>
                         </Menu>
                     </div>
                 </div>
             </Disclosure>
-            <div className="col-span-2 xl:col-span-4 flex mt-10 px-4 sm:px-6 lg:px-8">
+            <div className="col-span-2 xl:col-span-4 flex mt-10 px-4 sm:px-6 lg:px-5">
                 <PackageListManage></PackageListManage>
             </div>
         </div>

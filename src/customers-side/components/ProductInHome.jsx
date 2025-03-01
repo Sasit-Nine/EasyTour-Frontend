@@ -38,7 +38,7 @@ const ProductInHome = () => {
         sector: pkg.location.sector,
         start: pkg.start,
         end: pkg.end,
-        url: pkg.image[0].url,
+        url: pkg.thumbnail.url,
         package_id: pkg.package_id
     })) || [];
 

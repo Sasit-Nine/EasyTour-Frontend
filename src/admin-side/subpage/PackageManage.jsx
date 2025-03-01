@@ -1,7 +1,10 @@
 import React from "react"
+import FilterPackageManage from "../components/FilterPackageManage"
 const PackageManage = () => {
     return(
-        <h1>PackageManage</h1>
+        <div>
+            <FilterPackageManage></FilterPackageManage>
+        </div>
     )
 }
 export default PackageManage

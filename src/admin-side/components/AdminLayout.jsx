@@ -20,6 +20,7 @@ import {
   FolderIcon,
   HomeIcon,
   UsersIcon,
+  ArchiveBoxIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
@@ -32,11 +33,8 @@ import { useQuery } from '@apollo/client'
 const navigation = [
   { name: 'ภาพรวม', href: '/', icon: HomeIcon, current: false },
   { name: 'จัดการแพ็กเกจ', href: '/package_manage', icon: FolderIcon, current: false },
-  { name: 'จัดการลูกค้า', href: '/customer_manage', icon: UsersIcon, current: false },
-]
-const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'จัดการการจอง', href: '/customer_manage', icon: UsersIcon, current: false },
+  { name: 'ประวัติการจอง', href: '/history', icon: ArchiveBoxIcon, current: false },
 ]
 
 function classNames(...classes) {

@@ -4,13 +4,13 @@ import { QUERY_BOOKING, MUTATION_APPROVE } from "../../services/Graphql";
 import dayjs from "dayjs";
 import ViewDetail from "../components/ViewDetail";
 
-const CustomerManage = () => {
+const History = () => {
     const [APPROVE_MUTATION] = useMutation(MUTATION_APPROVE)
     const { data, loading, error, refetch } = useQuery(QUERY_BOOKING, {
         variables: {
             filters: {
                 booking_status: {
-                    eq: "pending"
+                    ne: "pending"
                 }
             },
         },
@@ -21,29 +21,12 @@ const CustomerManage = () => {
         },
     });
 
-    const handleApprove = (documentId) => {
+    const handleRecheck = (documentId) => {
         APPROVE_MUTATION({
             variables: {
                 documentId: documentId,
                 data: {
-                    booking_status: "success",
-                }
-            },
-            context: {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-                },
-            }
-        }).then(() => {
-            refetch()
-        })
-    }
-    const handleRejection = (documentId) => {
-        APPROVE_MUTATION({
-            variables: {
-                documentId: documentId,
-                data: {
-                    booking_status: "failed",
+                    booking_status: "pending",
                 }
             },
             context: {
@@ -105,12 +88,12 @@ const CustomerManage = () => {
 
     console.log(localBookings)
     return (
-        <div className="px-4 sm:px-6 lg:px-8 ">
+        <div className="px-4 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
                 <div className="sm:flex-auto">
-                    <h1 className="text-4xl font-medium text-gray-900">จัดการลูกค้า</h1>
+                    <h1 className="text-4xl font-medium text-gray-900">ประวัติการจอง</h1>
                     <p className="mt-2 text-xl text-gray-700">
-                        คุณสามารถตรวจสอบและอนุมัติการจองของลูกค้าได้จากหน้านี้
+                        คุณสามารถตรวจสอบและจัดการประวัติการจองได้จากหน้านี้
                     </p>
                 </div>
             </div>
@@ -165,16 +148,13 @@ const CustomerManage = () => {
                                                 {person.paymentStatus}
                                             </span>
                                         </td>
-                                        <td className="px-3 py-5 text-lg whitespace-nowrap text-yellow-500">
+                                        <td className="px-3 py-5 text-lg whitespace-nowrap text-gray-500">
                                             {(person.status === "pending") ? 'รอการอนุมัติ' : (person.status === 'success') ? 'อนุมัติการจอง' : 'ปฏิเสธการจอง'}
                                         </td>
                                         <td className="relative py-5 pr-4 pl-3 text-right text-lg font-medium whitespace-nowrap sm:pr-0">
                                             <div className="flex gap-3">
-                                                <a onClick={() => handleApprove(person.id)} className="text-green-600 hover:text-green-900 cursor-pointer">
-                                                    อนุมัติ
-                                                </a>
-                                                <a onClick={() => handleRejection(person.id)} className="text-red-600 hover:text-green-900 cursor-pointer">
-                                                    ปฏิเสธ
+                                                <a onClick={() => handleRecheck(person.id)} className="text-yellow-600 hover:text-green-900 cursor-pointer">
+                                                    พิจารณาใหม่
                                                 </a>
                                                 <a onClick={() => showDetails(person)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer">
                                                     ดูเพิ่มเติม
@@ -194,8 +174,7 @@ const CustomerManage = () => {
                 booking={selectedBooking}
             ></ViewDetail>
         </div>
-        
     );
 };
 
-export default CustomerManage;
+export default History;

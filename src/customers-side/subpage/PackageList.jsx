@@ -6,6 +6,7 @@ import { MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { debounce } from "lodash";
+import { useLocation } from "react-router-dom";
 
 const PackageList = ({filters}) => {
   const navigate = useNavigate()
@@ -87,7 +88,7 @@ const PackageList = ({filters}) => {
           {transformedPackages.map((product) => (
             <div 
             key={product.documentId} 
-            className="group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200 lg:w-2xs mb-8" 
+            className="group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200 lg:w-2xs" 
             onClick={() => handleToPackageDetail(product.documentId,product.package_id)} >
               <img
                 src={`${strapiBaseURL}${product.url}`}

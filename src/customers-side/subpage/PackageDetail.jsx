@@ -24,7 +24,6 @@ import { StarIcon } from '@heroicons/react/20/solid'
 import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import Review from "../components/Review";
 
 const people = [
     { id: 1, name: 'Leslie Alexander' },
@@ -79,11 +78,10 @@ const PackageDetail = () => {
     const uniqueDataTimeTour = Array.from(new Map(DataTimeTour.map(time => [time.documentId, time])).values())
     console.log(uniqueDataTimeTour)
     
-
-    //แปลงเวลา
     dayjs.extend(customParseFormat)
     const time = dataPackage.package.time;
     const formattedTime = dayjs(time, 'HH:mm:ss.SSS').format('HH:mm')
+    
 
     const handleBooking = async () => {
         console.log(user?.documentId)
@@ -358,7 +356,6 @@ const PackageDetail = () => {
                         </div>
                     </div>
                 </div>
-                <Review></Review>
             </div>
 
         </motion.div>

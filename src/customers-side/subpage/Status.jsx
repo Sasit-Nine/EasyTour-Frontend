@@ -64,7 +64,7 @@ const Status = () => {
         date: dayjs(bk.updatedAt).format('DD/MM/YYYY HH:mm:ss'),
         payment_status: (bk.payment?.status_payment === 'Success') ? 'ชำระเงินสำเร็จ' : 'ชำระเงินล้มเหลว',
         booking_status: (bk.booking_status === 'pending') ? 'รอการตรวจสอบ' : (bk.booking_status === 'success') ? 'อนุมัติการจอง' : 'การจองล้มเหลว',
-        timetable: `${dayjs(bk.timetable.start).format('DD-MM-YYYY')} - ${dayjs(bk.timetable.end).format('DD-MM-YYYY')}`
+        timetable: `${dayjs(bk?.timetable?.start).format('DD-MM-YYYY')} - ${dayjs(bk?.timetable?.end).format('DD-MM-YYYY')}`
     })) || [];
     console.log(transformedPackages)
 

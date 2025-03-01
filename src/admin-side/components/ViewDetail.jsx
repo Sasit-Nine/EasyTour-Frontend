@@ -1,18 +1,18 @@
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
 
 const ViewDetail = ({ visible, onCancel, booking }) => {
-  if (!booking) return null
-  console.log(booking)
+  if (!booking) return null;
+  console.log(booking);
 
   return (
     <Dialog open={visible} onClose={onCancel} className="relative z-10">
       <DialogBackdrop className="fixed inset-0 bg-gray-500/75 transition-opacity" />
 
-      <div className="fixed inset-0 z-10 w-screen overflow-y-auto flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-10 flex items-center justify-center p-4">
         <DialogPanel className="relative transform overflow-hidden rounded-lg bg-white px-6 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
           <div className="text-center">
             <DialogTitle as="h3" className="text-xl font-semibold text-gray-900">
-                รายละเอียดการจอง
+              รายละเอียดการจอง
             </DialogTitle>
           </div>
 
@@ -35,7 +35,6 @@ const ViewDetail = ({ visible, onCancel, booking }) => {
             </p>
             <p><strong>เวลาที่จอง : </strong> {booking.bookingTime}</p>
             {(booking.Reciep)&&<p><strong>ใบเสร็จ : </strong> <button className="cursor-pointer text-[#F8644B]" onClick={()=>{window.open(booking.Reciep)}}>ดูใบเสร็จ</button></p>}
-            
           </div>
 
           <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
