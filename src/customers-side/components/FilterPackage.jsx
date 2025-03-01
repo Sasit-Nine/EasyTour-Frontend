@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PlusIcon } from '@heroicons/react/20/solid'
 import PackageList from '../subpage/PackageList'
 import { motion } from "framer-motion";
+import { useLocation } from 'react-router-dom';
 
 const filters = [
   {
@@ -43,23 +44,52 @@ const filters = [
 
 const FilterPackage = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
-  const [selectFilters,setSelectFilters] = useState({
-    category: [],
-    duration: [],
-    sector: []
-  })
+  const location = useLocation();
+  const searchFilters = location.state?.searchFilters || null;
+  
+  // ตั้งค่า initial state จาก searchFilters ถ้ามี
+  const [selectFilters, setSelectFilters] = useState({
+    category: searchFilters?.category || [],
+    duration: searchFilters?.duration || [],
+    sector: searchFilters?.sector || []
+  });
 
-  const handleFilterChange = (filterId,value) => {
-    setSelectFilters((prevFilter)=>{
+  // เมื่อ location.state เปลี่ยน (เช่น เมื่อมาจากหน้า Home)
+  useEffect(() => {
+    if (searchFilters) {
+      const newFilters = { ...selectFilters };
+      
+      if (searchFilters.category && searchFilters.category.length > 0) {
+        newFilters.category = searchFilters.category;
+      }
+      
+      if (searchFilters.duration && searchFilters.duration.length > 0) {
+        newFilters.duration = searchFilters.duration;
+      }
+      
+      if (searchFilters.sector && searchFilters.sector.length > 0) {
+        newFilters.sector = searchFilters.sector;
+      }
+      
+      setSelectFilters(newFilters);
+    }
+  }, [searchFilters]);
+
+  const handleFilterChange = (filterId, value) => {
+    setSelectFilters((prevFilter) => {
       const newValues = prevFilter[filterId].includes(value)
         ? prevFilter[filterId].filter((v) => v !== value)
-        : [...prevFilter[filterId],value]
-      return{...prevFilter,[filterId]:newValues}
+        : [...prevFilter[filterId], value]
+      return { ...prevFilter, [filterId]: newValues }
     })
   }
 
-  return (
+  // ฟังก์ชันเพื่อตรวจสอบว่า checkbox ควรถูกเลือกหรือไม่
+  const isChecked = (sectionId, value) => {
+    return selectFilters[sectionId].includes(value);
+  }
 
+  return (
     <div className="bg-white">
       <div>
         {/* Mobile filter dialog */}
@@ -109,11 +139,12 @@ const FilterPackage = () => {
                               <div className="flex h-5 shrink-0 items-center">
                                 <div className="group grid size-4 grid-cols-1">
                                   <input
-                                    defaultValue={option.value}
+                                    value={option.value}
                                     id={`${section.id}-${optionIdx}-mobile`}
                                     name={`${section.id}[]`}
                                     onChange={() => handleFilterChange(section.id, option.value)}
                                     type="checkbox"
+                                    checked={isChecked(section.id, option.value)}
                                     className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                                   />
                                   <svg
@@ -186,11 +217,12 @@ const FilterPackage = () => {
                               <div className="flex h-5 shrink-0 items-center">
                                 <div className="group grid size-4 grid-cols-1">
                                   <input
-                                    defaultValue={option.value}
+                                    value={option.value}
                                     id={`${section.id}-${optionIdx}`}
                                     name={`${section.id}[]`}
                                     onChange={() => handleFilterChange(section.id, option.value)}
                                     type="checkbox"
+                                    checked={isChecked(section.id, option.value)}
                                     className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                                   />
                                   <svg
@@ -236,4 +268,5 @@ const FilterPackage = () => {
     </div>
   )
 }
+
 export default FilterPackage

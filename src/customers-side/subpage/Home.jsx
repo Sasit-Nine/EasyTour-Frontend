@@ -87,7 +87,11 @@ const Home = () => {
     const searchParams = {
       query: searchQuery,
       type: selectedTypes.value,
+      // ส่งค่า category ในรูปแบบที่ FilterPackage ใช้
       category: selectedCategory.value !== 'all' ? [selectedCategory.value] : [],
+      // เพิ่มข้อมูลเกี่ยวกับ category ที่เลือก
+      categoryId: selectedCategory.id,
+      categoryName: selectedCategory.name
     }
     
     // Navigate to packages page with search params

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext, useContext } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { QUERY_PACKAGELIST } from "../../services/Graphql";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -6,8 +6,9 @@ import { MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { debounce } from "lodash";
-
-const PackageList = ({filters}) => {
+// เพิ่ม context สำหรับแชร์ข้อมูลกับ FilterPackage
+export const FilterContext = createContext();
+const PackageList = ({filters, onFilterInitialized}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const strapiBaseURL = import.meta.env.VITE_STRAPI_URL;
@@ -26,28 +27,25 @@ const PackageList = ({filters}) => {
   
   // Update filters when searchFilters change
   useEffect(() => {
-    if (searchFilters) {
-      setDebounceFilters({
-        ...debounceFilters,
-        category: searchFilters.category || [],
-        searchQuery: searchFilters.query || ""
-      });
+    if (onFilterInitialized && searchFilters) {
+      onFilterInitialized(initialFilters);
     }
   }, [searchFilters]);
-  
   // Update filters when component filters change
-  useEffect(() => {
-    const handler = debounce(() => {
-      setDebounceFilters({
-        ...debounceFilters,
-        category: filters?.category || debounceFilters.category,
-        sector: filters?.sector || debounceFilters.sector
-      });
-    }, 500);
-    
-    handler();
-    return () => handler.cancel();
-  }, [filters]);
+ useEffect(() => {
+  const handler = debounce(() => {
+    if (filters) {
+      setDebounceFilters(prevFilters => ({
+        ...prevFilters,
+        category: filters.category || prevFilters.category,
+        sector: filters.sector || prevFilters.sector
+      }));
+    }
+  }, 500);
+  
+  handler();
+  return () => handler.cancel();
+}, [filters]);
 
   const { data: dataPackage, loading: loadingPackage, error: errorPackage, refetch } = useQuery(QUERY_PACKAGELIST, {
     variables: {
