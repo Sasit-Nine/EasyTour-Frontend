@@ -191,7 +191,6 @@ export const QUERY_ALL_CHATS = gql`
       phone
       profilePic
       lastMessage
-      lastMessageTime
       unreadCount
     }
   }
@@ -201,7 +200,6 @@ export const QUERY_ALL_CHATS = gql`
 export const QUERY_MESSAGES = gql`
   query GetMessages($customerId: ID!) {
     messages(customerId: $customerId) {
-      id
       sender
       content
       timestamp
@@ -218,6 +216,7 @@ export const MUTATION_SEND_MESSAGE = gql`
       sender
       content
       timestamp
+      read
     }
   }
 `;

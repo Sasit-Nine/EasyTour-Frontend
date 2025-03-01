@@ -80,6 +80,21 @@ const Home = () => {
   const navigate = useNavigate()
   const [selectedTypes, setSelectedTypes] = useState(types[0])
   const [selectedCategory, setSelectedCategory] = useState(category[0])
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const handleSearch = () => {
+    // Create search params object
+    const searchParams = {
+      query: searchQuery,
+      type: selectedTypes.value,
+      category: selectedCategory.value !== 'all' ? [selectedCategory.value] : [],
+    }
+    
+    // Navigate to packages page with search params
+    navigate('/packages', { 
+      state: { searchFilters: searchParams } 
+    })
+  }
 
   return (
     <div className="bg-white">
@@ -128,11 +143,12 @@ const Home = () => {
                 </label>
                 <input
                   placeholder="ค้นหาแพ็กเกจ"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full sm:w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-[#F8644B]"
                 />
               </div>
               
-
               {/* 🔹 Dropdown ประเภทแพ็คเกจ */}
               <div className="w-full sm:w-[1/2]">
                 <label className="block text-base font-medium text-gray-900 mb-1.5">
@@ -203,7 +219,9 @@ const Home = () => {
               </div>
 
               {/* 🔹 ปุ่มค้นหา */}
-              <button className="w-full sm:w-auto px-6 rounded-xl bg-[#F8644B] py-2 text-white cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-100">
+              <button 
+                onClick={handleSearch}
+                className="w-full sm:w-auto px-6 rounded-xl bg-[#F8644B] py-2 text-white cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-100">
                 ค้นหา
               </button>
             </div>

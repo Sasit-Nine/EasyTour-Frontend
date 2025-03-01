@@ -230,9 +230,9 @@ const AdminChat = () => {
                     className="flex-1 mr-2"
                   />
                   <Button 
-                    type="primary"
                     onClick={handleSendMessage}
-                    className="bg-[#F8644B] hover:bg-[#E05A43]"
+                    style={{ backgroundColor: '#F8644B', borderColor: '#F8644B' }}
+                    type="primary"
                   >
                     ส่ง
                   </Button>

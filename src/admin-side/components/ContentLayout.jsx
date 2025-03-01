@@ -4,7 +4,7 @@ import Dashboard from "../subpage/Dashboard";
 import PackageManage from "../subpage/PackageManage";
 import CustomerManage from "../subpage/CustomerManage";
 import AddPackage from "../subpage/AddPackage";
-import AdminChat from "../components/AdminChat";
+import AdminChat from "../subpage/AdminChat";
 
 const ContentLayout = () => {
     return(
