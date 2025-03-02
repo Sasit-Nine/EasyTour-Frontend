@@ -81,7 +81,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(category[0])
 
   const handleNavigate = (categoryValue) => {
-    navigate("/packages", { state: { title:"category",categorie: categoryValue } });
+    navigate("/packages", { state: { title:categoryValue, category: "category" } });
   };
   
 

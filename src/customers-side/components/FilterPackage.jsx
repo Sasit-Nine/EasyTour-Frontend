@@ -51,11 +51,14 @@ const FilterPackage = () => {
 
   console.log(location.state?.title,location.state?.categorie)
   useEffect(() => {
-    if (location.state?.title) {
-      console.log(location.state?.title,location.state?.categorie)
-      handleFilterChange(location.state?.title,location.state?.categorie)
+    if (location.state?.categorie) {
+      setSelectFilters((prevFilter) => {
+        return { ...prevFilter, category: [location.state?.categorie] }
+      })
     }
-  }, [location.state?.title,location.state?.categorie])
+  }, [location.state?.title, location.state?.categorie])
+  
+  
 
   const handleFilterChange = (filterId, value) => {
     console.log(filterId, value)
@@ -68,6 +71,9 @@ const FilterPackage = () => {
     console.log(selectFilters)
   }
   
+  useEffect(() => {
+    console.log('Updated filters:', selectFilters)
+  }, [selectFilters])
   
   return (
 
@@ -124,6 +130,7 @@ const FilterPackage = () => {
                                     defaultValue={option.value}
                                     id={`${section.id}-${optionIdx}-mobile`}
                                     name={`${section.id}[]`}
+                                    checked={selectFilters[section?.name]?.includes(option?.value)}
                                     onChange={() => handleFilterChange(section.id, option.value).then(console.log(section.id, option.value))}
                                     type="checkbox"
                                     className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"

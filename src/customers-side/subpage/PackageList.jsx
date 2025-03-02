@@ -15,6 +15,7 @@ const PackageList = ({filters}) => {
   useEffect(()=>{
     const handler = debounce(() => {
       setDebounceFilters(filters)
+      console.log(debounceFilters)
     },500)
     handler()
     return () => handler.cancel()

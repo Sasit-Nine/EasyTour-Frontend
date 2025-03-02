@@ -170,18 +170,6 @@ const AdminLayout = () => {
                     ))}
                   </ul>
                 </li>
-                <li className="mt-auto">
-                  <a
-                    href="#"
-                    className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#F8644B]"
-                  >
-                    <Cog6ToothIcon
-                      aria-hidden="true"
-                      className="size-6 shrink-0 text-gray-400 group-hover:text-[#F8644B]"
-                    />
-                    Settings
-                  </a>
-                </li>
               </ul>
             </nav>
           </div>
@@ -199,7 +187,7 @@ const AdminLayout = () => {
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
               <form action="#" method="GET" className="grid flex-1 grid-cols-1">
-                <input
+                {/* <input
                   name="search"
                   type="search"
                   placeholder="Search"
@@ -209,13 +197,13 @@ const AdminLayout = () => {
                 <MagnifyingGlassIcon
                   aria-hidden="true"
                   className="pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400"
-                />
+                /> */}
               </form>
               <div className="flex items-center gap-x-4 lg:gap-x-6">
-                <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+                {/* <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">View notifications</span>
                   <BellIcon aria-hidden="true" className="size-6" />
-                </button>
+                </button> */}
 
                 {/* Separator */}
                 <div aria-hidden="true" className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" />
