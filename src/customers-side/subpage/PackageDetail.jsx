@@ -93,7 +93,7 @@ const PackageDetail = () => {
                 packageId: package_id,
                 packageDocumentId: documentId,
                 name: dataPackage?.package?.name,
-                url: `${strapiBaseURL}${dataPackage.package.image[0].url}`,
+                url: `${strapiBaseURL}${dataPackage.package.thumbnail.url}`,
                 quantity: quantity,
                 price: dataPackage.package.price,
                 timetable: selectedTour.documentId
@@ -104,6 +104,7 @@ const PackageDetail = () => {
     const handleLogin = async () => {
         navigate('/login')
     }
+    
 
 
     return (

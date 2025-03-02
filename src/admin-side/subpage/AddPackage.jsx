@@ -8,8 +8,33 @@ import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@h
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { CheckIcon } from '@heroicons/react/20/solid'
 import { useNavigate } from "react-router-dom"
+import dayjs from "dayjs"
 
 const AddPackage = () => {
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!name) newErrors.name = "กรุณากรอกชื่อแพ็คเกจทัวร์";
+        if (!price) newErrors.price = "กรุณากรอกราคา";
+        if (!meeting_point) newErrors.meeting_point = "กรุณากรอกจุดนัดพบ";
+        if (!max_people) newErrors.max_people = "กรุณากรอกจำนวนลูกค้าสูงสุด";
+        if (!description) newErrors.description = "กรุณากรอกรายละเอียดแพ็คเกจ";
+        if (!duration) newErrors.duration = "กรุณากรอกระยะเวลา";
+        if (!price_includes) newErrors.price_includes = "กรุณากรอกราคานี้รวมอะไรบ้าง";
+        if (!tourist_attraction) newErrors.tourist_attraction = "กรุณากรอกสถานที่ท่องเที่ยว";
+        if (!district) newErrors.district = "กรุณากรอกอำเภอ";
+        if (!province) newErrors.province = "กรุณากรอกจังหวัด";
+        if (!selectedSector) newErrors.selectedSector = "กรุณาเลือกภาค";
+        if (!selectedType) newErrors.selectedType = "กรุณาเลือกสไตล์การท่องเที่ยว";
+        if (!selectPublish) newErrors.selectPublish = "กรุณาเลือกสถานะแพ็คเกจ";
+        if (!thumbnailFile) newErrors.thumbnail = "กรุณาอัปโหลดภาพหน้าปก";
+        if (imageFiles.length === 0) newErrors.image = "กรุณาอัปโหลดภาพประกอบ";
+
+        if (Object.keys(newErrors).length > 0) return newErrors;
+        return true; // คืนค่า true หากไม่มีข้อผิดพลาด
+    };
+
     const navagate = useNavigate()
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const [name, setName] = useState('')
@@ -60,41 +85,33 @@ const AddPackage = () => {
     const onTypeChange = (e) => {
         setWithAccommodation(e)
     }
+
+
     const handleDateChange = (index, field, date) => {
         setTableTime((prevTimetables) =>
             prevTimetables.map((timetable, i) =>
                 i === index ? { ...timetable, [field]: date } : timetable
             )
-        )
-    }
+        );
+    };
 
     const AddTimeTable = () => {
         setTableTime([...tableTime, { start: null, end: null }])
     }
 
     const handleSave = async () => {
-        console.log(name)
-        console.log(price)
-        console.log(tableTime)
-        console.log(meeting_point)
-        console.log(max_people)
-        console.log(description)
-        console.log(duration)
-        console.log(accommodation)
-        console.log(price_includes)
-        console.log(tourist_attraction)
-        console.log(district)
-        console.log(province)
-        console.log(sector)
-        console.log(image)
-        console.log(thumbnail)
-        console.log(with_accommodation)
+        const isValid = validateForm()
+        if (isValid){
+            return <p className="text-2xl text-red-600">{isValid[0]}</p>
+        }
+        if (!isValid) return
+
         try {
             const imagesFormData = new FormData()
             imageFiles.forEach(file => imagesFormData.append('files', file))
             const uploadImageRes = await axios.post(`${strapiBaseURL}/api/upload`, imagesFormData, {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                     'Content-Type': 'multipart/form-data',
                 },
             })
@@ -104,7 +121,7 @@ const AddPackage = () => {
             ThumbnailFormData.append('files', thumbnailFile)
             const uploadThumbnailRes = await axios.post(`${strapiBaseURL}/api/upload`, ThumbnailFormData, {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                     'Content-Type': 'multipart/form-data',
                 },
             })
@@ -120,7 +137,7 @@ const AddPackage = () => {
             },
                 {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                     },
                 })
             const detailRes = await axios.post(`${strapiBaseURL}/api/packagedetails`, {
@@ -132,7 +149,7 @@ const AddPackage = () => {
             },
                 {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                     },
                 })
 
@@ -156,7 +173,7 @@ const AddPackage = () => {
             },
                 {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                     },
                 })
 
@@ -171,7 +188,7 @@ const AddPackage = () => {
                     },
                         {
                             headers: {
-                                Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                                Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                             },
                         })
                     return res.data.data.documentId
@@ -189,6 +206,15 @@ const AddPackage = () => {
     }
     console.log(tableTime)
 
+    const RemoveTimeTableAtIndex = (index) => {
+        setTableTime(prevTimetables => prevTimetables.filter((_, i) => i !== index));
+    }
+
+    const handleDeleteImage = (index) => {
+        setImageFiles(prev => prev.filter((_, i) => i !== index))
+        setImage(prev => prev.filter((_, i) => i !== index))
+    }
+
     return (
         <div>
             <form>
@@ -200,7 +226,7 @@ const AddPackage = () => {
                         </p>
                         <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:pb-0">
 
-                        <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+                            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                                 <label htmlFor="username" className="block text-lg font-medium text-gray-900 sm:pt-1.5">
                                     สถานะแพ็กเกจ
                                 </label>
@@ -225,7 +251,7 @@ const AddPackage = () => {
                                                         value={type}
                                                         className="group relative cursor-default py-2 pr-4 pl-8 text-gray-900 select-none data-focus:bg-[#F8644B] data-focus:text-white data-focus:outline-hidden"
                                                     >
-                                                        <span className="block truncate font-normal group-data-selected:font-semibold text-base">{type === 'Publish'?'เผยแพร่':'ฉบับร่าง'}</span>
+                                                        <span className="block truncate font-normal group-data-selected:font-semibold text-base">{type === 'Publish' ? 'เผยแพร่' : 'ฉบับร่าง'}</span>
                                                         <span className="absolute inset-y-0 left-0 flex items-center pl-1.5 text-[#F8644B]group-not-data-selected:hidden group-data-focus:text-white">
                                                         </span>
                                                     </ListboxOption>
@@ -346,7 +372,7 @@ const AddPackage = () => {
                                                         value={type}
                                                         className="group relative cursor-default py-2 pr-4 pl-8 text-gray-900 select-none data-focus:bg-[#F8644B] data-focus:text-white data-focus:outline-hidden"
                                                     >
-                                                        <span className="block truncate font-normal group-data-selected:font-semibold text-base">{type === 'Nature & Mountain Tour' ? 'ธรรมชาติและภูเขา' : type === 'Cultural & Historical Tour' ? 'วัฒนธรรมและประวัติศาสตร์' : type === 'Adventure Tour' ? 'ผจญภัยและกิจกรรมกลางแจ้ง' : type === 'Family Tour' ? 'ครอบครัว' : 'ฮันนีมูนและโรแมนติก'}</span>
+                                                        <span className="block truncate font-normal group-data-selected:font-semibold text-base">{type === 'Nature And Mountain Tour' ? 'ธรรมชาติและภูเขา' : type === 'Cultural And Historical Tour' ? 'วัฒนธรรมและประวัติศาสตร์' : type === 'Adventure Tour' ? 'ผจญภัยและกิจกรรมกลางแจ้ง' : type === 'Family Tour' ? 'ครอบครัว' : 'ฮันนีมูนและโรแมนติก'}</span>
                                                         <span className="absolute inset-y-0 left-0 flex items-center pl-1.5 text-[#F8644B]group-not-data-selected:hidden group-data-focus:text-white">
                                                         </span>
                                                     </ListboxOption>
@@ -516,7 +542,18 @@ const AddPackage = () => {
                                         <div className="text-center">
                                             {(!Array.isArray(image)) && <PhotoIcon aria-hidden="true" className="mx-auto size-12 text-gray-300" />}
                                             <div className="flex flex-row flex-wrap gap-2">
-                                                {(Array.isArray(image)) && image.map((image, index) => (<img src={image} key={index} className="lg:col-span-3 object-cover w-50 h-50 rounded-xl" />))}
+                                                {(Array.isArray(image)) && image.map((image, index) => (
+                                                    <div key={index} className="relative">
+                                                        <img src={image} key={index} className="lg:col-span-3 object-cover w-50 h-50 rounded-xl" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteImage(index)} // ส่งเฉพาะ index
+                                                            className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-bl-lg hover:bg-red-600"
+                                                        >
+                                                            ลบ
+                                                        </button>
+                                                    </div>
+                                                ))}
                                             </div>
                                             <div className="mt-6 flex text-lg flex-col items-center justify-center text-gray-600">
                                                 <label
@@ -595,40 +632,54 @@ const AddPackage = () => {
                             }
                             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                                 <label htmlFor="username" className="block text-lg font-medium text-gray-900 sm:pt-1.5">
-                                    วันเริ่มทัวร์
+                                    วันเริ่มทัวร์ และ วันสิ้นสุดทัวร์
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
                                     <div>
                                         {tableTime?.map((timetable, index) => (
-                                            <div key={`${timetable.documentId}-${index}`} style={{ marginBottom: "10px" }}>
+                                            <div key={`${timetable.documentId}-${index}`} style={{ marginBottom: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
                                                 <DatePicker
                                                     className="h-11 w-40"
-                                                    defaultValue={timetable.start}
+                                                    defaultValue={timetable.start && dayjs(timetable.start)}
                                                     onChange={(date) => handleDateChange(index, "start", date)}
-                                                    showTimeSelect
-                                                    dateFormat="Pp"
+                                                    showTime
+                                                    format="YYYY-MM-DD HH:mm:ss"
                                                 />
-                                                <span>  -  </span>
+                                                <span> - </span>
                                                 <DatePicker
                                                     className="h-11 w-40"
-                                                    defaultValue={timetable.end}
+                                                    defaultValue={timetable.end && dayjs(timetable.end)}
                                                     onChange={(date) => handleDateChange(index, "end", date)}
-                                                    showTimeSelect
-                                                    dateFormat="Pp"
+                                                    showTime
+                                                    format="YYYY-MM-DD HH:mm:ss"
                                                 />
+                                                {tableTime.length > 1 && (
+                                                    <button
+                                                        onClick={() => RemoveTimeTableAtIndex(index)}
+                                                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                                                    >
+                                                        ลบ
+                                                    </button>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
-                                    <p onClick={() => { AddTimeTable() }} className="bg-[#F8644B] w-40 p-2 text-center rounded-md text-white cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100">เพิ่มรอบทัวร์</p>
+                                    <p
+                                        onClick={() => AddTimeTable()}
+                                        className="bg-[#F8644B] w-40 p-2 text-center rounded-md text-white cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100"
+                                    >
+                                        เพิ่มรอบทัวร์
+                                    </p>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
                 </div>
 
                 <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <button type="button" className="text-lg font-semibold text-gray-900">
+                    <button type="button" className="text-lg cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100 text-gray-900" onClick={() => { navagate('/package_manage') }}>
                         ยกเลิก
                     </button>
                     <p

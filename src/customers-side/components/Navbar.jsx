@@ -6,6 +6,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import planeImg from "../../assets/plane.png";
 import { QEURY_PROFILE } from "../../services/Graphql";
 import { useQuery } from "@apollo/client";
+import profile from "../../assets/profile.jpg";
 
 const Navbar = () => {
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
@@ -18,7 +19,7 @@ const Navbar = () => {
         },
         context: {
             headers: { 
-                Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
             },
         }
     })
@@ -60,7 +61,7 @@ const Navbar = () => {
                             <Menu as="div" className="relative ml-3">
                                 <div>
                                     <MenuButton className="relative flex rounded-full bg-white text-sm focus:ring-offset-2 focus:outline-none border-3 border-white hover:scale-110 active:scale-100 transition-transform duration-200 cursor-pointer">
-                                        <img alt="User" src={`${strapiBaseURL}${urlProfile?.usersPermissionsUser?.profile_picture?.url}`} className="size-10 rounded-full" />
+                                        <img alt="User" src={urlProfile?.usersPermissionsUser?.profile_picture?`${strapiBaseURL}${urlProfile?.usersPermissionsUser?.profile_picture?.url}`:profile} className="size-10 rounded-full" />
                                     </MenuButton>
                                 </div>
 

@@ -34,27 +34,27 @@ import ProductInHome from '../components/ProductInHome'
 const categories = [
   {
     name: 'ทัวร์ธรรมชาติและภูเขา',
-    href: '#',
+    value: 'Nature And Mountain Tour',
     imageSrc: 'https://images.unsplash.com/photo-1511162384289-94da0b4013d8?q=80&w=3165&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     name: 'ทัวร์วัฒนธรรมและประวัติศาสตร์',
-    href: '#',
+    value: 'Cultural And Historical Tour',
     imageSrc: 'https://images.unsplash.com/photo-1595131153384-21ced4991b07?q=80&w=2067&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     name: 'ทัวร์ผจญภัยและกิจกรรมกลางแจ้ง',
-    href: '#',
+    value: 'Adventure Tour',
     imageSrc: 'https://images.unsplash.com/photo-1521336575822-6da63fb45455?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     name: 'ทัวร์ครอบครัว',
-    href: '#',
+    value: 'Family Tour',
     imageSrc: 'https://plus.unsplash.com/premium_photo-1664367173144-7e854e199524?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     name: 'ทัวร์ฮันนีมูนและโรแมนติก',
-    href: '#',
+    value: 'Honeymoon & Romantic Tour',
     imageSrc: 'https://images.unsplash.com/photo-1513279922550-250c2129b13a?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
 ]
@@ -67,15 +67,12 @@ const types = [
 
 const category = [
   { id: 1, name: 'ทั้งหมด' , value: 'all'},
-  { id: 2, name: 'ธรรมชาติและภูเขา' , value: 'Nature & Mountain Tour' },
-  { id: 3, name: 'วัฒนธรรมและประวัติศาสตร์' , value: 'Cultural & Historical Tour' },
+  { id: 2, name: 'ธรรมชาติและภูเขา' , value: 'Nature And Mountain Tour' },
+  { id: 3, name: 'วัฒนธรรมและประวัติศาสตร์' , value: 'Cultural And Historical Tour' },
   { id: 4, name: 'ผจญภัยและกิจกรรมกลางแจ้ง' , value: 'Adventure Tour' },
   { id: 5, name: 'ครอบครัว' , value: 'Family Tour' },
   { id: 6, name: 'ฮันนีมูนและโรแมนติก' , value: 'Honeymoon & Romantic Tour' },
 ]
-
-
-
 
 const Home = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -83,9 +80,10 @@ const Home = () => {
   const [selectedTypes, setSelectedTypes] = useState(types[0])
   const [selectedCategory, setSelectedCategory] = useState(category[0])
 
-  const handleNavigate = (categorie) => {
-    navigate('/packages', {state: {categorie}})
-  }
+  const handleNavigate = (categoryValue) => {
+    navigate("/packages", { state: { title:"category",categorie: categoryValue } });
+  };
+  
 
   return (
     <div className="bg-white">
@@ -233,7 +231,6 @@ const Home = () => {
                   {categories.map((category) => (
                     <a
                       key={category.name}
-                      href={category.href}
                       onClick={() => handleNavigate(category.value)}
                       className="relative flex h-80 w-56 flex-col overflow-hidden rounded-lg p-6 xl:w-auto hover:scale-105 active:scale-100 transition-transform duration-100"
                     >

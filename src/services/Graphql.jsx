@@ -75,7 +75,7 @@ query Query($filters: PackageFiltersInput) {
   packages(filters: $filters) {
     thumbnail {
       url
-    }
+    } 
     type
     status_package
     name
@@ -90,6 +90,7 @@ query Query($filters: PackageFiltersInput) {
     image {
       previewUrl
       url
+      documentId
     }
     package_id
   }
@@ -108,6 +109,7 @@ query Query($documentId: ID!) {
     price
     image {
       url
+      documentId
     }
     max_people
     duration
@@ -239,3 +241,15 @@ mutation DeletePackage($documentId: ID!) {
     documentId
   }
 }`
+
+export const REGISTERMUTATION = gql`
+mutation Register($input: UsersPermissionsRegisterInput!) {
+  register(input: $input) {
+    jwt
+    user {
+      username
+      email
+    }
+  }
+}
+`;

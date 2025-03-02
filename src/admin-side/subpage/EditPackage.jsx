@@ -28,6 +28,7 @@ const EditPackage = () => {
     const [district, setDistrict] = useState('')
     const [province, setProvince] = useState('')
     const [with_accommodation, setWithAccommodation] = useState()
+    const [idImageDelete, setIdImageDelete] = useState([])
 
     const [sector, setSector] = useState(['north', 'south', 'west', 'east', 'central'])
     const [selectedSector, setSelectedSector] = useState('')
@@ -38,7 +39,7 @@ const EditPackage = () => {
     const [publish, setPublish] = useState(['Publish', 'Draft'])
     const [selectPublish, setSelectPublish] = useState('')
 
-    const [image, setImage] = useState({})
+    const [image, setImage] = useState([])
     const [thumbnail, setThumbnail] = useState()
     const [thumbnailFile, setThumbnailFile] = useState(null)
     const [imageFiles, setImageFiles] = useState([])
@@ -59,11 +60,29 @@ const EditPackage = () => {
 
     const { documentId } = useParams()
     console.log(documentId)
-    const { data: dataPackage, loading: loadingPackage, error: errorPackage } = useQuery(QUERY_PACKAGE, {
+    const { data: dataPackage, loading: loadingPackage, error: errorPackage, refetch } = useQuery(QUERY_PACKAGE, {
         variables: {
             documentId: documentId
         }
     })
+
+    const handleDeleteImage = async (index, imageId) => {
+        if (imageId) {
+            const res = await axios.get(`${strapiBaseURL}/api/upload/files?filters[documentId][$eq]=${imageId}`, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+                },
+            });
+            setIdImageDelete((prev) => [...prev, res.data[0].id]);
+            setImage((prev) => prev.filter((_, i) => i !== index));
+        } else {
+            setImageFiles((prev) => prev.filter((_, i) => i !== index));
+            setNewImage((prev) => prev.filter((_, i) => i !== index));
+        }
+    };
+
+
+
 
 
     const handleDelete = async () => {
@@ -74,7 +93,7 @@ const EditPackage = () => {
                 },
                 context: {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                     },
                 }
             })
@@ -92,11 +111,12 @@ const EditPackage = () => {
                 imageFiles.forEach(file => imagesFormData.append('files', file))
                 const uploadImageRes = await axios.post(`${strapiBaseURL}/api/upload`, imagesFormData, {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                         'Content-Type': 'multipart/form-data',
                     },
                 })
                 imageIds = uploadImageRes.data.map(file => file.id)
+                console.log('Image idddddd', uploadImageRes)
             }
 
             let ThumbnailIds = null
@@ -105,7 +125,7 @@ const EditPackage = () => {
                 ThumbnailFormData.append('files', thumbnailFile)
                 const uploadThumbnailRes = await axios.post(`${strapiBaseURL}/api/upload`, ThumbnailFormData, {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                         'Content-Type': 'multipart/form-data',
                     },
                 })
@@ -127,7 +147,7 @@ const EditPackage = () => {
             },
                 {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                     },
                 })
             const detailRes = await axios.put(`${strapiBaseURL}/api/packagedetails/${dataPackage.package.detail.documentId}`, {
@@ -139,14 +159,31 @@ const EditPackage = () => {
             },
                 {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                     },
                 })
 
             console.log(imageIds)
 
             // สร้าง array ของ image documentId เก่า
-            const existingImageIds = dataPackage.package.image.map(img => img.documentId);
+            // const existingImageIds = dataPackage.package.image.map(img => img.id);
+            const existingImageIds = await Promise.all(
+                dataPackage.package.image.map(async (img) => {
+                    const res = await axios.get(`${strapiBaseURL}/api/upload/files?filters[documentId][$eq]=${img.documentId}`, {
+                        headers: {
+                            Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+                        },
+                    });
+                    return res.data[0].id;
+                })
+            );
+            console.log(existingImageIds)
+
+            console.log(dataPackage.package.image)
+            const allImage = [...existingImageIds, ...imageIds]
+
+
+            console.log(allImage)
 
             // สร้าง thumbnailId ตามเงื่อนไข
             const thumbnailId = ThumbnailIds
@@ -158,12 +195,12 @@ const EditPackage = () => {
                     name: name,
                     price: price,
                     duration: duration,
-                    // image: [...existingImageIds, ...imageIds], // รวมรูปเก่า + ใหม่
+                    image: allImage,
                     location: locationRes.data.data.documentId,
                     max_people: max_people,
                     meeting_point: meeting_point,
                     description: description,
-                    thumbnail: thumbnailId, // ใช้ thumbnail ใหม่หรือเก่า
+                    thumbnail: thumbnailId,
                     detail: detailRes.data.data.documentId,
                     with_accommodation: with_accommodation,
                     type: selectedType,
@@ -172,7 +209,8 @@ const EditPackage = () => {
             },
                 {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
                     },
                 });
 
@@ -188,7 +226,7 @@ const EditPackage = () => {
                         },
                             {
                                 headers: {
-                                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                                    Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                                 },
                             })
                         return res.data.data.documentId
@@ -202,7 +240,7 @@ const EditPackage = () => {
                         },
                             {
                                 headers: {
-                                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                                    Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                                 },
                             })
                         return res.data.data.documentId
@@ -216,16 +254,38 @@ const EditPackage = () => {
                 removedTimetables.map(async (id) => {
                     await axios.delete(`${strapiBaseURL}/api/timetables/${id}`, {
                         headers: {
-                            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                            Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                         },
                     });
                 })
             );
 
+            if (idImageDelete.length > 0) {
+                try {
+                    await Promise.all(
+                        idImageDelete.map(async (id) => {
+                            await axios.delete(`${strapiBaseURL}/api/upload/files/${id}`, {
+                                headers: {
+                                    Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+                                },
+                            });
+                        })
+                    );
+                    setIdImageDelete([]);
+                    console.log('Deleted images successfully');
+                } catch (error) {
+                    console.error('Error deleting images:', error);
+                }
+            }
+
+
+            await refetch()
             console.log(timeRes)
 
             console.log(locationRes, detailRes)
             console.log(packageRes)
+            navigate('/package_manage')
+
         } catch (error) {
             if (error.response) {
                 console.log("Error response data:", error.response.data);
@@ -286,7 +346,13 @@ const EditPackage = () => {
         setTableTime(prevTimetables => prevTimetables.filter((_, i) => i !== index));
     }
 
-    console.log(dataPackage)
+    // console.log(dataPackage)
+    // const handleDeleteImage = (index) => {
+    //     setImageFiles((prev) => prev.filter((_, i) => i !== index))
+    //     setNewImage((prev) => prev.filter((_, i) => i !== index))
+    // }
+
+
     return (
         <div>
             <form>
@@ -339,7 +405,7 @@ const EditPackage = () => {
                                     ชื่อแพ็กเกจทัวร์
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
                                         <div className="shrink-0 text-lg text-gray-500 select-none sm:text-lg"></div>
                                         <input
                                             type="text"
@@ -356,7 +422,7 @@ const EditPackage = () => {
                                     ราคา
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
 
                                         <input
                                             type="text"
@@ -374,7 +440,7 @@ const EditPackage = () => {
                                     จุดนัดพบ
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
 
                                         <input
                                             type="text"
@@ -391,7 +457,7 @@ const EditPackage = () => {
                                     ระยะเวลา
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
 
                                         <input
                                             type="text"
@@ -411,7 +477,7 @@ const EditPackage = () => {
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
                                     <textarea
                                         rows={5}
-                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-lg text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:max-w-2xl sm:text-lg"
+                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-lg text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:max-w-2xl sm:text-lg"
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
                                     />
@@ -460,7 +526,7 @@ const EditPackage = () => {
                                     จำนวนลูกค้าสูงสุด
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
 
                                         <input
                                             type="text"
@@ -478,7 +544,7 @@ const EditPackage = () => {
                                     ราคานี้รวมอะไรบ้าง?
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
 
                                         <input
                                             type="text"
@@ -495,7 +561,7 @@ const EditPackage = () => {
                                     สถานที่ท่องเที่ยว
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
 
                                         <input
                                             type="text"
@@ -512,7 +578,7 @@ const EditPackage = () => {
                                     อำเภอ
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
 
                                         <input
                                             type="text"
@@ -529,7 +595,7 @@ const EditPackage = () => {
                                     จังหวัด
                                 </label>
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
 
                                         <input
                                             type="text"
@@ -593,7 +659,7 @@ const EditPackage = () => {
                                             <div className="mt-6 flex text-lg flex-col items-center justify-center text-gray-600">
                                                 <label
                                                     htmlFor="thumnail-upload"
-                                                    className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500"
+                                                    className="relative cursor-pointer rounded-md bg-white font-semibold text-[#F8644B] focus-within:ring-2 focus-within:ring-[#F8644B] focus-within:ring-offset-2 focus-within:outline-hidden hover:text-[#F8644B]"
                                                 >
                                                     <span>Upload a file</span>
                                                     <input id="thumnail-upload" name="file-upload" type="file" onChange={handleUploadThumbnail} className="sr-only" />
@@ -601,6 +667,7 @@ const EditPackage = () => {
                                             </div>
 
                                             <p className="text-xs/5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+
                                         </div>
                                     </div>
                                 </div>
@@ -612,23 +679,76 @@ const EditPackage = () => {
                                 <div className="mt-2 sm:col-span-2 sm:mt-0">
                                     <div className="flex max-w-2xl justify-center rounded-base border border-dashed border-gray-900/25 px-6 py-10">
                                         <div className="text-center">
-                                            {(!image) && <PhotoIcon aria-hidden="true" className="mx-auto size-12 text-gray-300" />}
-                                            {
-                                                <div className="flex flex-row flex-wrap gap-2">
-                                                    {(image) && image.map((image, index) => (<img src={`${strapiBaseURL}${image.url}`} key={index} className="lg:col-span-3 object-cover w-50 h-50 rounded-xl" />))}
-                                                    {(newImage) && newImage.map((image, index) => (<img src={`${image}`} key={index} className="lg:col-span-3 object-cover w-50 h-50 rounded-xl" />))}
-                                                </div>
-                                            }
+                                            {/* แสดงไอคอนเมื่อไม่มีรูปภาพ */}
+                                            {(!image || image.length === 0) && (!newImage || newImage.length === 0) && (
+                                                <PhotoIcon aria-hidden="true" className="mx-auto size-12 text-gray-300" />
+                                            )}
+
+                                            {/* แสดงรูปภาพ */}
+                                            <div className="flex flex-row flex-wrap gap-2">
+                                                {/* แสดงรูปภาพเก่า */}
+                                                {image &&
+                                                    image.map((img, index) => (
+                                                        <div key={index} className="relative">
+                                                            <img
+                                                                src={`${strapiBaseURL}${img.url}`}
+                                                                className="lg:col-span-3 object-cover w-50 h-50 rounded-xl"
+                                                                alt={`รูปภาพประกอบ ${index + 1}`}
+                                                            />
+                                                            {/* ปุ่มลบรูปภาพเก่า */}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleDeleteImage(index, img.documentId)} // ส่ง index และ imageId
+                                                                className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-bl-lg hover:bg-red-600"
+                                                            >
+                                                                ลบ
+                                                            </button>
+                                                        </div>
+                                                    ))}
+
+                                                {/* แสดงรูปภาพใหม่ */}
+                                                {newImage &&
+                                                    newImage.map((img, index) => (
+                                                        <div key={index} className="relative">
+                                                            <img
+                                                                src={img}
+                                                                className="lg:col-span-3 object-cover w-50 h-50 rounded-xl"
+                                                                alt={`รูปภาพใหม่ ${index + 1}`}
+                                                            />
+                                                            {/* ปุ่มลบรูปภาพใหม่ */}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleDeleteImage(index)} // ส่งเฉพาะ index
+                                                                className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-bl-lg hover:bg-red-600"
+                                                            >
+                                                                ลบ
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                            </div>
+
+                                            {/* ปุ่มอัปโหลดรูปภาพ */}
                                             <div className="mt-6 flex text-lg flex-col items-center justify-center text-gray-600">
                                                 <label
                                                     htmlFor="file-upload"
-                                                    className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500"
+                                                    className="relative cursor-pointer rounded-md bg-white font-semibold text-[#F8644B] focus-within:ring-2 focus-within:ring-[#F8644B] focus-within:ring-offset-2 focus-within:outline-hidden hover:text-[#F8644B]"
                                                 >
                                                     <span>Upload a file</span>
-                                                    <input id="file-upload" name="file-upload" type="file" multiple accept="image/*" onChange={handleUploadImage} className="sr-only" />
+                                                    <input
+                                                        id="file-upload"
+                                                        name="file-upload"
+                                                        type="file"
+                                                        multiple
+                                                        accept="image/*"
+                                                        onChange={handleUploadImage}
+                                                        className="sr-only"
+                                                    />
                                                 </label>
                                             </div>
+
+                                            {/* ข้อความแนะนำและปุ่มล้างภาพประกอบ */}
                                             <p className="text-xs/5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+
                                         </div>
                                     </div>
                                 </div>
@@ -650,7 +770,7 @@ const EditPackage = () => {
                                                         id="onedaytrip"
                                                         type="radio"
                                                         onChange={() => onTypeChange(false)}
-                                                        className="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                                                        className="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-[#F8644B] checked:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
                                                     />
                                                     <label htmlFor="onedaytrip" className="block text-lg font-medium text-gray-900">
                                                         แพ็กเกจทัวร์วันเดียว
@@ -663,7 +783,7 @@ const EditPackage = () => {
                                                         checked={with_accommodation === true}
                                                         onChange={() => onTypeChange(true)}
                                                         type="radio"
-                                                        className="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                                                        className="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-[#F8644B] checked:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
                                                     />
                                                     <label htmlFor="accommodation" className="block text-lg font-medium text-gray-900">
                                                         แพ็กเกจทัวร์พร้อมที่พัก
@@ -680,7 +800,7 @@ const EditPackage = () => {
                                         ที่พัก
                                     </label>
                                     <div className="mt-2 sm:col-span-2 sm:mt-0">
-                                        <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:max-w-md">
+                                        <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-[#F8644B] sm:max-w-md">
                                             <input
                                                 type="text"
                                                 value={accommodation}
@@ -734,20 +854,22 @@ const EditPackage = () => {
                                     </p>
                                 </div>
                             </div>
+
+
                         </div>
                     </div>
 
                 </div>
 
                 <div className="flex items-center justify-end gap-x-6">
-                    <button onClick={()=>{handleDelete()}}>ลบแพ็กเกจทัวร์</button>
+                    <button onClick={() => { handleDelete() }}>ลบแพ็กเกจทัวร์</button>
                     <div className="mt-6 flex items-center justify-end gap-x-6">
                         <button type="button" className="text-lg font-semibold text-gray-900 cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100" onClick={() => { navigate(-1) }}>
                             ยกเลิก
                         </button>
                         <p
                             type="submit"
-                            onClick={() => handleSave().then(() => navigate('/package_manage'))}
+                            onClick={() => handleSave()}
                             className="inline-flex justify-center rounded-md bg-[#F8644B] px-3 py-2 text-lg  text-white shadow-xs 
                         cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100"
                         >

@@ -31,7 +31,7 @@ const CustomerManage = () => {
             },
             context: {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                 },
             }
         }).then(() => {
@@ -48,7 +48,7 @@ const CustomerManage = () => {
             },
             context: {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
                 },
             }
         }).then(() => {

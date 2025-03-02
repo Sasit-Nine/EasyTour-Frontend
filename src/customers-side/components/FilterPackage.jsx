@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Dialog, DialogBackdrop, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PlusIcon } from '@heroicons/react/20/solid'
 import PackageList from '../subpage/PackageList'
-import { motion } from "framer-motion";
-import { useLocation } from 'react-router-dom'
 
 const filters = [
   {
@@ -42,35 +41,34 @@ const filters = [
 
 const FilterPackage = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
-  const [selectFilters,setSelectFilters] = useState({
+  const [selectFilters, setSelectFilters] = useState({
     category: [],
     duration: [],
     sector: []
   })
-  if (location.state) {
-    console.log(location.state)
-  }
 
+  console.log(location.state?.title,location.state?.categorie)
   useEffect(() => {
-    if (location.state && location.state.categorie) {
-      console.log(location.state.categorie)
-      setSelectFilters((prevFilters) => ({
-        ...prevFilters,
-        category: [location.state.categorie] 
-      }));
+    if (location.state?.title) {
+      console.log(location.state?.title,location.state?.categorie)
+      handleFilterChange(location.state?.title,location.state?.categorie)
     }
-  }, [location.state])
+  }, [location.state?.title,location.state?.categorie])
 
-  const handleFilterChange = (filterId,value) => {
-    setSelectFilters((prevFilter)=>{
+  const handleFilterChange = (filterId, value) => {
+    console.log(filterId, value)
+    setSelectFilters((prevFilter) => {
       const newValues = prevFilter[filterId].includes(value)
         ? prevFilter[filterId].filter((v) => v !== value)
-        : [...prevFilter[filterId],value]
-      return{...prevFilter,[filterId]:newValues}
+        : [...prevFilter[filterId], value]
+      return { ...prevFilter, [filterId]: newValues }
     })
+    console.log(selectFilters)
   }
-
+  
+  
   return (
 
     <div className="bg-white">
@@ -122,10 +120,11 @@ const FilterPackage = () => {
                               <div className="flex h-5 shrink-0 items-center">
                                 <div className="group grid size-4 grid-cols-1">
                                   <input
+                                    // checked={selectFilters[section?.name].includes(option?.name)}
                                     defaultValue={option.value}
                                     id={`${section.id}-${optionIdx}-mobile`}
                                     name={`${section.id}[]`}
-                                    onChange={() => handleFilterChange(section.id, option.value)}
+                                    onChange={() => handleFilterChange(section.id, option.value).then(console.log(section.id, option.value))}
                                     type="checkbox"
                                     className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                                   />

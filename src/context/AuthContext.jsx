@@ -1,19 +1,23 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-const AuthContext = createContext()
+import { useLazyQuery, useMutation } from "@apollo/client";
 import {
+    REGISTERMUTATION,
     LOGINMUTATION,
     QUERYUSERDATA
-}
-    from "../services/Graphql";
-import { useLazyQuery, useMutation } from "@apollo/client";
+} from "../services/Graphql";
+
+const AuthContext = createContext();
+
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [loginMutation, { loading: loginLoading, error: loginError }] = useMutation(LOGINMUTATION)
-    const [fetchUserData, { loading: fetchUserLoading, error: fetchUserError }] = useLazyQuery(QUERYUSERDATA)
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [registerMutation, { loading: registerLoading, error: registerError }] = useMutation(REGISTERMUTATION);
+    const [loginMutation, { loading: loginLoading, error: loginError }] = useMutation(LOGINMUTATION);
+    const [fetchUserData, { loading: fetchUserLoading, error: fetchUserError }] = useLazyQuery(QUERYUSERDATA);
+
     useEffect(() => {
         const loaderUser = async () => {
-            const token = sessionStorage.getItem("token")
+            const token = sessionStorage.getItem("token");
             if (token) {
                 try {
                     const { data: userData } = await fetchUserData({
@@ -22,18 +26,50 @@ export const AuthProvider = ({ children }) => {
                                 Authorization: `Bearer ${token}`
                             }
                         }
-                    })
-                    setUser(userData?.me)
+                    });
+                    setUser(userData?.me);
                 } catch (error) {
-                    console.log(error)
+                    console.log(error);
                 }
             }
-            setLoading(false)
-        }
-        loaderUser()
-    }, [fetchUserData,user])
+            setLoading(false);
+        };
+        loaderUser();
+    }, [fetchUserData]);
 
-    const login = async (username, password) => {
+    const register = async (username, email, password, remember) => {
+        try {
+            console.log(username, email, password);
+            const { data: jwtdata } = await registerMutation({
+                variables: {
+                    input: {
+                        username: username,
+                        email: email,
+                        password: password
+                    }
+                }
+            });
+            const jwt = jwtdata?.register?.jwt;
+            if (remember) localStorage.setItem("token", jwt);
+            sessionStorage.setItem("token", jwt);
+            const { data: userData } = await fetchUserData({
+                context: {
+                    headers: {
+                        Authorization: `Bearer ${jwt}`
+                    }
+                }
+            });
+            console.log(userData.me);
+            setUser(userData?.me);
+        } catch (error) {
+            console.error("Registration error:", error.message);
+            if (error.graphQLErrors) console.error("GraphQL errors:", error.graphQLErrors);
+            if (error.networkError) console.error("Network error:", error.networkError);
+            throw error;
+        }
+    };
+
+    const login = async (username, password, remember) => {
         try {
             const { data: jwtdata } = await loginMutation({
                 variables: {
@@ -42,32 +78,38 @@ export const AuthProvider = ({ children }) => {
                         password: password
                     }
                 }
-            })
-            const jwt = jwtdata?.login?.jwt
-            sessionStorage.setItem("token", jwt)
+            });
+            const jwt = jwtdata?.login?.jwt;
+            if (remember) localStorage.setItem("token", jwt);
+            sessionStorage.setItem("token", jwt);
             const { data: userData } = await fetchUserData({
                 context: {
                     headers: {
                         Authorization: `Bearer ${jwt}`
                     }
                 }
-            })
-            console.log(userData.me)
-            setUser(userData?.me)
+            });
+            console.log(userData.me);
+            setUser(userData?.me);
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-    }
+    };
+
     const logout = () => {
-        sessionStorage.removeItem("token")
-        setUser(null)
-    }
+        sessionStorage.removeItem("token");
+        setUser(null);
+    };
+
     return (
         <AuthContext.Provider value={{
             user,
             loading,
+            register,
             login,
             logout,
+            registerLoading,
+            registerError,
             loginLoading,
             loginError,
             fetchUserError,
@@ -75,8 +117,9 @@ export const AuthProvider = ({ children }) => {
         }}>
             {children}
         </AuthContext.Provider>
-    )
-}
+    );
+};
+
 export const useAuth = () => {
-    return useContext(AuthContext)
-}
+    return useContext(AuthContext);
+};
