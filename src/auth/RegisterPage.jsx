@@ -15,23 +15,54 @@ export default function Register() {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    // const [fullname, setFullname] = useState("");
     const [confirmpassword, setConfirmpassword] = useState("");
     const [passwordError, setPasswordError] = useState(false);
     const [email, setEmail] = useState("");
 
     const { register } = useAuth()
 
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleConfirmPasswordChange = (e) => {
+        setConfirmpassword(e.target.value);
+        setPasswordError(e.target.value !== password);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Username:", username, "Password:", password , "Email:", email);
-        await register(username, password, email)
-        navigate('/')
-    };
-    return (
 
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            alert("โปรดกรอกอีเมลให้ถูกต้อง!");
+            return;
+        }
+
+        if (password.length < 6) {
+            alert("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร!");
+            return;
+        }
+
+        if (password !== confirmpassword) {
+            setPasswordError(true);
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            await register(username, email, password);
+            navigate('/');
+        } catch (error) {
+            console.error("Registration failed:", error);
+            alert("เกิดข้อผิดพลาดในการสมัครสมาชิก โปรดลองอีกครั้ง!");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
         <>
-            <div className="flex min-h-full h-screen mt-[-4%]">
+            <div className="flex min-h-full h-screen mt-[-3%]">
                 <div className="relative w-2/3 hidden lg:block">
                     <img
                         alt=""
@@ -48,16 +79,12 @@ export default function Register() {
                                 className="h-10 w-auto"
                             />
                             <h2 className="mt-3 text-3xl/9 font-bold tracking-tight text-gray-900">สมัครสมาชิก</h2>
-
                         </div>
 
                         <div className="mt-5">
                             <div>
                                 <form onSubmit={handleSubmit} className="space-y-3.5">
                                     <div>
-                                        {/* <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
-                                            Username
-                                        </label> */}
                                         <div>
                                             <input
                                                 id="username"
@@ -73,29 +100,7 @@ export default function Register() {
                                         </div>
                                     </div>
 
-                                    {/* <div>
-                                        <label htmlFor="fullname" className="block text-sm/6 font-medium text-gray-900">
-                                            Fullname
-                                        </label>
-                                        <div>
-                                            <input
-                                                id="fullname"
-                                                type="text"
-                                                name="fullname"
-                                                required
-                                                autoComplete="fullname"
-                                                value={fullname}
-                                                onChange={(e) => setFullname(e.target.value)}
-                                                placeholder="Fullname"
-                                                className="block w-full rounded-md bg-white px-3 py-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-xl/6"
-                                            />
-                                        </div>
-                                    </div> */}
-
                                     <div>
-                                        {/* <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
-                                            Email
-                                        </label> */}
                                         <div >
                                             <input
                                                 id="email"
@@ -111,9 +116,6 @@ export default function Register() {
                                     </div>
 
                                     <div>
-                                        {/* <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
-                                            Password
-                                        </label> */}
                                         <div>
                                             <input
                                                 id="password"
@@ -123,81 +125,35 @@ export default function Register() {
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 placeholder="Password"
-
-                                                // autoComplete="current-password"
                                                 className="block w-full rounded-md bg-white px-3 py-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-xl/6"
                                             />
-
                                         </div>
                                     </div>
 
                                     <div>
-                                        {/* <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
-                                            Confirm Password
-                                        </label> */}
                                         <div>
                                             <input
-                                                id="setConfirmpassword"
-                                                name="setConfirmpassword"
+                                                id="ConfirmPassword"
+                                                name="ConfirmPassword"
                                                 type="password"
                                                 required
                                                 value={confirmpassword}
-                                                onChange={(e) => setConfirmpassword(e.target.value)}
+                                                onChange={handleConfirmPasswordChange}
                                                 placeholder="Confirm Password"
-                                                // autoComplete="current-password"
-                                                className="block w-full rounded-md bg-white px-3 py-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-xl/6"
+                                                className=" block w-full rounded-md bg-white px-3 py-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-xl/6"
                                             />
-
-                                            {passwordError && <p className="text-red-500 text-sm">Passwords do not match!</p>}
+                                            {passwordError && <p className="mb-5 text-red-500 text-sm">Passwords do not match!</p>}
                                         </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex gap-3">
-                                            <div className="flex h-6 shrink-0 items-center">
-                                                <div className="group grid size-4 grid-cols-1">
-                                                    <input
-                                                        id="remember-me"
-                                                        name="remember-me"
-                                                        type="checkbox"
-                                                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-400 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                                                    />
-                                                    <svg
-                                                        fill="none"
-                                                        viewBox="0 0 14 14"
-                                                        className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                                                    >
-                                                        <path
-                                                            d="M3 8L6 11L11 3.5"
-                                                            strokeWidth={2}
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            className="opacity-0 group-has-checked:opacity-100"
-                                                        />
-                                                        <path
-                                                            d="M3 7H11"
-                                                            strokeWidth={2}
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            className="opacity-0 group-has-indeterminate:opacity-100"
-                                                        />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                            <label htmlFor="remember-me" className="block text-m/6 text-gray-900">
-                                                I agree to Team & Condition
-                                            </label>
-                                        </div>
-
-
                                     </div>
 
                                     <div>
                                         <button
                                             type="submit"
-                                            className="flex w-full justify-center rounded-md bg-[#F8644B] px-3 py-1.5 text-xl font-semibold text-white shadow-xs hover:bg-[#F8644B]/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B]"
+                                            disabled={isLoading}
+                                            className={`flex w-full justify-center rounded-md bg-[#F8644B] px-3 py-1.5 text-xl font-semibold text-white shadow-xs 
+                                                    ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#F8644B]/90'}`}
                                         >
-                                            สมัครสมาชิก
+                                            {isLoading ? "กำลังสมัคร..." : "สมัครสมาชิก"}
                                         </button>
                                     </div>
                                 </form>
@@ -209,7 +165,7 @@ export default function Register() {
                                         <div className="w-full border-t border-gray-400" />
                                     </div>
                                     <div className="relative flex justify-center text-m/6 font-medium">
-                                        <span className="bg-white px-6 text-gray-900">หรือเข้าสู่ระบบด้วย</span>
+                                        <span className="bg-white px-6 text-gray-900">หรือสมัครสมาชิกด้วย</span>
                                     </div>
                                 </div>
 
@@ -227,7 +183,6 @@ export default function Register() {
                                         <span className="text-sm/6 font-semibold">Google</span>
                                     </a>
 
-
                                     <a
                                         href="#"
                                         className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:ring-transparent"
@@ -239,15 +194,12 @@ export default function Register() {
                                         </svg>
                                         <span className="text-sm/6 font-semibold">Facebook</span>
                                     </a>
-
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </>
     )
 }
-
