@@ -6,8 +6,46 @@ import { MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { debounce } from "lodash";
+
 // เพิ่ม context สำหรับแชร์ข้อมูลกับ FilterPackage
 export const FilterContext = createContext();
+
+// ฟังก์ชันสำหรับแปลงเป็นเงื่อนไขของระยะเวลา
+const convertDurationToCondition = (durationFilters) => {
+  if (!durationFilters || durationFilters.length === 0) return null;
+  
+  const conditions = [];
+  
+  durationFilters.forEach(filter => {
+    switch (filter) {
+      case '1-day':
+        conditions.push({ duration: { lte: 1 } });
+        break;
+      case '2-3-days':
+        conditions.push({ 
+          and: [
+            { duration: { gte: 2 } },
+            { duration: { lte: 3 } }
+          ]
+        });
+        break;
+      case '4-7-days':
+        conditions.push({ 
+          and: [
+            { duration: { gte: 4 } },
+            { duration: { lte: 7 } }
+          ]
+        });
+        break;
+      case 'more-than-7-days':
+        conditions.push({ duration: { gt: 7 } });
+        break;
+    }
+  });
+  
+  return conditions.length > 0 ? { or: conditions } : null;
+};
+
 const PackageList = ({filters, onFilterInitialized}) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,6 +57,8 @@ const PackageList = ({filters, onFilterInitialized}) => {
   // Merge search filters from Home with existing filters if available
   const initialFilters = {
     category: searchFilters?.category || filters?.category || [],
+    packageType: searchFilters?.type && searchFilters?.type !== 'all' ? [searchFilters.type] : filters?.packageType || [],
+    duration: filters?.duration || [],
     sector: filters?.sector || [],
     searchQuery: searchFilters?.query || ""
   };
@@ -31,34 +71,71 @@ const PackageList = ({filters, onFilterInitialized}) => {
       onFilterInitialized(initialFilters);
     }
   }, [searchFilters]);
+
   // Update filters when component filters change
- useEffect(() => {
-  const handler = debounce(() => {
-    if (filters) {
-      setDebounceFilters(prevFilters => ({
-        ...prevFilters,
-        category: filters.category || prevFilters.category,
-        sector: filters.sector || prevFilters.sector
-      }));
+  useEffect(() => {
+    const handler = debounce(() => {
+      if (filters) {
+        setDebounceFilters(prevFilters => ({
+          ...prevFilters,
+          category: filters.category || prevFilters.category,
+          packageType: filters.packageType || prevFilters.packageType,
+          duration: filters.duration || prevFilters.duration,
+          sector: filters.sector || prevFilters.sector
+        }));
+      }
+    }, 500);
+    
+    handler();
+    return () => handler.cancel();
+  }, [filters]);
+
+  // สร้างเงื่อนไขสำหรับ GraphQL query
+  const buildQueryFilters = () => {
+    const queryFilters = {
+      status_package: {
+        eq: "PUBLISH"
+      }
+    };
+
+    // เพิ่มเงื่อนไขหมวดหมู่
+    if (debounceFilters.category.length > 0) {
+      queryFilters.type = { in: debounceFilters.category };
     }
-  }, 500);
-  
-  handler();
-  return () => handler.cancel();
-}, [filters]);
+
+    // เพิ่มเงื่อนไขภาค
+    if (debounceFilters.sector.length > 0) {
+      queryFilters.location = { sector: { in: debounceFilters.sector } };
+    }
+
+    // เพิ่มเงื่อนไขการค้นหา
+    if (debounceFilters.searchQuery) {
+      queryFilters.name = { containsi: debounceFilters.searchQuery };
+    }
+
+    // เพิ่มเงื่อนไขประเภทแพ็คเกจ
+    if (debounceFilters.packageType?.length > 0) {
+      queryFilters.package_type = { in: debounceFilters.packageType };
+    }
+
+    // สร้างเงื่อนไขสำหรับระยะเวลา
+    const durationCondition = convertDurationToCondition(debounceFilters.duration);
+    if (durationCondition) {
+      // รวมเงื่อนไขระยะเวลากับเงื่อนไขอื่นๆ
+      return {
+        and: [
+          queryFilters,
+          durationCondition
+        ]
+      };
+    }
+
+    return queryFilters;
+  };
 
   const { data: dataPackage, loading: loadingPackage, error: errorPackage, refetch } = useQuery(QUERY_PACKAGELIST, {
     variables: {
-      filters: {
-        status_package: {
-          eq: "PUBLISH"
-        },
-        ...(debounceFilters.category.length > 0 && { type: { in: debounceFilters.category } }),
-        ...(debounceFilters.sector.length > 0 && { location: { sector: { in: debounceFilters.sector } } }),
-        ...(debounceFilters.searchQuery && { 
-          name: { containsi: debounceFilters.searchQuery }
-        })
-      }
+      filters: buildQueryFilters()
     }
   });
 
@@ -103,7 +180,7 @@ const PackageList = ({filters, onFilterInitialized}) => {
 
   return (
     <motion.div
-      key={debounceFilters.category.join(",")}
+      key={`${debounceFilters.category.join(",")}-${debounceFilters.duration.join(",")}-${debounceFilters.packageType.join(",")}`}
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
@@ -113,6 +190,38 @@ const PackageList = ({filters, onFilterInitialized}) => {
       {debounceFilters.searchQuery && (
         <div className="mb-6">
           <h2 className="text-xl font-medium">ผลการค้นหา: "{debounceFilters.searchQuery}"</h2>
+        </div>
+      )}
+      
+      {/* Show applied filters summary */}
+      {(debounceFilters.category.length > 0 || 
+        debounceFilters.duration.length > 0 || 
+        debounceFilters.packageType.length > 0 || 
+        debounceFilters.sector.length > 0) && (
+        <div className="mb-6">
+          <h3 className="text-lg font-medium mb-2">กำลังกรอง:</h3>
+          <div className="flex flex-wrap gap-2">
+            {debounceFilters.category.length > 0 && (
+              <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                หมวดหมู่: {debounceFilters.category.length} รายการ
+              </span>
+            )}
+            {debounceFilters.packageType.length > 0 && (
+              <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                ประเภทแพ็กเกจ: {debounceFilters.packageType.length} รายการ
+              </span>
+            )}
+            {debounceFilters.duration.length > 0 && (
+              <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                ระยะเวลา: {debounceFilters.duration.length} รายการ
+              </span>
+            )}
+            {debounceFilters.sector.length > 0 && (
+              <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                ภาค: {debounceFilters.sector.length} รายการ
+              </span>
+            )}
+          </div>
         </div>
       )}
       
@@ -141,6 +250,9 @@ const PackageList = ({filters, onFilterInitialized}) => {
                       <MapPin className="text-[#F8644B]"></MapPin>
                       <p className="mt-1 text-sm text-gray-500">{product.location}</p>
                     </div>
+                    <div className="mt-1">
+                      <p className="text-sm text-gray-500">ระยะเวลา: {product.duration} วัน</p>
+                    </div>
                   </div>
                   <p className="text-3xl font-bold text-[#F8644B]">{product.price} ฿</p>
                 </div>
@@ -160,15 +272,21 @@ const PackageList = ({filters, onFilterInitialized}) => {
 PackageList.propTypes = {
   filters: PropTypes.shape({
     category: PropTypes.array,
+    packageType: PropTypes.array,
+    duration: PropTypes.array,
     sector: PropTypes.array
-  })
+  }),
+  onFilterInitialized: PropTypes.func
 };
 
 PackageList.defaultProps = {
   filters: {
     category: [],
+    packageType: [],
+    duration: [],
     sector: []
-  }
+  },
+  onFilterInitialized: () => {}
 };
 
 export default PackageList;

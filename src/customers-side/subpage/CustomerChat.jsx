@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const CustomerChat = () => {
   const { user } = useAuth();
-  const { messages, unreadCount, sendMessage, markAsRead } = useChat();
+  const { messages, unreadCount, sendCustomerMessage, markCustomerMessagesAsRead } = useChat();
   const [messageInput, setMessageInput] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const messagesEndRef = useRef(null);
@@ -17,9 +17,9 @@ const CustomerChat = () => {
   // Mark messages as read when chat is opened
   useEffect(() => {
     if (isChatOpen) {
-      markAsRead();
+      markCustomerMessagesAsRead();
     }
-  }, [isChatOpen, markAsRead]);
+  }, [isChatOpen, markCustomerMessagesAsRead]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -28,7 +28,7 @@ const CustomerChat = () => {
   // Handle sending a message
   const handleSendMessage = () => {
     if (!messageInput.trim() || !user) return;
-    sendMessage(messageInput);
+    sendCustomerMessage(messageInput);
     setMessageInput('');
   };
 

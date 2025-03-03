@@ -19,6 +19,14 @@ const filters = [
     ],
   },
   {
+    id: 'packageType',
+    name: 'ประเภทแพ็กเกจ',
+    options: [
+      { value: 'Package with accommodation', label: 'แพ็กเกจพร้อมที่พัก' },
+      { value: 'One day trip', label: 'แพ็กเกจวันเดียว' },
+    ],
+  },
+  {
     id: 'duration',
     name: 'ระยะเวลา',
     options: [
@@ -50,6 +58,7 @@ const FilterPackage = () => {
   // ตั้งค่า initial state จาก searchFilters ถ้ามี
   const [selectFilters, setSelectFilters] = useState({
     category: searchFilters?.category || [],
+    packageType: searchFilters?.type ? [searchFilters.type] : [],
     duration: searchFilters?.duration || [],
     sector: searchFilters?.sector || []
   });
@@ -61,6 +70,10 @@ const FilterPackage = () => {
       
       if (searchFilters.category && searchFilters.category.length > 0) {
         newFilters.category = searchFilters.category;
+      }
+      
+      if (searchFilters.type && searchFilters.type !== 'all') {
+        newFilters.packageType = [searchFilters.type];
       }
       
       if (searchFilters.duration && searchFilters.duration.length > 0) {
@@ -88,6 +101,14 @@ const FilterPackage = () => {
   const isChecked = (sectionId, value) => {
     return selectFilters[sectionId].includes(value);
   }
+
+  const handleFilterInitialized = (initialFilters) => {
+    // ปรับปรุง state ของ filter เมื่อมีการกำหนดค่าเริ่มต้นจาก Home
+    setSelectFilters(prevFilters => ({
+      ...prevFilters,
+      ...initialFilters
+    }));
+  };
 
   return (
     <div className="bg-white">
@@ -260,7 +281,10 @@ const FilterPackage = () => {
               </div>
             </aside>
             <div className="col-span-2 xl:col-span-3">
-              <PackageList filters={selectFilters}></PackageList>
+              <PackageList 
+                filters={selectFilters} 
+                onFilterInitialized={handleFilterInitialized}
+              />
             </div>
           </div>
         </main>

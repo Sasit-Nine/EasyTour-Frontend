@@ -1,84 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
-import { QUERY_ALL_CHATS, QUERY_MESSAGES, MUTATION_SEND_MESSAGE } from '../../services/Graphql';
+import React, { useState, useEffect, useRef } from 'react';
+import { useChat } from '../../context/ChatContext';
 import { Input, Button, Spin } from 'antd';
 import { UserIcon } from '@heroicons/react/24/outline';
 
 const AdminChat = () => {
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const { 
+    customers, 
+    selectedCustomer, 
+    setSelectedCustomer, 
+    getMessagesForCustomer, 
+    sendAdminMessage, 
+    markAdminMessagesAsRead 
+  } = useChat();
+  
   const [messageInput, setMessageInput] = useState('');
-  const [customers, setCustomers] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null);
 
-  // Query to get all customers with chats
-  const { data: chatsData, loading: chatsLoading } = useQuery(QUERY_ALL_CHATS, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-      },
-    },
-    pollInterval: 10000, // Poll every 10 seconds to check for new messages
-  });
-
-  // Query to get messages for selected customer
-  const { data: messagesData, loading: messagesLoading, refetch: refetchMessages } = useQuery(QUERY_MESSAGES, {
-    variables: { customerId: selectedCustomer?.id || "" },
-    skip: !selectedCustomer,
-    context: {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-      },
-    },
-    pollInterval: 5000, // Poll every 5 seconds for new messages
-  });
-
-  // Mutation to send a message
-  const [sendMessage] = useMutation(MUTATION_SEND_MESSAGE, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-      },
-    },
-    onCompleted: () => {
-      refetchMessages();
-      setMessageInput('');
-    }
-  });
-
-  // Update customers list when chat data changes
+  // อัพเดทข้อความเมื่อลูกค้าที่เลือกเปลี่ยนแปลง
   useEffect(() => {
-    if (chatsData && chatsData.customers) {
-      setCustomers(chatsData.customers);
+    if (selectedCustomer) {
+      setMessages(getMessagesForCustomer(selectedCustomer.id));
+      markAdminMessagesAsRead(selectedCustomer.id);
     }
-  }, [chatsData]);
+  }, [selectedCustomer, getMessagesForCustomer, markAdminMessagesAsRead]);
 
-  // Update messages when message data changes or when selected customer changes
+  // อัพเดทข้อความอยู่เสมอเพื่อให้ได้ข้อความล่าสุด
   useEffect(() => {
-    if (messagesData && messagesData.messages) {
-      setMessages(messagesData.messages);
-      scrollToBottom();
+    if (selectedCustomer) {
+      const intervalId = setInterval(() => {
+        setMessages(getMessagesForCustomer(selectedCustomer.id));
+      }, 1000);
+      return () => clearInterval(intervalId);
     }
-  }, [messagesData, selectedCustomer]);
+  }, [selectedCustomer, getMessagesForCustomer]);
 
   // Function to scroll to bottom of message container
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const scrollToBottom = () => {
-    const messageContainer = document.getElementById('message-container');
-    if (messageContainer) {
-      messageContainer.scrollTop = messageContainer.scrollHeight;
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   // Handle sending a message
   const handleSendMessage = () => {
     if (!messageInput.trim() || !selectedCustomer) return;
 
-    sendMessage({
-      variables: {
-        customerId: selectedCustomer.id,
-        content: messageInput,
-      },
-    });
+    sendAdminMessage(messageInput, selectedCustomer.id);
+    setMessageInput('');
   };
 
   // Filter customers based on search query
@@ -109,7 +81,7 @@ const AdminChat = () => {
           </div>
           
           <div className="overflow-y-auto h-[calc(100%-60px)]">
-            {chatsLoading ? (
+            {customers.length === 0 ? (
               <div className="flex justify-center items-center h-full">
                 <Spin />
               </div>
@@ -179,9 +151,9 @@ const AdminChat = () => {
                 id="message-container"
                 className="flex-1 p-4 overflow-y-auto"
               >
-                {messagesLoading ? (
-                  <div className="flex justify-center items-center h-full">
-                    <Spin />
+                {messages.length === 0 ? (
+                  <div className="flex justify-center items-center h-full text-gray-500">
+                    ไม่มีข้อความ เริ่มการสนทนากับลูกค้า
                   </div>
                 ) : (
                   messages.map((message, index) => (
@@ -206,11 +178,7 @@ const AdminChat = () => {
                     </div>
                   ))
                 )}
-                {messages.length === 0 && !messagesLoading && (
-                  <div className="flex justify-center items-center h-full text-gray-500">
-                    ไม่มีข้อความ เริ่มการสนทนากับลูกค้า
-                  </div>
-                )}
+                <div ref={messagesEndRef} />
               </div>
               
               {/* Message input */}

@@ -4,19 +4,56 @@ import { useAuth } from './AuthContext';
 // สร้าง context
 const ChatContext = createContext();
 
-// สร้าง reducer สำหรับจัดการกับข้อความ
+// สร้าง reducer สำหรับจัดการกับข้อความและลูกค้า
 const chatReducer = (state, action) => {
   switch (action.type) {
     case 'LOAD_MESSAGES':
-      return action.payload;
+      return {
+        ...state,
+        messages: action.payload
+      };
     case 'ADD_MESSAGE':
-      return [...state, action.payload];
+      return {
+        ...state,
+        messages: [...state.messages, action.payload],
+        customers: state.customers.map(customer => {
+          if (customer.id === action.customerId) {
+            return {
+              ...customer,
+              lastMessage: action.payload.content,
+              unreadCount: action.payload.sender === 'customer' ? customer.unreadCount + 1 : customer.unreadCount
+            };
+          }
+          return customer;
+        })
+      };
     case 'MARK_AS_READ':
-      return state.map(message => 
-        message.sender === 'admin' && !message.read 
-          ? { ...message, read: true } 
-          : message
-      );
+      return {
+        ...state,
+        messages: state.messages.map(message => 
+          message.sender === action.sender && !message.read && message.to === action.to
+            ? { ...message, read: true } 
+            : message
+        ),
+        // ถ้ามีการ markAsRead จาก admin ให้ลบ unreadCount ของลูกค้าคนนั้น
+        customers: action.sender === 'customer' 
+          ? state.customers.map(customer => 
+              customer.id === action.customerId 
+                ? { ...customer, unreadCount: 0 } 
+                : customer
+            )
+          : state.customers
+      };
+    case 'LOAD_CUSTOMERS':
+      return {
+        ...state,
+        customers: action.payload
+      };
+    case 'ADD_CUSTOMER':
+      return {
+        ...state,
+        customers: [...state.customers, action.payload]
+      };
     default:
       return state;
   }
@@ -25,18 +62,35 @@ const chatReducer = (state, action) => {
 // สร้าง Provider component
 export const ChatProvider = ({ children }) => {
   const { user } = useAuth();
-  const [messages, dispatch] = useReducer(chatReducer, []);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [state, dispatch] = useReducer(chatReducer, {
+    messages: [],
+    customers: []
+  });
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  // สร้างข้อความทดสอบเมื่อ provider เริ่มทำงาน
+  // สร้างข้อมูลทดสอบเมื่อ provider เริ่มทำงาน
   useEffect(() => {
     if (user) {
+      // สร้างข้อมูลลูกค้าจำลอง
+      const demoCustomers = [
+        {
+          id: user.id || 'customer-1',
+          name: user.name || 'ลูกค้าทดสอบ',
+          email: user.email || 'customer@example.com',
+          profilePic: null,
+          lastMessage: 'สวัสดีค่ะ มีอะไรให้ช่วยไหมคะ?',
+          unreadCount: 2
+        }
+      ];
+      
       // ข้อความจำลองสำหรับการทดสอบ
       const demoMessages = [
         {
           id: '1',
           content: 'สวัสดีค่ะ มีอะไรให้ช่วยไหมคะ?',
           sender: 'admin',
+          to: user.id || 'customer-1',
+          customerId: user.id || 'customer-1',
           timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
           read: false
         },
@@ -44,66 +98,120 @@ export const ChatProvider = ({ children }) => {
           id: '2',
           content: 'หากคุณมีข้อสงสัยเกี่ยวกับแพ็คเกจทัวร์ สามารถสอบถามได้เลยค่ะ',
           sender: 'admin',
+          to: user.id || 'customer-1',
+          customerId: user.id || 'customer-1',
           timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString(),
           read: false
         }
       ];
       
+      dispatch({ type: 'LOAD_CUSTOMERS', payload: demoCustomers });
       dispatch({ type: 'LOAD_MESSAGES', payload: demoMessages });
     }
   }, [user]);
 
-  // อัพเดท unreadCount เมื่อมีการเปลี่ยนแปลงที่ messages
-  useEffect(() => {
-    if (messages) {
-      const count = messages.filter(msg => msg.sender === 'admin' && !msg.read).length;
-      setUnreadCount(count);
-    }
-  }, [messages]);
-
-  // ฟังก์ชันส่งข้อความ
-  const sendMessage = (content) => {
+  // ฟังก์ชันส่งข้อความจากลูกค้า
+  const sendCustomerMessage = (content) => {
+    if (!user) return;
+    
+    const customerId = user.id || 'customer-1';
+    
     const newMessage = {
       id: Date.now().toString(),
       content,
       sender: 'customer',
+      to: 'admin',
+      customerId,
       timestamp: new Date().toISOString(),
-      read: true
+      read: false
     };
     
-    dispatch({ type: 'ADD_MESSAGE', payload: newMessage });
-    
-    // จำลองการตอบกลับจาก admin (หลังจากส่งข้อความไป 1 วินาที)
-    setTimeout(() => {
-      const responses = [
-        'ขอบคุณสำหรับข้อความค่ะ จะดำเนินการให้ทันทีนะคะ',
-        'ได้ค่ะ ทางเราจะดูแลเรื่องนี้ให้ค่ะ',
-        'มีอะไรให้ช่วยเพิ่มเติมไหมคะ?',
-        'ขอบคุณที่ติดต่อเรา ทางเราจะพยายามตอบกลับให้เร็วที่สุดค่ะ',
-        'เข้าใจค่ะ ต้องขออภัยในความไม่สะดวกด้วยนะคะ'
-      ];
-      
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
-      const adminReply = {
-        id: (Date.now() + 1).toString(),
-        content: randomResponse,
-        sender: 'admin',
-        timestamp: new Date().toISOString(),
-        read: false
-      };
-      
-      dispatch({ type: 'ADD_MESSAGE', payload: adminReply });
-    }, 1000);
+    dispatch({ 
+      type: 'ADD_MESSAGE', 
+      payload: newMessage,
+      customerId
+    });
   };
 
-  // ฟังก์ชันทำเครื่องหมายว่าอ่านแล้ว
-  const markAsRead = () => {
-    dispatch({ type: 'MARK_AS_READ' });
+  // ฟังก์ชันส่งข้อความจาก admin
+  const sendAdminMessage = (content, customerId) => {
+    if (!customerId) return;
+    
+    const newMessage = {
+      id: Date.now().toString(),
+      content,
+      sender: 'admin',
+      to: customerId,
+      customerId,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+    
+    dispatch({ 
+      type: 'ADD_MESSAGE', 
+      payload: newMessage,
+      customerId
+    });
+  };
+
+  // ฟังก์ชันทำเครื่องหมายว่าอ่านแล้วสำหรับลูกค้า
+  const markCustomerMessagesAsRead = () => {
+    if (!user) return;
+    
+    dispatch({ 
+      type: 'MARK_AS_READ', 
+      sender: 'admin',
+      to: user.id || 'customer-1'
+    });
+  };
+
+  // ฟังก์ชันทำเครื่องหมายว่าอ่านแล้วสำหรับ admin
+  const markAdminMessagesAsRead = (customerId) => {
+    dispatch({ 
+      type: 'MARK_AS_READ', 
+      sender: 'customer',
+      to: 'admin',
+      customerId
+    });
+  };
+
+  // ดึงข้อความสำหรับลูกค้าที่เข้าสู่ระบบปัจจุบัน
+  const getCustomerMessages = () => {
+    if (!user) return [];
+    
+    const customerId = user.id || 'customer-1';
+    return state.messages.filter(msg => msg.customerId === customerId);
+  };
+
+  // ดึงข้อความสำหรับลูกค้าที่เลือกโดย admin
+  const getMessagesForCustomer = (customerId) => {
+    if (!customerId) return [];
+    return state.messages.filter(msg => msg.customerId === customerId);
+  };
+
+  // คำนวณจำนวนข้อความที่ยังไม่ได้อ่านสำหรับลูกค้า
+  const getCustomerUnreadCount = () => {
+    if (!user) return 0;
+    
+    const customerId = user.id || 'customer-1';
+    return state.messages.filter(
+      msg => msg.customerId === customerId && msg.sender === 'admin' && !msg.read
+    ).length;
   };
 
   return (
-    <ChatContext.Provider value={{ messages, unreadCount, sendMessage, markAsRead }}>
+    <ChatContext.Provider value={{ 
+      customers: state.customers,
+      messages: getCustomerMessages(),
+      unreadCount: getCustomerUnreadCount(),
+      selectedCustomer,
+      setSelectedCustomer,
+      getMessagesForCustomer,
+      sendCustomerMessage,
+      sendAdminMessage,
+      markCustomerMessagesAsRead,
+      markAdminMessagesAsRead
+    }}>
       {children}
     </ChatContext.Provider>
   );

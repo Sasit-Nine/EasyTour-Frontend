@@ -99,7 +99,6 @@ const Home = () => {
       state: { searchFilters: searchParams } 
     })
   }
-
   return (
     <div className="bg-white">
       {/* Mobile menu */}
