@@ -18,6 +18,9 @@ const Category = () => {
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }, [pathname])
+    const scroll = () => {
+        window.scrollTo({ top: 700, behavior: 'smooth' })
+    }
     const navigate = useNavigate()
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const { data: packageList, loading: loadingPackage, error: errorPackage } = useQuery(QUERY_PACKAGELIST, {
@@ -123,11 +126,11 @@ const Category = () => {
                                         : category === 'Adventure Tour' ? 'ท้าทายขีดจำกัดของคุณ! ไม่ว่าจะเป็นปีนเขา ดำน้ำ ซิปไลน์ หรือกิจกรรมสุดมันส์อื่น ๆ ทัวร์ผจญภัยจะพาคุณไปสัมผัสประสบการณ์ตื่นเต้นที่ไม่มีวันลืม เหมาะสำหรับสายลุยที่ชอบความท้าทายและแอดเรนาลีนที่พุ่งพล่าน'
                                             : category === 'Family Tour' ? 'ความสุขสำหรับทุกวัย เดินทางพร้อมกันทั้งครอบครัว สนุกสนานกับกิจกรรมที่ออกแบบมาให้เหมาะกับทุกคน ไม่ว่าจะเป็นเด็กหรือผู้ใหญ่ พักผ่อนสบาย ๆ กับที่พักแสนอบอุ่น และสร้างความทรงจำดี ๆ ไปด้วยกัน'
                                                 : category === 'Honeymoon & Romantic Tour' ? 'เติมเต็มความหวานให้คู่รัก กับบรรยากาศสุดโรแมนติก ดื่มด่ำพระอาทิตย์ตกดินริมทะเล ดินเนอร์ใต้แสงเทียน และพักผ่อนในรีสอร์ตสุดหรู ที่จะทำให้ทุกช่วงเวลาของคุณและคนพิเศษเต็มไปด้วยความทรงจำที่สวยงาม'
-                                                    : 'ทัวร์อื่นๆ'}
+                                                    : ''}
                             </p>
                             <a
-                                href="#"
-                                className="mt-8 block w-full rounded-md border border-transparent bg-white px-8 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 sm:w-auto"
+                                onClick={()=>{scroll()}}
+                                className="mt-8 block w-xs rounded-xl border border-transparent bg-white px-8 py-3 text-base font-medium text-[#F8644B]  hover:scale-105 active:scale-100 transition-transform duration-100"
                             >
                                 เลือกดูแพ็คเกจ
                             </a>
@@ -156,14 +159,15 @@ const Category = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-10">
-                            <motion.div
+                        <motion.div
                                 key={SearchText}
                                 initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.6, ease: "easeOut" }}
                             >
+                        <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-10">
+                            
                                 {filterData.map((product) => (
                                     <div
                                         key={product.documentId}
@@ -191,8 +195,9 @@ const Category = () => {
                                         </div>
                                     </div>
                                 ))}
-                            </motion.div>
+                            
                         </div>
+                        </motion.div>
                     </div>
                 </div>
             </div>

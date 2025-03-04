@@ -3,9 +3,11 @@ import { useMutation, useQuery } from "@apollo/client";
 import { QUERY_BOOKING, MUTATION_APPROVE } from "../../services/Graphql";
 import dayjs from "dayjs";
 import ViewDetail from "../components/ViewDetail";
+import { useSearch } from "../components/AdminLayout";
 
 const History = () => {
-    const [APPROVE_MUTATION] = useMutation(MUTATION_APPROVE)
+    const [APPROVE_MUTATION] = useMutation(MUTATION_APPROVE);
+    const { searchQuery } = useSearch();
     const { data, loading, error, refetch } = useQuery(QUERY_BOOKING, {
         variables: {
             filters: {
@@ -40,22 +42,12 @@ const History = () => {
     }
 
     const [localBookings, setLocalBookings] = useState([]);
-    const [historyBookings, setHistoryBookings] = useState([]);
+    const [filteredBookings, setFilteredBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isHistoryModalVisible, setIsHistoryModalVisible] = useState(false);
-    const [isReasonModalVisible, setIsReasonModalVisible] = useState(false);
-    const [rejectingId, setRejectingId] = useState(null);
-    const [rejectionReason, setRejectionReason] = useState("");
-    const [isHistoryReasonModalVisible, setIsHistoryReasonModalVisible] = useState(false);
-    const [historyRejectingId, setHistoryRejectingId] = useState(null);
-    const [historyRejectionReason, setHistoryRejectionReason] = useState("");
-
-    console.log(data)   
 
     useEffect(() => {
         if (data && data.bookings) {
-            console.log(data)
             const transformedBookings = data.bookings.map((bk) => ({
                 id: bk.documentId,
                 fullName: `${bk.fname} ${bk.lname}`,
@@ -74,19 +66,41 @@ const History = () => {
                 bookingTime: dayjs(bk.createdAt).format("DD/MM/YYYY HH:mm:ss"),
             }));
             setLocalBookings(transformedBookings);
+            setFilteredBookings(transformedBookings);
         }
     }, [data]);
 
+    // Effect for filtering based on the global search query
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setFilteredBookings(localBookings);
+            return;
+        }
+
+        const query = searchQuery.toLowerCase().trim();
+        const filtered = localBookings.filter((booking, index) => {
+            //const bookingIndex = (index + 1).toString();
+            const customerName = booking.fullName.toLowerCase();
+            const packageName = booking.packageName ? booking.packageName.toLowerCase() : '';
+            
+            return (
+                customerName.includes(query) ||
+                //bookingIndex.includes(query) ||
+                packageName.includes(query)
+            );
+        });
+        
+        setFilteredBookings(filtered);
+    }, [searchQuery, localBookings]);
+
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error.message}</p>;
-
 
     const showDetails = (record) => {
         setIsModalVisible(true);
         setSelectedBooking(record);
     };
 
-    console.log(localBookings)
     return (
         <div className="px-4 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
@@ -124,7 +138,7 @@ const History = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
-                                {localBookings.map((person, index) => (
+                                {filteredBookings.map((person, index) => (
                                     <tr key={index}>
                                         <td className="py-5 pr-3 pl-4 text-lg whitespace-nowrap sm:pl-0">
                                             <div className="flex items-center">
@@ -148,13 +162,19 @@ const History = () => {
                                                 {person.paymentStatus}
                                             </span>
                                         </td>
-                                        <td className="px-3 py-5 text-lg whitespace-nowrap text-gray-500">
-                                            {(person.status === "pending") ? 'รอการอนุมัติ' : (person.status === 'success') ? 'อนุมัติการจอง' : 'ปฏิเสธการจอง'}
+                                        <td className="px-3 py-5 text-lg whitespace-nowrap">
+                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-lg font-normal ring-1 ring-inset ${
+                                                person.status === "success" 
+                                                    ? "bg-green-50 text-green-700 ring-green-600/20" 
+                                                    : "bg-red-50 text-red-700 ring-red-600/20"
+                                            }`}>
+                                                {person.status === "success" ? "อนุมัติการจอง" : "ปฏิเสธการจอง"}
+                                            </span>
                                         </td>
                                         <td className="relative py-5 pr-4 pl-3 text-right text-lg font-medium whitespace-nowrap sm:pr-0">
                                             <div className="flex gap-3">
-                                                <a onClick={() => handleRecheck(person.id)} className="text-yellow-600 hover:text-green-900 cursor-pointer">
-                                                    พิจารณาใหม่
+                                                <a onClick={() => handleRecheck(person.id)} className="text-indigo-600 hover:text-indigo-900 cursor-pointer">
+                                                    ตรวจสอบใหม่
                                                 </a>
                                                 <a onClick={() => showDetails(person)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer">
                                                     ดูเพิ่มเติม

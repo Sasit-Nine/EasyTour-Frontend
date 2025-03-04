@@ -1,5 +1,7 @@
 import React from "react"
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
+import { QUERY_BOOKING } from "../../services/Graphql"
+import { useQuery } from "@apollo/client"
 
 const stats = [
   { name: 'Total Subscribers', stat: '71,897', previousStat: '70,946', change: '12%', changeType: 'increase' },
@@ -11,8 +13,23 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 const Dashboard = () => {
-    return(
-        <div>
+  const { data, loading, error, refetch } = useQuery(QUERY_BOOKING, {
+    variables: {
+      filters: {
+        booking_status: {
+          eq: "pending"
+        }
+      },
+    },
+    context: {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+    },
+  });
+  console.log(data)
+  return (  
+    <div>
       <h3 className="text-base font-semibold text-gray-900">Last 30 days</h3>
       <dl className="mt-5 grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow-sm md:grid-cols-3 md:divide-x md:divide-y-0">
         {stats.map((item) => (
@@ -44,6 +61,6 @@ const Dashboard = () => {
         ))}
       </dl>
     </div>
-    )
+  )
 }
 export default Dashboard

@@ -68,7 +68,7 @@ const ProductInHome = () => {
                 <p onClick={()=>{handleNavigateSector('north')}} className="text-lg text-[#F8644B] cursor-pointer">ดูเพิ่มเติม</p>
             </div>
             <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-10">
-                {transformedPackages.filter(product => product.sector === "north").slice(0,5).map((product) => (
+                {transformedPackages.filter(product => product.sector === "north").slice(0,4).map((product) => (
                     <div
                         key={product.documentId}
                         className="group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200 lg:w-2xs mb-8"
@@ -96,12 +96,12 @@ const ProductInHome = () => {
                     </div>
                 ))}
             </div>
-            <div className="flex justify-between items-center mt-10">
+            <div className="flex justify-between items-center mt-5">
                 <h2 className="text-2xl font-bold tracking-tight text-gray-900">แพ็กเกจทัวร์ภาคกลาง</h2>
                 <p onClick={()=>{handleNavigateSector('central')}} className="text-lg text-[#F8644B] cursor-pointer">ดูเพิ่มเติม</p>
             </div>
             <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-10">
-                {transformedPackages.filter(product => product.sector === "central").slice(0,5).map((product) => (
+                {transformedPackages.filter(product => product.sector === "central").slice(0,4).map((product) => (
                     <div
                         key={product.documentId}
                         className="group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200 lg:w-2xs mb-8"
@@ -129,13 +129,13 @@ const ProductInHome = () => {
                     </div>
                 ))}
             </div>
-            <div className="flex justify-between items-center mt-10">
+            <div className="flex justify-between items-center mt-5">
                 <h2 className="text-2xl font-bold tracking-tight text-gray-900">แพ็กเกจทัวร์ภาคตะวันออกเฉียงเหนือ
                 </h2>
                 <p onClick={()=>{handleNavigateSector('northeast')}} className="text-lg text-[#F8644B] cursor-pointer">ดูเพิ่มเติม</p>
             </div>
             <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-10">
-                {transformedPackages.filter(product => product.sector === "northeast").slice(0,5).map((product) => (
+                {transformedPackages.filter(product => product.sector === "northeast").slice(0,4).map((product) => (
                     <div
                         key={product.documentId}
                         className="group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200 lg:w-2xs mb-8"
@@ -163,12 +163,12 @@ const ProductInHome = () => {
                     </div>
                 ))}
             </div>
-            <div className="flex justify-between items-center mt-10">
+            <div className="flex justify-between items-center mt-5">
                 <h2 className="text-2xl font-bold tracking-tight text-gray-900">แพ็กเกจทัวร์ภาคตะวันออก</h2>
                 <p onClick={()=>{handleNavigateSector('east')}} className="text-lg text-[#F8644B] cursor-pointer">ดูเพิ่มเติม</p>
             </div>
             <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-10">
-                {transformedPackages.filter(product => product.sector === "east").slice(0,5).map((product) => (
+                {transformedPackages.filter(product => product.sector === "east").slice(0,4).map((product) => (
                     <div
                         key={product.documentId}
                         className="group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200 lg:w-2xs mb-8"
@@ -196,12 +196,12 @@ const ProductInHome = () => {
                     </div>
                 ))}
             </div>
-            <div className="flex justify-between items-center mt-10">
+            <div className="flex justify-between items-center mt-5">
                 <h2 className="text-2xl font-bold tracking-tight text-gray-900">แพ็กเกจทัวร์ภาคใต้</h2>
                 <p onClick={()=>{handleNavigateSector('south')}} className="text-lg text-[#F8644B] cursor-pointer">ดูเพิ่มเติม</p>
             </div>
             <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-10">
-                {transformedPackages.filter(product => product.sector === "south").slice(0,5).map((product) => (
+                {transformedPackages.filter(product => product.sector === "south").slice(0,4).map((product) => (
                     <div
                         key={product.documentId}
                         className="group relative cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-200 lg:w-2xs mb-8"

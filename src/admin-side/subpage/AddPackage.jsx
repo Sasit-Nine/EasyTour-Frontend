@@ -9,9 +9,12 @@ import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { CheckIcon } from '@heroicons/react/20/solid'
 import { useNavigate } from "react-router-dom"
 import dayjs from "dayjs"
+import {
+    XMarkIcon,
+} from '@heroicons/react/24/outline'
 
 const AddPackage = () => {
-
+    const [notFilled, setNotFilled] = useState(false)
     const validateForm = () => {
         const newErrors = {};
 
@@ -50,7 +53,7 @@ const AddPackage = () => {
     const [district, setDistrict] = useState('')
     const [province, setProvince] = useState('')
 
-    const [sector, setSector] = useState(['north', 'south', 'west', 'east', 'central'])
+    const [sector, setSector] = useState(['north', 'south', 'east', 'central', 'northeast'])
     const [selectedSector, setSelectedSector] = useState('')
 
     const [type, setType] = useState(['Nature And Mountain Tour', 'Cultural And Historical Tour', 'Adventure Tour', 'Family Tour', 'Honeymoon & Romantic Tour'])
@@ -101,10 +104,10 @@ const AddPackage = () => {
 
     const handleSave = async () => {
         const isValid = validateForm()
-        if (isValid){
-            return <p className="text-2xl text-red-600">{isValid[0]}</p>
+        if (isValid !== true) {
+            setNotFilled(true)
+            return
         }
-        if (!isValid) return
 
         try {
             const imagesFormData = new FormData()
@@ -154,6 +157,7 @@ const AddPackage = () => {
                 })
 
             console.log(imageIds)
+            console.log(selectedSector)
             const packageRes = await axios.post(`${strapiBaseURL}/api/packages`, {
                 data: {
                     name: name,
@@ -202,7 +206,11 @@ const AddPackage = () => {
         } catch (error) {
             console.log(error)
         }
-        navagate('/package_manage')
+        navagate('/',{
+            state:{
+                add: true
+            }
+        })
     }
     console.log(tableTime)
 
@@ -678,8 +686,28 @@ const AddPackage = () => {
 
                 </div>
 
+                {(notFilled) && <div className="rounded-xl bg-red-50 p-4 mt-5">
+                    <div className="flex">
+                        <div className="ml-3">
+                            <p className="text-lg font-medium text-red-800">กรุณากรอกข้อมูลให้ครบ</p>
+                        </div>
+                        <div className="ml-auto pl-3">
+                            <div className="-mx-1.5 -my-1.5">
+                                <button
+                                    type="button"
+                                    className="inline-flex rounded-md bg-red-50 p-1.5 text-red-500 hover:bg-red-100 focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-green-50 focus:outline-hidden"
+                                >
+                                    <span className="sr-only">ปิด</span>
+
+                                    <XMarkIcon aria-hidden="true" className="size-5 cursor-pointer" onClick={() => setNotFilled(false)} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>}
+
                 <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <button type="button" className="text-lg cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100 text-gray-900" onClick={() => { navagate('/package_manage') }}>
+                    <button type="button" className="text-lg cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100 text-gray-900" onClick={() => { navagate('/') }}>
                         ยกเลิก
                     </button>
                     <p

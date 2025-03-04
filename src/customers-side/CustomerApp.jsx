@@ -10,11 +10,12 @@ import Login from "../auth/LoginPage";
 import Register from "../auth/RegisterPage"
 import Payment from "./subpage/Payment"
 import Booking from "./subpage/Booking";
-import CheckoutSuccess from "./subpage/CheckoutSuccess";
+// import CheckoutSuccess from "./subpage/CheckoutSuccess";
 import FilterPackage from "./components/FilterPackage";
 import Status from "./subpage/Status";
 import Category from "./subpage/Category";
 import Settings from "./subpage/Settings";
+import BackgroundSuccess from "./components/CheckoutSuccessBG";
 
 
 const CustomerApp = () => {
@@ -31,7 +32,7 @@ const CustomerApp = () => {
                         <Route path="/booking" element={<Booking></Booking>}></Route>
                         <Route path="/payment" element={<Payment></Payment>}></Route>
                         <Route path="/packages/:documentId" element={<PackageDetail></PackageDetail>}></Route>
-                        <Route path="/checkout-success" element={<CheckoutSuccess></CheckoutSuccess>}></Route>
+                        <Route path="/checkout-success" element={<BackgroundSuccess></BackgroundSuccess>}></Route>
                         <Route path="/status" element={<Status></Status>}></Route>
                         <Route path="/category" element={<Category></Category>}></Route>
                         <Route path="/settings" element={<Settings></Settings>}></Route>

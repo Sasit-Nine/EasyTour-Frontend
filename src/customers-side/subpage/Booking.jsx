@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
 import { useMutation, useLazyQuery } from "@apollo/client";
@@ -9,6 +9,37 @@ import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 const Booking = () => {
   const navigate = useNavigate()
+
+  const fetchUser = async () => {
+    try {
+      const DataUser = await axios.get(`${strapiBaseURL}/api/users/me?populate=*`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+        }
+      })
+      return DataUser.data
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  useEffect(() => {
+    const getUserData = async () => {
+      const userData = await fetchUser()
+      console.log(userData)
+      if (userData) {
+        setFname(userData.fname || '')
+        setLname(userData.lname || '')
+        setTel(userData.tel || '')
+        setAddress(userData.address || '')
+        setCity(userData.city || '')
+        setDistrict(userData.district || '')
+        setProvince(userData.province || '')
+      }
+    }
+    getUserData()
+  }, [])
+
   const [BookingMutation] = useMutation(MUTATION_BOOKING)
   const [BookingQuery] = useLazyQuery(QEURY_BOOKINGID)
   const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
@@ -28,7 +59,6 @@ const Booking = () => {
   const [address, setAddress] = useState('')
   const [city, setCity] = useState('')
   const [province, setProvince] = useState('')
-  const [zipCode, setZipcode] = useState('')
   const [district, setDistrict] = useState('')
 
   console.log(packageId, packageDocumentId)
@@ -36,7 +66,7 @@ const Booking = () => {
 
   const handleBooking = async (e) => {
     e.preventDefault();
-    console.log(fname, lname, tel, address, city, district, province, zipCode)
+    console.log(fname, lname, tel, address, city, district, province)
     try {
       const { data: BookingData } = await BookingMutation({
         variables: {
@@ -128,7 +158,7 @@ const Booking = () => {
                           </div>
                         </div>
                         <div className="flex flex-1 items-end justify-between pt-2">
-                          <p className="mt-1 text-base font-normal text-[#F8644B] cursor-pointer" onClick={()=>{navigate(`/packages/${packageDocumentId}`)}}>ดูแพ็กเกจทัวร์</p>
+                          <p className="mt-1 text-base font-normal text-[#F8644B] cursor-pointer" onClick={() => { navigate(`/packages/${packageDocumentId}`) }}>ดูแพ็กเกจทัวร์</p>
                         </div>
                       </div>
                     </li>
@@ -144,7 +174,7 @@ const Booking = () => {
                     </div>
                     <div className="flex items-center justify-between border-t border-gray-200 pt-6">
                       <dt className="text-lg font-medium">ราคารวม</dt>
-                      <dd className="text-lg font-medium text-gray-900">{price*quantity}</dd>
+                      <dd className="text-lg font-medium text-gray-900">{price * quantity}</dd>
                     </div>
                   </dl>
                 </div>
@@ -164,6 +194,7 @@ const Booking = () => {
                   type="text"
                   autoComplete="given-name"
                   onChange={(e) => setFname(e.target.value)}
+                  value={name}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-base"
                 />
               </div>
@@ -179,6 +210,7 @@ const Booking = () => {
                   name="last-name"
                   type="text"
                   autoComplete="family-name"
+                  value={lname}
                   onChange={(e) => setLname(e.target.value)}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-base"
                 />
@@ -194,6 +226,7 @@ const Booking = () => {
                   id="tel"
                   name="tel"
                   type="tel"
+                  value={tel}
                   autoComplete="tel"
                   onChange={(e) => setTel(e.target.value)}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-base"
@@ -210,6 +243,7 @@ const Booking = () => {
                   id="street-address"
                   name="street-address"
                   type="text"
+                  value={address}
                   autoComplete="street-address"
                   onChange={(e) => setAddress(e.target.value)}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-base"
@@ -225,6 +259,7 @@ const Booking = () => {
                 <input
                   id="city"
                   name="city"
+                  value={city}
                   type="text"
                   autoComplete="address-level2"
                   onChange={(e) => setCity(e.target.value)}
@@ -241,6 +276,7 @@ const Booking = () => {
                 <input
                   id="district"
                   name="district"
+                  value={district}
                   type="text"
                   autoComplete="address-level1"
                   onChange={(e) => setDistrict(e.target.value)}
@@ -258,6 +294,7 @@ const Booking = () => {
                   id="region"
                   name="region"
                   type="text"
+                  value={province}
                   autoComplete="address-level1"
                   onChange={(e) => setProvince(e.target.value)}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-base"

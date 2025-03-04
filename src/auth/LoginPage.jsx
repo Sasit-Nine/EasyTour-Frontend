@@ -3,6 +3,9 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import krabi_pic from "../assets/evan-krause-BU6lABNbTpA-unsplash.jpg"
 import plane from "../assets/plane_orange.png"
+import {
+    XMarkIcon,
+} from '@heroicons/react/24/outline'
 
 export default function Login() {
     const navigate = useNavigate()
@@ -15,13 +18,18 @@ export default function Login() {
     const [remember, setRemember] = useState(false);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [invalid, setInvalid] = useState(false)
     const { login } = useAuth()
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Username:", username, "Password:", password);
         await login(username, password, remember)
-        navigate('/')
+        if (sessionStorage.getItem('token') || localStorage.getItem('token')) {
+            navigate('/')
+        }else{
+            setInvalid(true)
+        }
     };
     return (
 
@@ -150,6 +158,25 @@ export default function Login() {
                                     </div>
                                 </form>
                             </div>
+                            {(invalid) && <div className="rounded-xl bg-red-50 p-4 mt-5">
+                                <div className="flex">
+                                    <div className="ml-3">
+                                        <p className="text-lg font-medium text-red-800">ชื่อผู้ใช้หรือรหัสผ่านผิดพลาด</p>
+                                    </div>
+                                    <div className="ml-auto pl-3">
+                                        <div className="-mx-1.5 -my-1.5">
+                                            <button
+                                                type="button"
+                                                className="inline-flex rounded-md bg-red-50 p-1.5 text-red-500 hover:bg-red-100 focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-green-50 focus:outline-hidden"
+                                            >
+                                                <span className="sr-only">ปิด</span>
+
+                                                <XMarkIcon aria-hidden="true" className="size-5 cursor-pointer" onClick={() => setInvalid(false)} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>}
 
                             <div className="mt-10">
                                 <div className="relative">

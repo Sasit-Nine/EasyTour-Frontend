@@ -7,6 +7,7 @@ import planeImg from "../../assets/plane.png";
 import { QEURY_PROFILE } from "../../services/Graphql";
 import { useQuery } from "@apollo/client";
 import profile from "../../assets/profile.jpg";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
@@ -24,6 +25,12 @@ const Navbar = () => {
         }
     })
     console.log()
+
+    const navigate = useNavigate()
+    const handleLogout = () => {
+        logout()
+        navigate('/')
+    }
 
 
 
@@ -73,7 +80,7 @@ const Navbar = () => {
                                     <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/status">สถานะและประวัติการจอง</Link>
                                 </MenuItem>
                                     <MenuItem>
-                                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-700" onClick={logout}>ออกจากระบบ</button>
+                                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-700" onClick={()=>{handleLogout()}}>ออกจากระบบ</button>
                                     </MenuItem>
                                 </MenuItems>
                             </Menu>

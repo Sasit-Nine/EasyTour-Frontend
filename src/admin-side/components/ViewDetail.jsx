@@ -5,7 +5,7 @@ const ViewDetail = ({ visible, onCancel, booking }) => {
   console.log(booking);
 
   return (
-    <Dialog open={visible} onClose={onCancel} className="relative z-10">
+    <Dialog open={visible} onClose={onCancel} className="fixed inset-0 z-50 flex items-center justify-center">
       <DialogBackdrop className="fixed inset-0 bg-gray-500/75 transition-opacity" />
 
       <div className="fixed inset-0 z-10 flex items-center justify-center p-4">

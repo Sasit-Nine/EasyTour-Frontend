@@ -10,8 +10,14 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headless
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import axios from 'axios'
 import { useNavigate } from "react-router-dom"
+import {
+    XMarkIcon,
+} from '@heroicons/react/24/outline'
+import DeletePopup from "../components/DeletePopup"
 
 const EditPackage = () => {
+    const [confirmModalOpen,setConfirmModalOpen] = useState(false)
+    const [notFilled, setNotFilled] = useState(false)
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const [DELETE_PACKAGE_MUTATION] = useMutation(DELETE_PACKAGE)
     const navigate = useNavigate()
@@ -30,7 +36,7 @@ const EditPackage = () => {
     const [with_accommodation, setWithAccommodation] = useState()
     const [idImageDelete, setIdImageDelete] = useState([])
 
-    const [sector, setSector] = useState(['north', 'south', 'west', 'east', 'central'])
+    const [sector, setSector] = useState(['north', 'south', 'east', 'central','northeast'])
     const [selectedSector, setSelectedSector] = useState('')
 
     const [type, setType] = useState(['Nature And Mountain Tour', 'Cultural And Historical Tour', 'Adventure Tour', 'Family Tour', 'Honeymoon & Romantic Tour'])
@@ -81,11 +87,11 @@ const EditPackage = () => {
         }
     };
 
+    const handlePopup = () => {
+        setConfirmModalOpen(true)
+    }
 
-
-
-
-    const handleDelete = async () => {
+    const handleConfirmAction = async () => {
         try {
             await DELETE_PACKAGE_MUTATION({
                 variables: {
@@ -100,10 +106,19 @@ const EditPackage = () => {
         } catch (error) {
             console.log(error)
         }
-        navigate('/admin/package')
+        navigate('/',{
+            state:{
+                delete: true
+            }
+        })
     }
 
     const handleSave = async () => {
+        const isValid = validateForm()
+        if (isValid !== true) {
+            setNotFilled(true)
+            return
+        }
         try {
             let imageIds = []
             if (imageFiles.length > 0) {
@@ -284,7 +299,11 @@ const EditPackage = () => {
 
             console.log(locationRes, detailRes)
             console.log(packageRes)
-            navigate('/package_manage')
+            navigate('/',{
+                state:{
+                    update: true
+                }
+            })
 
         } catch (error) {
             if (error.response) {
@@ -295,6 +314,29 @@ const EditPackage = () => {
         }
     }
     console.log(tableTime)
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!name) newErrors.name = "กรุณากรอกชื่อแพ็คเกจทัวร์";
+        if (!price) newErrors.price = "กรุณากรอกราคา";
+        if (!meeting_point) newErrors.meeting_point = "กรุณากรอกจุดนัดพบ";
+        if (!max_people) newErrors.max_people = "กรุณากรอกจำนวนลูกค้าสูงสุด";
+        if (!description) newErrors.description = "กรุณากรอกรายละเอียดแพ็คเกจ";
+        if (!duration) newErrors.duration = "กรุณากรอกระยะเวลา";
+        if (!price_includes) newErrors.price_includes = "กรุณากรอกราคานี้รวมอะไรบ้าง";
+        if (!tourist_attraction) newErrors.tourist_attraction = "กรุณากรอกสถานที่ท่องเที่ยว";
+        if (!district) newErrors.district = "กรุณากรอกอำเภอ";
+        if (!province) newErrors.province = "กรุณากรอกจังหวัด";
+        if (!selectedSector) newErrors.selectedSector = "กรุณาเลือกภาค";
+        if (!selectedType) newErrors.selectedType = "กรุณาเลือกสไตล์การท่องเที่ยว";
+        if (!selectPublish) newErrors.selectPublish = "กรุณาเลือกสถานะแพ็คเกจ";
+        if (!thumbnailFile) newErrors.thumbnail = "กรุณาอัปโหลดภาพหน้าปก";
+        if (imageFiles.length === 0) newErrors.image = "กรุณาอัปโหลดภาพประกอบ";
+
+        if (Object.keys(newErrors).length > 0) return newErrors;
+        return true; // คืนค่า true หากไม่มีข้อผิดพลาด
+    };
 
     useEffect(() => {
         setName(dataPackage?.package?.name)
@@ -358,10 +400,16 @@ const EditPackage = () => {
             <form>
                 <div className="space-y-12 sm:space-y-16">
                     <div>
-                        <h2 className="text-4xl font-semibold text-gray-900">แก้ไขแพ็คเกจทัวร์</h2>
-                        <p className="mt-1 max-w-2xl text-xl text-gray-600">
-                            คุณสามารถแก้ไขแพ็คเกจทัวร์ได้จากหน้านี้
-                        </p>
+                        <div className="flex flex-wrap justify-between items-center">
+                            <div>
+                                <h2 className="text-4xl font-semibold text-gray-900">แก้ไขแพ็คเกจทัวร์</h2>
+                                <p className="mt-1 max-w-2xl text-xl text-gray-600">
+                                    คุณสามารถแก้ไขแพ็คเกจทัวร์ได้จากหน้านี้
+                                </p>
+                            </div>
+                            <button type="button" onClick={() => { handlePopup() }} className="w-full sm:w-50 size-11 px-6 rounded-xl bg-red-600 py-2 text-white cursor-pointer hover:scale-105 active:scale-100 transition-transform duration-100">ลบแพ็กเกจทัวร์</button>
+                        </div>
+
                         <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:pb-0">
                             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                                 <label htmlFor="username" className="block text-lg font-medium text-gray-900 sm:pt-1.5">
@@ -861,8 +909,30 @@ const EditPackage = () => {
 
                 </div>
 
+                {(notFilled) && <div className="rounded-xl bg-red-50 p-4 mt-5">
+                    <div className="flex">
+                        <div className="ml-3">
+                            <p className="text-lg font-medium text-red-800">กรุณากรอกข้อมูลให้ครบ</p>
+                        </div>
+                        <div className="ml-auto pl-3">
+                            <div className="-mx-1.5 -my-1.5">
+                                <button
+                                    type="button"
+                                    className="inline-flex rounded-md bg-red-50 p-1.5 text-red-500 hover:bg-red-100 focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-green-50 focus:outline-hidden"
+                                >
+                                    <span className="sr-only">ปิด</span>
+
+                                    <XMarkIcon aria-hidden="true" className="size-5 cursor-pointer" onClick={() => setNotFilled(false)} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>}
+
                 <div className="flex items-center justify-end gap-x-6">
-                    <button onClick={() => { handleDelete() }}>ลบแพ็กเกจทัวร์</button>
+
+                
+
                     <div className="mt-6 flex items-center justify-end gap-x-6">
                         <button type="button" className="text-lg font-semibold text-gray-900 cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100" onClick={() => { navigate(-1) }}>
                             ยกเลิก
@@ -879,6 +949,12 @@ const EditPackage = () => {
                 </div>
 
             </form>
+
+            <DeletePopup
+                isOpen={confirmModalOpen}
+                onClose={() => setConfirmModalOpen(false)}
+                onConfirm={handleConfirmAction}
+            />
         </div>
     )
 }

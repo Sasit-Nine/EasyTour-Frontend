@@ -10,12 +10,11 @@ const ContentLayout = () => {
     return(
         <Router>
             <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/package_manage" element={<PackageManage />} />
+                <Route path="/" element={<PackageManage />} />
                 <Route path="/customer_manage" element={<CustomerManage />} />
                 <Route path="/add_package" element={<AddPackage />} />
                 <Route path="/history" element={<History />} />
-                <Route path="/package_manage/:documentId" element={<EditPackage></EditPackage>}></Route>
+                <Route path="/:documentId" element={<EditPackage></EditPackage>}></Route>
             </Routes>
         </Router>
     )

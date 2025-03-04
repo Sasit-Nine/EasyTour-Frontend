@@ -124,14 +124,15 @@ const PackageList = ({ filters, search }) => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-          <motion.div
+        <motion.div
             key={SearchText}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          
             {filterPackage.map((product) => (
               <div
                 key={product.documentId}
@@ -158,8 +159,9 @@ const PackageList = ({ filters, search }) => {
                 </div>
               </div>
             ))}
-          </motion.div>
+         
         </div>
+        </motion.div>
       </div>
     </motion.div>
   )

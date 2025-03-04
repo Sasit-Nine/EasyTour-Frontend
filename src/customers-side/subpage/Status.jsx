@@ -170,7 +170,10 @@ const Status = () => {
                             <div className="flex justify-between gap-x-4 py-3">
                                 <dt className="text-gray-500 text-lg">ใบเสร็จ</dt>
                                 <dd className="text-gray-700">
-                                    <p className='text-lg text-green-600 cursor-pointer' onClick={() => { window.open(booking.payment_reciept) }}>รับใบเสร็จ</p>
+                                    {booking.payment_status==='ชำระเงินสำเร็จ'?<p className='text-lg text-green-600 cursor-pointer' onClick={() => { window.open(booking.payment_reciept) }}>รับใบเสร็จ</p>:
+                                    <p className='text-lg text-red-600'>คุณชำระเงินล้มเหลว</p>
+                                    }
+                                    
                                 </dd>
                             </div>
                         </dl>

@@ -80,6 +80,7 @@ export const AuthProvider = ({ children }) => {
                 }
             });
             const jwt = jwtdata?.login?.jwt;
+            
             if (remember) localStorage.setItem("token", jwt);
             sessionStorage.setItem("token", jwt);
             const { data: userData } = await fetchUserData({
@@ -98,6 +99,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         sessionStorage.removeItem("token");
+        localStorage.removeItem("token")
         setUser(null);
     };
 

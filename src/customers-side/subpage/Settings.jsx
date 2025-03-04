@@ -153,6 +153,25 @@ const Settings = () => {
             UpdateRes.status === 200 ? setUpdateSuccess(true) : setUpdateError(true)
             console.log(UpdateRes)
         }
+        else if(!imgUrl) {
+            const UpdateRes = await axios.put(`${strapiBaseURL}/api/users/${uId}`,
+                {
+                    fname: fname,
+                    lname: lname,
+                    address: addr,
+                    tel: tel,
+                    province: province,
+                    district: district,
+                    city: city,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+                    }
+                })
+            console.log(UpdateRes)
+            UpdateRes.status === 200 ? setUpdateSuccess(true) : setUpdateError(true)
+        }
         else {
             const UpdateRes = await axios.put(`${strapiBaseURL}/api/users/${uId}`,
                 {

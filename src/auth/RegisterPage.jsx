@@ -51,7 +51,10 @@ export default function Register() {
 
         try {
             await register(username, email, password);
-            navigate('/');
+            if(sessionStorage.getItem('token')){
+                navigate('/');
+            }
+            
         } catch (error) {
             console.error("Registration failed:", error);
             alert("เกิดข้อผิดพลาดในการสมัครสมาชิก โปรดลองอีกครั้ง!");
