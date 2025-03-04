@@ -87,7 +87,7 @@ const FilterPackageManage = () => {
 
     return (
         <div className="bg-white">
-            <div className="px-4 py-5 text-left sm:px-6 lg:px-8">
+            <div className="px- py-5 text-left sm:px-6 lg:px-8">
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900">จัดการแพ็กเกจ</h1>
                 <p className="mx-auto mt-4 text-lg text-gray-500">
                     คุณสามารถเพิ่ม แก้ไข หรือ ลบแพ็กเกจทัวร์ตามต้องการ
@@ -129,7 +129,7 @@ const FilterPackageManage = () => {
                     <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 px-4 text-sm sm:px-6 md:gap-x-6 lg:px-8">
                         <div className="grid auto-rows-min grid-cols-1 gap-y-10 md:grid-cols-2 md:gap-x-6">
                             <fieldset>
-                                <legend className="block font-medium">{filters[0].name}</legend>
+                                <legend className="block font-medium text-xl">{filters[0].name}</legend>
                                 <div className="space-y-6 pt-6 sm:space-y-4 sm:pt-4">
                                     {filters[0].options.map((option, optionIdx) => (
                                         <div key={option.value} className="flex gap-3">
@@ -166,7 +166,7 @@ const FilterPackageManage = () => {
                                                     </svg>
                                                 </div>
                                             </div>
-                                            <label htmlFor={`category-${optionIdx}`} className="text-base text-gray-600 sm:text-sm">
+                                            <label htmlFor={`category-${optionIdx}`} className="text-lg text-gray-600 sm:text-lg">
                                                 {option.label}
                                             </label>
                                         </div>
@@ -174,7 +174,7 @@ const FilterPackageManage = () => {
                                 </div>
                             </fieldset>
                             <fieldset>
-                                <legend className="block font-medium">{filters[1].name}</legend>
+                                <legend className="block font-medium text-xl">{filters[1].name}</legend>
                                 <div className="space-y-6 pt-6 sm:space-y-4 sm:pt-4">
                                     {filters[1].options.map((option, optionIdx) => (
                                         <div key={option.value} className="flex gap-3">
@@ -215,7 +215,7 @@ const FilterPackageManage = () => {
                                                     </svg>
                                                 </div>
                                             </div>
-                                            <label htmlFor={`duration-${optionIdx}`} className="text-base text-gray-600 sm:text-sm">
+                                            <label htmlFor={`duration-${optionIdx}`} className="text-lg text-gray-600 sm:text-lg">
                                                 {option.label}
                                             </label>
                                         </div>
@@ -225,7 +225,7 @@ const FilterPackageManage = () => {
                         </div>
                         <div className="grid auto-rows-min grid-cols-1 gap-y-10 md:grid-cols-2 md:gap-x-6">
                             <fieldset>
-                                <legend className="block font-medium">{filters[2].name}</legend>
+                                <legend className="block font-medium text-xl">{filters[2].name}</legend>
                                 <div className="space-y-6 pt-6 sm:space-y-4 sm:pt-4">
                                     {filters[2].options.map((option, optionIdx) => (
                                         <div key={option.value} className="flex gap-3">
@@ -262,7 +262,7 @@ const FilterPackageManage = () => {
                                                     </svg>
                                                 </div>
                                             </div>
-                                            <label htmlFor={`sector-${optionIdx}`} className="text-base text-gray-600 sm:text-sm">
+                                            <label htmlFor={`sector-${optionIdx}`} className="text-lg text-gray-600 sm:text-lg">
                                                 {option.label}
                                             </label>
                                         </div>

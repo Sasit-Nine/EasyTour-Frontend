@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { QUERY_BOOKING, MUTATION_APPROVE } from "../../services/Graphql";
 import dayjs from "dayjs";
@@ -82,14 +82,14 @@ const History = () => {
             //const bookingIndex = (index + 1).toString();
             const customerName = booking.fullName.toLowerCase();
             const packageName = booking.packageName ? booking.packageName.toLowerCase() : '';
-            
+
             return (
                 customerName.includes(query) ||
                 //bookingIndex.includes(query) ||
                 packageName.includes(query)
             );
         });
-        
+
         setFilteredBookings(filtered);
     }, [searchQuery, localBookings]);
 
@@ -163,22 +163,34 @@ const History = () => {
                                             </span>
                                         </td>
                                         <td className="px-3 py-5 text-lg whitespace-nowrap">
-                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-lg font-normal ring-1 ring-inset ${
-                                                person.status === "success" 
-                                                    ? "bg-green-50 text-green-700 ring-green-600/20" 
+                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-lg font-normal ring-1 ring-inset ${person.status === "success"
+                                                    ? "bg-green-50 text-green-700 ring-green-600/20"
                                                     : "bg-red-50 text-red-700 ring-red-600/20"
-                                            }`}>
+                                                }`}>
                                                 {person.status === "success" ? "อนุมัติการจอง" : "ปฏิเสธการจอง"}
                                             </span>
                                         </td>
                                         <td className="relative py-5 pr-4 pl-3 text-right text-lg font-medium whitespace-nowrap sm:pr-0">
-                                            <div className="flex gap-3">
-                                                <a onClick={() => handleRecheck(person.id)} className="text-indigo-600 hover:text-indigo-900 cursor-pointer">
+                                            <div className="flex gap-3 justify-end">
+                                                <button
+                                                    onClick={() => handleRecheck(person.id)}
+                                                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                    </svg>
                                                     ตรวจสอบใหม่
-                                                </a>
-                                                <a onClick={() => showDetails(person)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer">
+                                                </button>
+                                                <button
+                                                    onClick={() => showDetails(person)}
+                                                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#F8644B] hover:bg-[#e55b43] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F8644B] transition-colors duration-200"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
                                                     ดูเพิ่มเติม
-                                                </a>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

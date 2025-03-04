@@ -69,7 +69,6 @@ query Booking($documentId: ID!) {
   }
 }
 `
-
 export const QUERY_PACKAGELIST = gql`
 query Query($filters: PackageFiltersInput) {
   packages(filters: $filters) {
@@ -203,6 +202,7 @@ export const MUTATION_APPROVE = gql`
 mutation Mutation($documentId: ID!, $data: BookingInput!) {
   updateBooking(documentId: $documentId, data: $data) {
     booking_status
+    notes
   }
 }`
 
