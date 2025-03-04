@@ -2,14 +2,18 @@ import React, { useState, useEffect } from "react"
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
 import { useMutation, useLazyQuery } from "@apollo/client";
-import { MUTATION_BOOKING, QEURY_BOOKINGID } from "../../services/Graphql";
+import { MUTATION_BOOKING, QEURY_BOOKINGID, UPDATE_QTT } from "../../services/Graphql";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { XMarkIcon } from '@heroicons/react/24/outline'
+
 const Booking = () => {
   const navigate = useNavigate()
 
+  const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
+  
   const fetchUser = async () => {
     try {
       const DataUser = await axios.get(`${strapiBaseURL}/api/users/me?populate=*`, {
@@ -41,8 +45,8 @@ const Booking = () => {
   }, [])
 
   const [BookingMutation] = useMutation(MUTATION_BOOKING)
+  const [UPDATEQT] = useMutation(UPDATE_QTT)
   const [BookingQuery] = useLazyQuery(QEURY_BOOKINGID)
-  const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
   const location = useLocation()
   const packageId = location.state.packageId
   const name = location.state.name
@@ -51,6 +55,7 @@ const Booking = () => {
   const price = location.state.price
   const packageDocumentId = location.state.packageDocumentId
   const timetable = location.state.timetable
+  const max = location.state.max
   const { user } = useAuth();
 
   const [fname, setFname] = useState('')
@@ -63,67 +68,91 @@ const Booking = () => {
 
   console.log(packageId, packageDocumentId)
   console.log(user?.documentId)
+  const [inputAll, setInputAll] = useState(false)
 
   const handleBooking = async (e) => {
     e.preventDefault();
-    console.log(fname, lname, tel, address, city, district, province)
-    try {
-      const { data: BookingData } = await BookingMutation({
-        variables: {
-          data: {
-            customers: user?.documentId,
-            package: packageDocumentId,
-            fname: fname,
-            lname: lname,
-            city: city,
-            district: district,
-            province: province,
-            total_price: price * quantity,
-            quantity: quantity,
-            tel: tel,
-            address: address,
-            timetable: timetable
+    if (fname === '' || lname === '' || address === '' || tel === '' || city === '' || province === '' || district === '') {
+      setInputAll(true)
+      return
+    }
+    else {
+      console.log(fname, lname, tel, address, city, district, province)
+      try {
+        const { data: BookingData } = await BookingMutation({
+          variables: {
+            data: {
+              customers: user?.documentId,
+              package: packageDocumentId,
+              fname: fname,
+              lname: lname,
+              city: city,
+              district: district,
+              province: province,
+              total_price: price * quantity,
+              quantity: quantity,
+              tel: tel,
+              address: address,
+              timetable: timetable
+            }
+          },
+          context: {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+            },
           }
-        },
-        context: {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
-          },
-        }
-      })
+        })
 
-      const { data: BookingID } = await BookingQuery({
-        variables: {
-          documentId: BookingData?.createBooking?.documentId
-        },
-        context: {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+        const { data: UpdateQT } = await UPDATEQT({
+          variables: {
+            documentId: packageDocumentId,
+            data: {
+              max_people: max - quantity
+            }
           },
-        }
-      })
-      const bkID = BookingID?.booking?.booking_id
-      console.log(bkID)
+          context: {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+            },
+          }
+        })
 
-      const response = await axios.post(`${strapiBaseURL}/api/payment/checkout`, {
-        packageId: packageId,
-        BookingId: bkID,
-        Quantity: quantity
-      })
-      console.log('Response:', response.data.url)
-      if (response?.data?.url) {
-        window.location.href = response.data.url
-      } else {
-        alert('Error Payment')
+        console.log(UpdateQT)
+
+        const { data: BookingID } = await BookingQuery({
+          variables: {
+            documentId: BookingData?.createBooking?.documentId
+          },
+          context: {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
+            },
+          }
+        })
+        const bkID = BookingID?.booking?.booking_id
+        console.log(bkID)
+        const response = await axios.post(`${strapiBaseURL}/api/payment/checkout`, {
+          packageId: packageId,
+          BookingId: bkID,
+          Quantity: quantity
+        })
+        console.log('Response:', response.data.url)
+        if (response?.data?.url) {
+          window.location.href = response.data.url
+        } else {
+          alert('Error Payment')
+        }
+      } catch (error) {
+        console.log(error)
       }
-    } catch (error) {
-      console.log(error)
     }
   }
 
   return (
     <form>
+      
       <div className="p-15 flex justify-center items-center">
+        
         <div className="grid grid-cols-1 gap-y-10 border-b border-gray-900/10 pb-12 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2">
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">ข้อมูลผู้จองแพ็คเกจ</h2>
@@ -194,7 +223,7 @@ const Booking = () => {
                   type="text"
                   autoComplete="given-name"
                   onChange={(e) => setFname(e.target.value)}
-                  value={name}
+                  value={fname}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-base"
                 />
               </div>
@@ -208,9 +237,9 @@ const Booking = () => {
                 <input
                   id="last-name"
                   name="last-name"
-                  type="text"
                   autoComplete="family-name"
                   value={lname}
+                  type="text"
                   onChange={(e) => setLname(e.target.value)}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-base"
                 />
@@ -304,12 +333,33 @@ const Booking = () => {
           </div>
         </div>
 
+
       </div>
+      {(inputAll) && <div className="rounded-xl bg-red-50 p-4 mr-40 ml-40 mb-5">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-lg font-medium text-red-800">กรุณากรอกข้อมูลให้ครบ</p>
+            </div>
+            <div className="ml-auto pl-3">
+              <div className="-mx-1.5 -my-1.5">
+                <button
+                  type="button"
+                  className="inline-flex rounded-md bg-red-50 p-1.5 text-red-500 hover:bg-red-100 focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-green-50 focus:outline-hidden"
+                >
+                  <span className="sr-only">ปิด</span>
+
+                  <XMarkIcon aria-hidden="true" className="size-5 cursor-pointer" onClick={() => setInputAll(false)} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>}
       <div className="flex justify-center pb-12">
         <button type='submit' onClick={handleBooking} className="cursor-pointer flex max-w-50 flex-1 items-center justify-center rounded-md border border-transparent bg-[#F8644B] px-8 py-3 text-lg font-medium text-white hover:bg-[#f84b4b] focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:outline-hidden sm:w-3xs hover:scale-105 active:scale-100 transition-transform duration-00">ยืนยันการจอง</button>
       </div>
-
+      
     </form>
+    
   )
 };
 

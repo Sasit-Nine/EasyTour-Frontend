@@ -64,7 +64,7 @@ const Navbar = () => {
                     {(user) ? (
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                             {/* Profile Dropdown */}
-                            <p className="text-white text-lg">สวัสดี {user.username}</p>
+                            <p className="text-white text-lg max-sm:hidden">สวัสดี {user.username}</p>
                             <Menu as="div" className="relative ml-3">
                                 <div>
                                     <MenuButton className="relative flex rounded-full bg-white text-sm focus:ring-offset-2 focus:outline-none border-3 border-white hover:scale-110 active:scale-100 transition-transform duration-200 cursor-pointer">

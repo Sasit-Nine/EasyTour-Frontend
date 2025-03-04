@@ -42,6 +42,9 @@ const PackageList = ({ filters, search }) => {
         status_package: {
           eq: "PUBLISH"
         },
+        max_people:{
+          gt:0
+        },
         ...(debounceFilters.category.length > 0 && { type: { in: debounceFilters.category } }),
         ...(debounceFilters.duration.length > 0 && { with_accommodation: { in: debounceFilters.duration } }),
         ...(debounceFilters.sector.length > 0 && { location: { sector: { in: debounceFilters.sector } } }),

@@ -10,7 +10,10 @@ const ProductInHome = () => {
             filters: {
                 status_package: {
                     eq: "PUBLISH"
-                }
+                },
+                max_people:{
+                    gt:0
+                },
             }
         }
     })

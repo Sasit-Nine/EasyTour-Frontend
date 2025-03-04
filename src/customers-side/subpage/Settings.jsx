@@ -46,6 +46,7 @@ const Settings = () => {
     const [updatePWSS , setPWSS] = useState(false)
     const [filledData ,setFilledData] = useState(false)
     const [pwFilled , setPwFilled] = useState(false)
+    const [pwInvalid,setPWinvalid] = useState(false)
 
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const fetchUser = async () => {
@@ -204,7 +205,6 @@ const Settings = () => {
             console.log(password)
             console.log(newPassword)
             console.log(confirm_password)
-            console.log('Heloo')
             return
         } else {
             console.log(password)

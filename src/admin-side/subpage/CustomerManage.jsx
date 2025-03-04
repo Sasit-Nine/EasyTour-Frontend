@@ -218,19 +218,19 @@ const CustomerManage = () => {
                                             <div className="flex gap-3">
                                                 <a 
                                                   onClick={() => showApproveConfirmation(person.id)} 
-                                                  className="text-green-600 hover:text-green-900 cursor-pointer"
+                                                  className="text-green-600 hover:text-green-900 cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100"
                                                 >
                                                     อนุมัติ
                                                 </a>
                                                 <a 
                                                   onClick={() => showRejectConfirmation(person.id)} 
-                                                  className="text-red-600 hover:text-red-900 cursor-pointer"
+                                                  className="text-red-600 hover:text-red-900 cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100"
                                                 >
                                                     ปฏิเสธ
                                                 </a>
                                                 <a 
                                                   onClick={() => showDetails(person)} 
-                                                  className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer"
+                                                  className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100"
                                                 >
                                                     ดูเพิ่มเติม
                                                 </a>

@@ -90,7 +90,8 @@ const PackageDetail = () => {
                 url: `${strapiBaseURL}${dataPackage.package.thumbnail.url}`,
                 quantity: quantity,
                 price: dataPackage.package.price,
-                timetable: selectedTour.documentId
+                timetable: selectedTour.documentId,
+                max: dataPackage.package.max_people
             }
         })
     }
@@ -229,7 +230,7 @@ const PackageDetail = () => {
                                             <p className="text-gray-900 text-xs/2">Trav.</p>
                                             <p className="text-lg">{quantity}</p>
                                         </div>
-                                        <button className="text-gray-500" onClick={(e) => { e.preventDefault(); setQuantity(quantity + 1) }}>+</button>
+                                        <button className="text-gray-500" onClick={(e) => { e.preventDefault(); quantity<dataPackage.package.max_people && setQuantity(quantity + 1) }}>+</button>
                                     </div>
 
                                     <button

@@ -4,7 +4,6 @@ import { Dialog, DialogBackdrop, DialogPanel, Disclosure, DisclosureButton, Disc
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PlusIcon } from '@heroicons/react/20/solid'
 import PackageList from '../subpage/PackageList'
-import { set } from 'lodash'
 
 const filters = [
   {
@@ -33,7 +32,6 @@ const filters = [
       { value: 'north', label: 'ภาคเหนือ' },
       { value: 'south', label: 'ภาคใต้' },
       { value: 'east', label: 'ภาคตะวันออก' },
-      { value: 'west', label: 'ภาคตะวันตก' },
       { value: 'northwest', label: 'ภาคตะวันออกเฉียงเหนือ' },
       { value: 'central', label: 'ภาคกลาง' },
     ],

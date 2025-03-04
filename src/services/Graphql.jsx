@@ -260,3 +260,11 @@ mutation Mutation($currentPassword: String!, $password: String!, $passwordConfir
     jwt
   }
 }`
+
+export const UPDATE_QTT = gql`
+mutation UpdatePackage($documentId: ID!, $data: PackageInput!) {
+  updatePackage(documentId: $documentId, data: $data) {
+    max_people
+  }
+}
+`

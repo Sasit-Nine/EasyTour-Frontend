@@ -173,10 +173,10 @@ const History = () => {
                                         </td>
                                         <td className="relative py-5 pr-4 pl-3 text-right text-lg font-medium whitespace-nowrap sm:pr-0">
                                             <div className="flex gap-3">
-                                                <a onClick={() => handleRecheck(person.id)} className="text-indigo-600 hover:text-indigo-900 cursor-pointer">
+                                                <a onClick={() => handleRecheck(person.id)} className="text-yellow-500  cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100">
                                                     ตรวจสอบใหม่
                                                 </a>
-                                                <a onClick={() => showDetails(person)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer">
+                                                <a onClick={() => showDetails(person)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100">
                                                     ดูเพิ่มเติม
                                                 </a>
                                             </div>

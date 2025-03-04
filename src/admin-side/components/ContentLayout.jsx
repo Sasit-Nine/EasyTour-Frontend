@@ -6,6 +6,8 @@ import CustomerManage from "../subpage/CustomerManage";
 import AddPackage from "../subpage/AddPackage";
 import EditPackage from "../subpage/EditPackage";
 import History from "../subpage/History";
+import Settings from "../../customers-side/subpage/Settings";
+
 const ContentLayout = () => {
     return(
         <Router>
@@ -15,6 +17,7 @@ const ContentLayout = () => {
                 <Route path="/add_package" element={<AddPackage />} />
                 <Route path="/history" element={<History />} />
                 <Route path="/:documentId" element={<EditPackage></EditPackage>}></Route>
+                <Route path="/admin/setting" element={<Settings></Settings>}></Route>
             </Routes>
         </Router>
     )

@@ -77,6 +77,10 @@ const AdminLayout = () => {
         window.location.href = "/login"
     }
 
+    const handleSetting = () => {
+      window.location.href = "/admin/setting"
+  }
+
   return (
     <>
       <SearchContext.Provider value={{ searchQuery, setSearchQuery }}>
@@ -148,11 +152,16 @@ const AdminLayout = () => {
           <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
             {/* Sidebar component, swap this element with another sidebar if you like */}
             <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
-              <div className="flex h-16 shrink-0 items-center">
+              <div className="flex h-16 shrink-0 items-center mt-3">
                 <img
                   src={LogoPicture}
-                  className="size-10"
+                  className="size-12"
                 />
+                <div>
+                  <p className='text-3xl font-bold ml-2 text-[#F8644B]'>EazyTour</p>
+                  <p className='text-lg font-bold ml-2 text-[#F8644B]'>Admin</p>
+                </div>
+                
               </div>
               <nav className="flex flex-1 flex-col">
                 <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -166,7 +175,7 @@ const AdminLayout = () => {
                               item.current
                                 ? 'bg-gray-50 text-[#F8644B]'
                                 : 'text-gray-700 hover:bg-gray-50 hover:text-[#F8644B]',
-                              'group flex gap-x-3 rounded-md p-2 text-md font-normal',
+                              'group flex gap-x-3 rounded-md p-2 text-lg font-normal',
                             )}
                           >
                             <item.icon
@@ -228,8 +237,11 @@ const AdminLayout = () => {
                     </div>
 
                     <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5">
+                    <MenuItem>
+                        <button className="block w-full text-left px-4 py-2 text-base text-gray-700 hover:bg-gray-100" onClick={()=>{handleSetting()}}>จัดการบัญชี</button>
+                      </MenuItem>
                       <MenuItem>
-                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-700" onClick={()=>{handleLogout()}}>ออกจากระบบ</button>
+                        <button className="block w-full text-left px-4 py-2 text-base text-gray-700 hover:bg-gray-100 hover:text-orange-700" onClick={()=>{handleLogout()}}>ออกจากระบบ</button>
                       </MenuItem>
                     </MenuItems>
                   </Menu>
