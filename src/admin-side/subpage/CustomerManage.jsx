@@ -3,9 +3,13 @@ import { useMutation, useQuery } from "@apollo/client";
 import { QUERY_BOOKING, MUTATION_APPROVE } from "../../services/Graphql";
 import dayjs from "dayjs";
 import ViewDetail from "../components/ViewDetail";
+import ConfirmationModal from "../components/ConfirmationModal"; // เพิ่ม import
+import useFilterCustomer from "../components/FilterCustomer";
+import { useSearch } from "../components/AdminLayout";
 
 const CustomerManage = () => {
-    const [APPROVE_MUTATION] = useMutation(MUTATION_APPROVE)
+    const [APPROVE_MUTATION] = useMutation(MUTATION_APPROVE);
+    const { searchQuery } = useSearch();
     const { data, loading, error, refetch } = useQuery(QUERY_BOOKING, {
         variables: {
             filters: {
@@ -21,10 +25,40 @@ const CustomerManage = () => {
         },
     });
 
-    const handleApprove = (documentId) => {
+    // เพิ่ม state สำหรับ confirmation modal
+    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(null);
+    const [confirmBookingId, setConfirmBookingId] = useState(null);
+
+    // แสดง modal ยืนยันการอนุมัติ
+    const showApproveConfirmation = (documentId) => {
+        setConfirmAction('approve');
+        setConfirmBookingId(documentId);
+        setConfirmModalOpen(true);
+    };
+
+    // แสดง modal ยืนยันการปฏิเสธ
+    const showRejectConfirmation = (documentId) => {
+        setConfirmAction('reject');
+        setConfirmBookingId(documentId);
+        setConfirmModalOpen(true);
+    };
+
+    // ดำเนินการหลังจากยืนยัน
+    const handleConfirmAction = () => {
+        if (confirmAction === 'approve') {
+            confirmApprove();
+        } else if (confirmAction === 'reject') {
+            confirmReject();
+        }
+        setConfirmModalOpen(false);
+    };
+
+    // ฟังก์ชั่นอนุมัติหลังจากยืนยัน
+    const confirmApprove = () => {
         APPROVE_MUTATION({
             variables: {
-                documentId: documentId,
+                documentId: confirmBookingId,
                 data: {
                     booking_status: "success",
                 }
@@ -35,13 +69,15 @@ const CustomerManage = () => {
                 },
             }
         }).then(() => {
-            refetch()
-        })
-    }
-    const handleRejection = (documentId) => {
+            refetch();
+        });
+    };
+    
+    // ฟังก์ชั่นปฏิเสธหลังจากยืนยัน
+    const confirmReject = () => {
         APPROVE_MUTATION({
             variables: {
-                documentId: documentId,
+                documentId: confirmBookingId,
                 data: {
                     booking_status: "failed",
                 }
@@ -52,27 +88,17 @@ const CustomerManage = () => {
                 },
             }
         }).then(() => {
-            refetch()
-        })
-    }
+            refetch();
+        });
+    };
 
     const [localBookings, setLocalBookings] = useState([]);
-    const [historyBookings, setHistoryBookings] = useState([]);
+    const [filteredBookings, setFilteredBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isHistoryModalVisible, setIsHistoryModalVisible] = useState(false);
-    const [isReasonModalVisible, setIsReasonModalVisible] = useState(false);
-    const [rejectingId, setRejectingId] = useState(null);
-    const [rejectionReason, setRejectionReason] = useState("");
-    const [isHistoryReasonModalVisible, setIsHistoryReasonModalVisible] = useState(false);
-    const [historyRejectingId, setHistoryRejectingId] = useState(null);
-    const [historyRejectionReason, setHistoryRejectionReason] = useState("");
-
-    console.log(data)   
 
     useEffect(() => {
         if (data && data.bookings) {
-            console.log(data)
             const transformedBookings = data.bookings.map((bk) => ({
                 id: bk.documentId,
                 fullName: `${bk.fname} ${bk.lname}`,
@@ -91,19 +117,39 @@ const CustomerManage = () => {
                 bookingTime: dayjs(bk.createdAt).format("DD/MM/YYYY HH:mm:ss"),
             }));
             setLocalBookings(transformedBookings);
+            setFilteredBookings(transformedBookings);
         }
     }, [data]);
 
+    // Effect for filtering based on the global search query
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setFilteredBookings(localBookings);
+            return;
+        }
+
+        const query = searchQuery.toLowerCase().trim();
+        const filtered = localBookings.filter((booking, index) => {
+            const customerName = booking.fullName.toLowerCase();
+            const packageName = booking.packageName ? booking.packageName.toLowerCase() : '';
+            
+            return (
+                customerName.includes(query) ||
+                packageName.includes(query)
+            );
+        });
+        
+        setFilteredBookings(filtered);
+    }, [searchQuery, localBookings]);
+
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error.message}</p>;
-
 
     const showDetails = (record) => {
         setIsModalVisible(true);
         setSelectedBooking(record);
     };
 
-    console.log(localBookings)
     return (
         <div className="px-4 sm:px-6 lg:px-8 ">
             <div className="sm:flex sm:items-center">
@@ -141,7 +187,7 @@ const CustomerManage = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
-                                {localBookings.map((person, index) => (
+                                {filteredBookings.map((person, index) => (
                                     <tr key={index}>
                                         <td className="py-5 pr-3 pl-4 text-lg whitespace-nowrap sm:pl-0">
                                             <div className="flex items-center">
@@ -170,13 +216,22 @@ const CustomerManage = () => {
                                         </td>
                                         <td className="relative py-5 pr-4 pl-3 text-right text-lg font-medium whitespace-nowrap sm:pr-0">
                                             <div className="flex gap-3">
-                                                <a onClick={() => handleApprove(person.id)} className="text-green-600 hover:text-green-900 cursor-pointer">
+                                                <a 
+                                                  onClick={() => showApproveConfirmation(person.id)} 
+                                                  className="text-green-600 hover:text-green-900 cursor-pointer"
+                                                >
                                                     อนุมัติ
                                                 </a>
-                                                <a onClick={() => handleRejection(person.id)} className="text-red-600 hover:text-green-900 cursor-pointer">
+                                                <a 
+                                                  onClick={() => showRejectConfirmation(person.id)} 
+                                                  className="text-red-600 hover:text-red-900 cursor-pointer"
+                                                >
                                                     ปฏิเสธ
                                                 </a>
-                                                <a onClick={() => showDetails(person)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer">
+                                                <a 
+                                                  onClick={() => showDetails(person)} 
+                                                  className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer"
+                                                >
                                                     ดูเพิ่มเติม
                                                 </a>
                                             </div>
@@ -188,13 +243,28 @@ const CustomerManage = () => {
                     </div>
                 </div>
             </div>
+            
+            {/* Modal สำหรับดูรายละเอียด */}
             <ViewDetail
                 visible={isModalVisible}
                 onCancel={() => setIsModalVisible(false)}
                 booking={selectedBooking}
-            ></ViewDetail>
+            />
+
+            {/* Modal ยืนยันการอนุมัติหรือปฏิเสธ */}
+            <ConfirmationModal
+                isOpen={confirmModalOpen}
+                onClose={() => setConfirmModalOpen(false)}
+                onConfirm={handleConfirmAction}
+                action={confirmAction}
+                title={confirmAction === 'approve' ? 'ยืนยันการอนุมัติ' : 'ยืนยันการปฏิเสธ'}
+                message={
+                    confirmAction === 'approve'
+                        ? 'คุณต้องการยืนยันการอนุมัติการจองนี้ใช่หรือไม่?'
+                        : 'คุณต้องการยืนยันการปฏิเสธการจองนี้ใช่หรือไม่?'
+                }
+            />
         </div>
-        
     );
 };
 
