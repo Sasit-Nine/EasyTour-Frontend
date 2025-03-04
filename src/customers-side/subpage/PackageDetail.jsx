@@ -25,32 +25,26 @@ import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
-const people = [
-    { id: 1, name: 'Leslie Alexander' },
-    // More users...
-]
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 const PackageDetail = () => {
+    const location = useLocation()
+    const { pathname } = useLocation()
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, [pathname])
     // Data User
     const { user } = useAuth()
     // ทำ Combobox
     const [query, setQuery] = useState('')
     const [selectedTour, setSelectedTour] = useState(null)
-    const filteredPeople =
-    query === ''
-      ? people
-      : people.filter((person) => {
-          return person.name.toLowerCase().includes(query.toLowerCase())
-        })
 
     const [quantity, setQuantity] = useState(1)
-    const location = useLocation()
     const navigate = useNavigate()
     const package_id = location.state?.pkgID
-    
+
     const strapiBaseURL = import.meta.env.VITE_STRAPI_URL
     const { documentId } = useParams()
     console.log(documentId)
@@ -77,11 +71,11 @@ const PackageDetail = () => {
     DataTimeTour = dataPackage?.package?.timetables
     const uniqueDataTimeTour = Array.from(new Map(DataTimeTour.map(time => [time.documentId, time])).values())
     console.log(uniqueDataTimeTour)
-    
+
     dayjs.extend(customParseFormat)
     const time = dataPackage.package.time;
     const formattedTime = dayjs(time, 'HH:mm:ss.SSS').format('HH:mm')
-    
+
 
     const handleBooking = async () => {
         console.log(user?.documentId)
@@ -104,7 +98,7 @@ const PackageDetail = () => {
     const handleLogin = async () => {
         navigate('/login')
     }
-    
+
 
 
     return (
@@ -153,24 +147,6 @@ const PackageDetail = () => {
                             <h1 className="text-4xl font-bold tracking-tight text-gray-900">{dataPackage.package.name}</h1>
                             {/* Reviews */}
                             <div className="mt-5">
-                                <h3 className="sr-only">Reviews</h3>
-                                <div className="flex items-center">
-
-                                    <div className="flex items-center">
-                                        {[0, 1, 2, 3, 4].map((rating) => (
-                                            <StarIcon
-                                                key={rating}
-                                                aria-hidden="true"
-                                                className={classNames(
-                                                    dataPackage.package.rating > rating ? 'text-[#F8644B]' : 'text-gray-300',
-                                                    'size-5 shrink-0',
-                                                )}
-                                            />
-                                        ))}
-                                    </div>
-                                    <p className="sr-only">{dataPackage.package.rating} out of 5 stars</p>
-
-                                </div>
                                 <div className="mb-2.5 flex items-center space-x-1.5 text-base mt-6">
                                     <MapPin className="text-[#F8644B]"></MapPin>
                                     <p>จุดนัดพบ : {dataPackage.package.meeting_point}</p>
@@ -183,7 +159,7 @@ const PackageDetail = () => {
 
                             <div className="mt-3">
                                 <h3 className="sr-only">Description</h3>
-
+                                <p className="text-bold font-medium text-gray-900">คำอธิบายแพ็คเกจทัวร์</p>
                                 <div
                                     dangerouslySetInnerHTML={{ __html: dataPackage.package.description }}
                                     className="space-y-6 text-lg text-gray-700"
@@ -208,8 +184,8 @@ const PackageDetail = () => {
                                             className="size-11 block w-full rounded-md bg-white py-1.5 pr-12 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#f84b4b] sm:text-sm/6"
                                             onChange={(event) => setQuery(event.target.value)}
                                             onBlur={() => setQuery('')}
-                                            displayValue={(selectedTour) => 
-                                                selectedTour 
+                                            displayValue={(selectedTour) =>
+                                                selectedTour
                                                     ? `${dayjs(selectedTour.start).format('DD-MM-YYYY HH:mm')} - ${dayjs(selectedTour.end).format('DD-MM-YYYY HH:mm')}`
                                                     : ''
                                             }
@@ -220,7 +196,7 @@ const PackageDetail = () => {
 
                                         {DataTimeTour.length > 0 && (
                                             <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 shadow-lg ring-black/5 focus:outline-hidden sm:text-sm">
-                                                {uniqueDataTimeTour.map((DataTimeTour,index) => (
+                                                {uniqueDataTimeTour.map((DataTimeTour, index) => (
                                                     <ComboboxOption
                                                         key={index}
                                                         value={DataTimeTour}

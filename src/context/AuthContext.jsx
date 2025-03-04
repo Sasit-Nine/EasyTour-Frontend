@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const loaderUser = async () => {
-            const token = sessionStorage.getItem("token");
+            const token = sessionStorage.getItem("token")||localStorage.getItem("token");
             if (token) {
                 try {
                     const { data: userData } = await fetchUserData({

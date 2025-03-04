@@ -50,7 +50,6 @@ const Navbar = () => {
                         <div className="hidden sm:ml-10 sm:flex sm:space-x-3">
                             <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/">หน้าหลัก</Link>
                             <Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/packages">แพ็กเกจทัวร์</Link>
-                            {(user)&&(<Link className="inline-flex items-center px-3 pt-1 text-lg font-light text-white hover:text-gray-200 hover:scale-105 active:scale-100 transition-transform duration-100" to="/status">สถานะและประวัติการจอง</Link>)}
                         </div>
                     </div>
 
@@ -58,6 +57,7 @@ const Navbar = () => {
                     {(user) ? (
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                             {/* Profile Dropdown */}
+                            <p className="text-white text-lg">สวัสดี {user.username}</p>
                             <Menu as="div" className="relative ml-3">
                                 <div>
                                     <MenuButton className="relative flex rounded-full bg-white text-sm focus:ring-offset-2 focus:outline-none border-3 border-white hover:scale-110 active:scale-100 transition-transform duration-200 cursor-pointer">
@@ -66,12 +66,12 @@ const Navbar = () => {
                                 </div>
 
                                 <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5">
-                                    {/* <MenuItem>
-                                    <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/profile">Your Profile</Link>
+                                <MenuItem>
+                                    <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/settings">จัดการบัญชี</Link>
                                 </MenuItem>
                                 <MenuItem>
-                                    <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/settings">Settings</Link>
-                                </MenuItem> */}
+                                    <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to="/status">สถานะและประวัติการจอง</Link>
+                                </MenuItem>
                                     <MenuItem>
                                         <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-700" onClick={logout}>ออกจากระบบ</button>
                                     </MenuItem>

@@ -13,6 +13,8 @@ import Booking from "./subpage/Booking";
 import CheckoutSuccess from "./subpage/CheckoutSuccess";
 import FilterPackage from "./components/FilterPackage";
 import Status from "./subpage/Status";
+import Category from "./subpage/Category";
+import Settings from "./subpage/Settings";
 
 
 const CustomerApp = () => {
@@ -31,6 +33,8 @@ const CustomerApp = () => {
                         <Route path="/packages/:documentId" element={<PackageDetail></PackageDetail>}></Route>
                         <Route path="/checkout-success" element={<CheckoutSuccess></CheckoutSuccess>}></Route>
                         <Route path="/status" element={<Status></Status>}></Route>
+                        <Route path="/category" element={<Category></Category>}></Route>
+                        <Route path="/settings" element={<Settings></Settings>}></Route>
                     </Routes>
             </div>
             <Footer></Footer>

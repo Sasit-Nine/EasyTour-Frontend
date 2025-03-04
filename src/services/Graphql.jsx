@@ -252,4 +252,11 @@ mutation Register($input: UsersPermissionsRegisterInput!) {
     }
   }
 }
-`;
+`
+
+export const CHANGE_PASSWORD = gql`
+mutation Mutation($currentPassword: String!, $password: String!, $passwordConfirmation: String!) {
+  changePassword(currentPassword: $currentPassword, password: $password, passwordConfirmation: $passwordConfirmation) {
+    jwt
+  }
+}`
