@@ -3,18 +3,16 @@ import { useMutation, useQuery } from "@apollo/client";
 import { QUERY_BOOKING, MUTATION_APPROVE } from "../../services/Graphql";
 import dayjs from "dayjs";
 import ViewDetail from "../components/ViewDetail";
-import ConfirmationModal from "../components/ConfirmationModal"; // เพิ่ม import
-import useFilterCustomer from "../components/FilterCustomer";
 import { useSearch } from "../components/AdminLayout";
 
-const CustomerManage = () => {
+const History = () => {
     const [APPROVE_MUTATION] = useMutation(MUTATION_APPROVE);
     const { searchQuery } = useSearch();
     const { data, loading, error, refetch } = useQuery(QUERY_BOOKING, {
         variables: {
             filters: {
                 booking_status: {
-                    eq: "pending"
+                    ne: "pending"
                 }
             },
         },
@@ -25,42 +23,12 @@ const CustomerManage = () => {
         },
     });
 
-    // เพิ่ม state สำหรับ confirmation modal
-    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-    const [confirmAction, setConfirmAction] = useState(null);
-    const [confirmBookingId, setConfirmBookingId] = useState(null);
-
-    // แสดง modal ยืนยันการอนุมัติ
-    const showApproveConfirmation = (documentId) => {
-        setConfirmAction('approve');
-        setConfirmBookingId(documentId);
-        setConfirmModalOpen(true);
-    };
-
-    // แสดง modal ยืนยันการปฏิเสธ
-    const showRejectConfirmation = (documentId) => {
-        setConfirmAction('reject');
-        setConfirmBookingId(documentId);
-        setConfirmModalOpen(true);
-    };
-
-    // ดำเนินการหลังจากยืนยัน
-    const handleConfirmAction = () => {
-        if (confirmAction === 'approve') {
-            confirmApprove();
-        } else if (confirmAction === 'reject') {
-            confirmReject();
-        }
-        setConfirmModalOpen(false);
-    };
-
-    // ฟังก์ชั่นอนุมัติหลังจากยืนยัน
-    const confirmApprove = () => {
+    const handleRecheck = (documentId) => {
         APPROVE_MUTATION({
             variables: {
-                documentId: confirmBookingId,
+                documentId: documentId,
                 data: {
-                    booking_status: "success",
+                    booking_status: "pending",
                 }
             },
             context: {
@@ -69,28 +37,9 @@ const CustomerManage = () => {
                 },
             }
         }).then(() => {
-            refetch();
-        });
-    };
-    
-    // ฟังก์ชั่นปฏิเสธหลังจากยืนยัน
-    const confirmReject = () => {
-        APPROVE_MUTATION({
-            variables: {
-                documentId: confirmBookingId,
-                data: {
-                    booking_status: "failed",
-                }
-            },
-            context: {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`,
-                },
-            }
-        }).then(() => {
-            refetch();
-        });
-    };
+            refetch()
+        })
+    }
 
     const [localBookings, setLocalBookings] = useState([]);
     const [filteredBookings, setFilteredBookings] = useState([]);
@@ -130,11 +79,13 @@ const CustomerManage = () => {
 
         const query = searchQuery.toLowerCase().trim();
         const filtered = localBookings.filter((booking, index) => {
+            //const bookingIndex = (index + 1).toString();
             const customerName = booking.fullName.toLowerCase();
             const packageName = booking.packageName ? booking.packageName.toLowerCase() : '';
             
             return (
                 customerName.includes(query) ||
+                //bookingIndex.includes(query) ||
                 packageName.includes(query)
             );
         });
@@ -151,12 +102,12 @@ const CustomerManage = () => {
     };
 
     return (
-        <div className="px-4 sm:px-6 lg:px-8 ">
+        <div className="px-4 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
                 <div className="sm:flex-auto">
-                    <h1 className="text-4xl font-medium text-gray-900">จัดการลูกค้า</h1>
+                    <h1 className="text-4xl font-medium text-gray-900">ประวัติการจอง</h1>
                     <p className="mt-2 text-xl text-gray-700">
-                        คุณสามารถตรวจสอบและอนุมัติการจองของลูกค้าได้จากหน้านี้
+                        คุณสามารถตรวจสอบและจัดการประวัติการจองได้จากหน้านี้
                     </p>
                 </div>
             </div>
@@ -211,27 +162,21 @@ const CustomerManage = () => {
                                                 {person.paymentStatus}
                                             </span>
                                         </td>
-                                        <td className="px-3 py-5 text-lg whitespace-nowrap text-yellow-500">
-                                            {(person.status === "pending") ? 'รอการอนุมัติ' : (person.status === 'success') ? 'อนุมัติการจอง' : 'ปฏิเสธการจอง'}
+                                        <td className="px-3 py-5 text-lg whitespace-nowrap">
+                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-lg font-normal ring-1 ring-inset ${
+                                                person.status === "success" 
+                                                    ? "bg-green-50 text-green-700 ring-green-600/20" 
+                                                    : "bg-red-50 text-red-700 ring-red-600/20"
+                                            }`}>
+                                                {person.status === "success" ? "อนุมัติการจอง" : "ปฏิเสธการจอง"}
+                                            </span>
                                         </td>
                                         <td className="relative py-5 pr-4 pl-3 text-right text-lg font-medium whitespace-nowrap sm:pr-0">
                                             <div className="flex gap-3">
-                                                <a 
-                                                  onClick={() => showApproveConfirmation(person.id)} 
-                                                  className="text-green-600 hover:text-green-900 cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100"
-                                                >
-                                                    อนุมัติ
+                                                <a onClick={() => handleRecheck(person.id)} className="text-yellow-500  cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100">
+                                                    ตรวจสอบใหม่
                                                 </a>
-                                                <a 
-                                                  onClick={() => showRejectConfirmation(person.id)} 
-                                                  className="text-red-600 hover:text-red-900 cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100"
-                                                >
-                                                    ปฏิเสธ
-                                                </a>
-                                                <a 
-                                                  onClick={() => showDetails(person)} 
-                                                  className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100"
-                                                >
+                                                <a onClick={() => showDetails(person)} className="text-[#F8644B] hover:text-[#F8644B] cursor-pointer font-medium hover:scale-105 active:scale-100 transition-transform duration-100">
                                                     ดูเพิ่มเติม
                                                 </a>
                                             </div>
@@ -243,29 +188,13 @@ const CustomerManage = () => {
                     </div>
                 </div>
             </div>
-            
-            {/* Modal สำหรับดูรายละเอียด */}
             <ViewDetail
                 visible={isModalVisible}
                 onCancel={() => setIsModalVisible(false)}
                 booking={selectedBooking}
-            />
-
-            {/* Modal ยืนยันการอนุมัติหรือปฏิเสธ */}
-            <ConfirmationModal
-                isOpen={confirmModalOpen}
-                onClose={() => setConfirmModalOpen(false)}
-                onConfirm={handleConfirmAction}
-                action={confirmAction}
-                title={confirmAction === 'approve' ? 'ยืนยันการอนุมัติ' : 'ยืนยันการปฏิเสธ'}
-                message={
-                    confirmAction === 'approve'
-                        ? 'คุณต้องการยืนยันการอนุมัติการจองนี้ใช่หรือไม่?'
-                        : 'คุณต้องการยืนยันการปฏิเสธการจองนี้ใช่หรือไม่?'
-                }
-            />
+            ></ViewDetail>
         </div>
     );
 };
 
-export default CustomerManage;
+export default History;

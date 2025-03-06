@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const loaderUser = async () => {
-            const token = sessionStorage.getItem("token");
+            const token = sessionStorage.getItem("token")||localStorage.getItem("token");
             if (token) {
                 try {
                     const { data: userData } = await fetchUserData({
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
         loaderUser();
     }, [fetchUserData]);
 
-    const register = async (username, email, password) => {
+    const register = async (username, email, password, remember) => {
         try {
             console.log(username, email, password);
             const { data: jwtdata } = await registerMutation({
@@ -50,6 +50,7 @@ export const AuthProvider = ({ children }) => {
                 }
             });
             const jwt = jwtdata?.register?.jwt;
+            if (remember) localStorage.setItem("token", jwt);
             sessionStorage.setItem("token", jwt);
             const { data: userData } = await fetchUserData({
                 context: {
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const login = async (username, password) => {
+    const login = async (username, password, remember) => {
         try {
             const { data: jwtdata } = await loginMutation({
                 variables: {
@@ -79,6 +80,8 @@ export const AuthProvider = ({ children }) => {
                 }
             });
             const jwt = jwtdata?.login?.jwt;
+            
+            if (remember) localStorage.setItem("token", jwt);
             sessionStorage.setItem("token", jwt);
             const { data: userData } = await fetchUserData({
                 context: {
@@ -96,6 +99,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         sessionStorage.removeItem("token");
+        localStorage.removeItem("token")
         setUser(null);
     };
 

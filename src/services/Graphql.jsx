@@ -1,16 +1,16 @@
 import { gql, useQuery } from '@apollo/client';
 
-export const REGISTERMUTATION = gql`
-mutation Register($input: UsersPermissionsRegisterInput!) {
-  register(input: $input) {
-    jwt
-    user {
-      username
-      email
-    }
-  }
-}
-`;
+// export const REGISTERMUTATION = gql`
+// mutation Register($input: UsersPermissionsRegisterInput!) {
+//   register(input: $input) {
+//     jwt
+//     user {
+//       username
+//       email
+//     }
+//   }
+// }
+// `;
 
 export const LOGINMUTATION = gql`
 mutation Mutation($input: UsersPermissionsLoginInput!) {
@@ -61,6 +61,9 @@ mutation CreateBooking($data: BookingInput!) {
     booking_status
     documentId
     booking_id
+    timetable {
+      documentId
+    }
   }
 }
 `;
@@ -86,6 +89,11 @@ query Booking($documentId: ID!) {
 export const QUERY_PACKAGELIST = gql`
 query Query($filters: PackageFiltersInput) {
   packages(filters: $filters) {
+    thumbnail {
+      url
+    } 
+    type
+    status_package
     name
     location {
       district
@@ -93,13 +101,12 @@ query Query($filters: PackageFiltersInput) {
       sector
     }
     price
-    start
-    end
     duration
     documentId
     image {
       previewUrl
       url
+      documentId
     }
     package_id
   }
@@ -109,30 +116,43 @@ query Query($filters: PackageFiltersInput) {
 export const QUERY_PACKAGE = gql`
 query Query($documentId: ID!) {
   package(documentId: $documentId) {
+    package_id
+    with_accommodation
+    thumbnail {
+        url
+      }
     name
     price
     image {
       url
+      documentId
     }
-    start
-    end
     max_people
     duration
     location {
+      documentId
       province
       google_place_id
       district
       sector
     }
     time
-    note
     meeting_point
     rating
-    package_details {
-      name
-      detail
-    }
     description
+    detail {
+      documentId
+      accommodation
+      price_includes
+      tourist_attraction
+    }
+    timetables {
+      documentId
+      start
+      end
+    }
+    status_package
+    type
   }
 }`;
 
@@ -165,6 +185,12 @@ query Booking($documentId: ID!) {
 export const QUERY_BOOKING = gql`
 query Bookings($filters: BookingFiltersInput) {
   bookings(filters: $filters) {
+    province 
+    district
+    city
+    address
+    documentId
+    tel
     fname
     lname
     package {
@@ -182,6 +208,79 @@ query Bookings($filters: BookingFiltersInput) {
     }
     booking_status
     updatedAt
+    timetable{
+      start
+      end
+    }
+  }
+}
+`
+export const MUTATION_APPROVE = gql`
+mutation Mutation($documentId: ID!, $data: BookingInput!) {
+  updateBooking(documentId: $documentId, data: $data) {
+    booking_status
+  }
+}`
+
+export const UPDATE_PACKAGE = gql`
+mutation UpdatePackage($documentId: ID!, $data: PackageInput!) {
+  updatePackage(documentId: $documentId, data: $data) {
+    name
+    meeting_point
+    max_people
+    location {
+      sector
+      province
+      district
+    }
+    price
+    time
+    timetables {
+      start
+      end
+    }
+    type
+    duration
+    detail {
+      tourist_attraction
+      price_includes
+      accommodation
+    }
+    description
+  }
+}
+`
+
+export const DELETE_PACKAGE = gql`
+mutation DeletePackage($documentId: ID!) {
+  deletePackage(documentId: $documentId) {
+    documentId
+  }
+}`
+
+export const REGISTERMUTATION = gql`
+mutation Register($input: UsersPermissionsRegisterInput!) {
+  register(input: $input) {
+    jwt
+    user {
+      username
+      email
+    }
+  }
+}
+`
+
+export const CHANGE_PASSWORD = gql`
+mutation Mutation($currentPassword: String!, $password: String!, $passwordConfirmation: String!) {
+  changePassword(currentPassword: $currentPassword, password: $password, passwordConfirmation: $passwordConfirmation) {
+    jwt
+  }
+}`
+
+export const UPDATE_QTT = gql`
+mutation UpdatePackage($documentId: ID!, $data: PackageInput!) {
+  updatePackage(documentId: $documentId, data: $data) {
+    max_people
   }
 }
 `
