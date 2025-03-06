@@ -1,11 +1,25 @@
-import {gql} from '@apollo/client'
+import { gql, useQuery } from '@apollo/client';
+
+// export const REGISTERMUTATION = gql`
+// mutation Register($input: UsersPermissionsRegisterInput!) {
+//   register(input: $input) {
+//     jwt
+//     user {
+//       username
+//       email
+//     }
+//   }
+// }
+// `;
+
 export const LOGINMUTATION = gql`
 mutation Mutation($input: UsersPermissionsLoginInput!) {
   login(input: $input) {
     jwt
   }
 }
-`
+`;
+
 // {
 //     "input": {
 //       "identifier": "customer1",
@@ -24,7 +38,8 @@ query Query {
     documentId
   }
 }
-`
+`;
+
 export const MUTATION_BOOKING = gql`
 mutation CreateBooking($data: BookingInput!) {
   createBooking(data: $data) {
@@ -51,7 +66,8 @@ mutation CreateBooking($data: BookingInput!) {
     }
   }
 }
-`
+`;
+
 // {
 //   "data": {
 //     "total_price": 1500,
@@ -68,7 +84,7 @@ query Booking($documentId: ID!) {
     client_secret
   }
 }
-`
+`;
 
 export const QUERY_PACKAGELIST = gql`
 query Query($filters: PackageFiltersInput) {
@@ -95,7 +111,7 @@ query Query($filters: PackageFiltersInput) {
     package_id
   }
 }
-`
+`;
 
 export const QUERY_PACKAGE = gql`
 query Query($documentId: ID!) {
@@ -138,7 +154,7 @@ query Query($documentId: ID!) {
     status_package
     type
   }
-}`
+}`;
 
 export const QUERY_PAYMENT_INTENT_ID = gql`
 query Booking($documentId: ID!) {
@@ -146,7 +162,7 @@ query Booking($documentId: ID!) {
     payment_intent_id
   }
 }
-`
+`;
 
 export const QEURY_PROFILE = gql`
 query Me($documentId: ID!) {
@@ -156,7 +172,7 @@ query Me($documentId: ID!) {
     }
   }
 }
-`
+`;
 
 export const QEURY_BOOKINGID = gql`
 query Booking($documentId: ID!) {
@@ -164,7 +180,7 @@ query Booking($documentId: ID!) {
     booking_id
   }
 }
-`
+`;
 
 export const QUERY_BOOKING = gql`
 query Bookings($filters: BookingFiltersInput) {

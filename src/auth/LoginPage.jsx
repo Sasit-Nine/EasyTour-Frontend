@@ -21,6 +21,9 @@ export default function Login() {
     const [invalid, setInvalid] = useState(false)
     const { login } = useAuth()
 
+    // toggle password
+    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Username:", username, "Password:", password);
@@ -31,6 +34,8 @@ export default function Login() {
             setInvalid(true)
         }
     };
+
+
     return (
 
         <>
@@ -42,7 +47,7 @@ export default function Login() {
           <body class="h-full">
           ```
         */}
-            <div className="flex min-h-full">
+            <div className="flex min-h-full h-screen mt-[-3%] ">
                 <div className="relative w-2/3 hidden lg:block">
                     <img
                         alt=""
@@ -50,7 +55,7 @@ export default function Login() {
                         className="absolute inset-0 size-full object-cover"
                     />
                 </div>
-                <div className="flex w-full lg:w-1/2 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+                <div className="flex w-full lg:w-1/2 flex-col justify-center px-4 py-38 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
                     <div className="mx-auto w-full max-w-sm lg:w-96">
                         <div>
                             <img
@@ -69,14 +74,15 @@ export default function Login() {
 
                         <div className="mt-10">
                             <div>
-                                <form onSubmit={handleSubmit} className="space-y-6">
+                                <form onSubmit={handleSubmit} className="space-y-4">
                                     <div>
-                                        <label htmlFor="email" className="block text-base font-medium text-gray-900">
+                                        <label htmlFor="Username" className="block text-base font-medium text-gray-900">
                                             ชื่อผู้ใช้
                                         </label>
                                         <div className="mt-2">
                                             <input
                                                 id="username"
+                                                type="text"
                                                 name="username"
                                                 required
                                                 autoComplete="username"
@@ -93,6 +99,7 @@ export default function Login() {
                                             รหัสผ่าน
                                         </label>
                                         <div className="mt-2">
+                                            
                                             <input
                                                 id="password"
                                                 name="password"
@@ -101,6 +108,7 @@ export default function Login() {
                                                 required
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
+                                                
                                                 autoComplete="current-password"
                                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#F8644B] sm:text-base"
                                             />
@@ -117,7 +125,7 @@ export default function Login() {
                                                         checked={remember}
                                                         onChange={() => setRemember(!remember)}
                                                         type="checkbox"
-                                                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                                                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-400 bg-white checked:border-[#F8644B] checked:bg-[#F8644B] indeterminate:border-[#F8644B] indeterminate:bg-[#F8644B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F8644B] disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                                                     />
                                                     <svg
                                                         fill="none"
@@ -181,7 +189,7 @@ export default function Login() {
                             <div className="mt-10">
                                 <div className="relative">
                                     <div aria-hidden="true" className="absolute inset-0 flex items-center">
-                                        <div className="w-full border-t border-gray-200" />
+                                        <div className="w-full border-t border-gray-400" />
                                     </div>
                                     {/* <div className="relative flex justify-center text-base font-medium">
                                         <span className="bg-white px-6 text-gray-900">หรือเข้าสู่ระบบด้วย</span>
