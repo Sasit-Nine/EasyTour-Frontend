@@ -109,7 +109,6 @@ export const AuthProvider = ({ children }) => {
             loading,
             register,
             login,
-            register,
             logout,
             registerLoading,
             registerError,
