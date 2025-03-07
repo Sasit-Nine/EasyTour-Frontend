@@ -1,179 +1,271 @@
-import React from "react"
-import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
+import React, { useEffect, useState } from "react"
+import { ArrowUpIcon } from '@heroicons/react/20/solid'
 import { QUERY_BOOKING } from "../../services/Graphql"
 import { useQuery } from "@apollo/client"
 import ReactApexChart from 'react-apexcharts'
-
-const stats = [
-  { name: 'Total Subscribers', stat: '71,897', previousStat: '70,946', change: '12%', changeType: 'increase' },
-  { name: 'Avg. Open Rate', stat: '58.16%', previousStat: '56.14%', change: '2.02%', changeType: 'increase' },
-  { name: 'Avg. Click Rate', stat: '24.57%', previousStat: '28.62%', change: '4.05%', changeType: 'decrease' },
-]
+import dayjs from 'dayjs'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
+
 const Dashboard = () => {
   const { data, loading, error, refetch } = useQuery(QUERY_BOOKING, {
     variables: {
-      filters: {
-        booking_status: {
-          eq: "pending"
-        }
-      },
+      filters: {}, 
     },
     context: {
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
     },
+    notifyOnNetworkStatusChange: true,
   });
-  console.log(data)
-  const bookings = data?.bookings || []  // ตรวจสอบว่ามีข้อมูล bookings หรือไม่
 
-  // ตรวจสอบค่าของ bookingChartOptions และ revenueChartOptions
+  const [processedBookings, setProcessedBookings] = useState([]);
+  const [stats, setStats] = useState([
+    { name: 'Total Bookings', stat: '0', icon: ArrowUpIcon, iconColor: 'text-green-500' },
+    { name: 'Total Revenue', stat: '฿0', icon: ArrowUpIcon, iconColor: 'text-green-500' },
+    { name: 'Pending Bookings', stat: '0', icon: ArrowUpIcon, iconColor: 'text-green-500' }
+  ]);
+
+  useEffect(() => {
+    if (data?.bookings && data.bookings.length > 0) {
+      const transformedBookings = data.bookings.map((booking) => ({
+        ...booking,
+        date: dayjs(booking.createdAt).format("DD/MM/YYYY"),
+        total_price: booking.total_price ?? 0,
+        booking_status: booking.booking_status?.status ?? "unknown",
+      }));
+
+      // ปรับปรุงการรวบรวมข้อมูล โดยใช้ Map เพื่อจัดการข้อมูลที่ซ้ำกัน
+      const bookingsByDate = new Map();
+
+      transformedBookings.forEach((booking) => {
+        // ถ้ายังไม่มีข้อมูลวันนั้น ให้สร้างข้อมูลใหม่
+        if (!bookingsByDate.has(booking.date)) {
+          bookingsByDate.set(booking.date, {
+            date: booking.date,
+            count: 0,
+            revenue: 0,
+            pendingCount: 0
+          });
+        }
+
+        // ดึงข้อมูลปัจจุบันของวันนั้น
+        const dateData = bookingsByDate.get(booking.date);
+
+        // เพิ่มข้อมูล
+        dateData.count += 1;
+        dateData.revenue += booking.total_price || 0;
+        
+        if (booking.booking_status === 'pending') {
+          dateData.pendingCount += 1;
+        }
+      });
+
+      // แปลง Map เป็น Array และเรียงลำดับ
+      const sortedBookings = Array.from(bookingsByDate.values())
+        .sort((a, b) => dayjs(a.date, 'DD/MM/YYYY').diff(dayjs(b.date, 'DD/MM/YYYY')))
+        .filter(booking => booking.count > 0);
+
+      // อัพเดตสถานะ
+      setProcessedBookings(sortedBookings);
+
+      // คำนวณสถิติเช่นเดิม
+      const totalBookings = sortedBookings.reduce((sum, booking) => sum + booking.count, 0);
+      const totalRevenue = sortedBookings.reduce((sum, booking) => sum + booking.revenue, 0);
+      const totalPending = data.bookings.filter(booking => booking.booking_status === 'pending').length;
+
+      setStats([
+        {
+          name: 'รายการจองของเดือนนี้',
+          stat: totalBookings.toLocaleString(),
+          icon: ArrowUpIcon,
+          iconColor: 'text-green-500'
+        },
+        {
+          name: 'รายได้ทั้งหมด',
+          stat: `฿${totalRevenue.toLocaleString()}`,
+          icon: ArrowUpIcon,
+          iconColor: 'text-green-500'
+        },
+        {
+          name: 'รอการอนุมัติ',
+          stat: totalPending.toLocaleString(),
+          icon: ArrowUpIcon,
+          iconColor: 'text-green-500'
+        }
+      ]);
+    }
+  }, [data]);
+
+  const currentMonth = dayjs().format('MM/YYYY');
+  const lastMonth = dayjs().subtract(1, 'month').format('MM/YYYY');
+
   const bookingChartOptions = {
     chart: {
       type: 'line',
       height: 350,
     },
+    plotOptions: {
+      bar: {
+        columnWidth: '20%',
+        borderRadius: 2,
+      },
+    },
     xaxis: {
-      categories: bookings.map(booking => booking.date),
+      categories: processedBookings.map(booking => booking.date),
     },
     yaxis: {
       title: {
-        text: 'Number of Bookings',
+        text: 'จำนวนการจอง',
       },
     },
   };
 
-  const bookingChartSeries = [{
-    name: "Bookings",
-    data: bookings.map(booking => booking.count),
-  }];
+  const bookingChartSeries = [
+    {
+      name: "รายการจองเดือนนี้",
+      data: processedBookings.map(booking => booking.count)
+    },
+  ];
 
   const revenueChartOptions = {
     chart: {
       type: 'bar',
       height: 350,
     },
+    plotOptions: {
+      bar: {
+        columnWidth: '20%',
+        borderRadius: 2,
+      },
+    },
     xaxis: {
-      categories: bookings.map(booking => booking.date),
+      categories: processedBookings.map(booking => booking.date),
     },
     yaxis: {
       title: {
-        text: 'Revenue',
+        text: 'รายได้    ฿',
       },
     },
   };
 
-  const revenueChartSeries = [{
-    name: "Revenue",
-    data: bookings.map(booking => booking.revenue),
-  }];
+  const revenueChartSeries = [
+    {
+      name: "รายรับเดือนนี้",
+      data: processedBookings.map(booking => booking.revenue),
+    }
+  ];
 
-  // กำหนดค่าเริ่มต้นให้กับ stats หากไม่พบข้อมูล
-  const stats = [
-    {
-      name: 'Total Bookings',
-      stat: bookings.length || 'N/A',
-      previousStat: '70,946',
-      change: '12%',
-      changeType: 'increase'
-    },
-    {
-      name: 'Pending Bookings',
-      stat: bookings.filter(booking => booking.status === 'pending').length || 'N/A',
-      previousStat: '56.14%',
-      change: '2.02%',
-      changeType: 'increase'
-    },
-    {
-      name: 'Completed Bookings',
-      stat: bookings.filter(booking => booking.status === 'completed').length || 'N/A',
-      previousStat: '28.62%',
-      change: '4.05%',
-      changeType: 'decrease'
-    },
-  ]
+  // Loading state
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+    </div>
+  );
+  
+  // Error state
+  if (error) return (
+    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <strong className="font-bold">Error: </strong>
+      <span className="block sm:inline">{error.message}</span>
+    </div>
+  );
+
+  // No data state
+  if (!data?.bookings || data.bookings.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-gray-500 text-xl">No bookings found</p>
+      </div>
+    );
+  }
 
   return (  
-    <div>
-      <h3 className="text-base font-semibold text-gray-900">Last 30 days</h3>
+    <div className="bg-gray-50 min-h-screen p-6">
+      <div className="container mx-auto">
+        <h3 className="text-2xl font-bold text-gray-800 mb-6">ภาพรวมทั้งหมด</h3>
 
-      <dl className="mt-5 grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow-sm md:grid-cols-3 md:divide-x md:divide-y-0">
-        {stats.map((item) => (
-          <div key={item.name} className="px-4 py-5 sm:p-6">
-            <dt className="text-base font-normal text-gray-900">{item.name}</dt>
-            <dd className="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
-                {item.stat}
-                <span className="ml-2 text-sm font-medium text-gray-500">from {item.previousStat}</span>
-              </div>
-
-              <div
-                className={classNames(
-                  item.changeType === 'increase' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800',
-                  'inline-flex items-baseline rounded-full px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0',
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {stats.map((item) => (
+            <div key={item.name} className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{item.name}</dt>
+                  <dd className="mt-1 text-3xl font-semibold text-gray-900">{item.stat}</dd>
+                </div>
+                {item.icon && (
+                  <item.icon 
+                    className={`h-8 w-8 ${item.iconColor}`} 
+                    aria-hidden="true" 
+                  />
                 )}
-              >
-                {item.changeType === 'increase' ? (
-                  <ArrowUpIcon aria-hidden="true" className="mr-0.5 -ml-1 size-5 shrink-0 self-center text-green-500" />
-                ) : (
-                  <ArrowDownIcon aria-hidden="true" className="mr-0.5 -ml-1 size-5 shrink-0 self-center text-red-500" />
-                )}
-
-                <span className="sr-only"> {item.changeType === 'increase' ? 'Increased' : 'Decreased'} by </span>
-                {item.change}
               </div>
-            </dd>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h4 className="text-xl font-semibold text-gray-800 mb-4">รายการจองเดือนนี้</h4>
+            <ReactApexChart
+              options={bookingChartOptions}  
+              series={bookingChartSeries}
+              type="bar"
+              height={350}
+            />
           </div>
-        ))}
-      </dl>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="col-span-1">
-          <h4 className="text-lg font-semibold">Bookings Over Time</h4>
-          <ReactApexChart
-            options={bookingChartOptions}  
-            series={bookingChartSeries}
-            type="line"
-            height={350}
-          />
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h4 className="text-xl font-semibold text-gray-800 mb-4">รายได้เดือนนี้</h4>
+            <ReactApexChart
+              options={revenueChartOptions}  
+              series={revenueChartSeries}
+              type="bar"
+              height={350}
+            />
+          </div>
         </div>
 
-        <div className="col-span-1">
-          <h4 className="text-lg font-semibold">Revenue Over Time</h4>
-          <ReactApexChart
-            options={revenueChartOptions}  
-            series={revenueChartSeries}
-            type="bar"
-            height={350}
-          />
+        <div className="mt-8 bg-white shadow-md rounded-lg p-6">
+          <h4 className="text-xl font-semibold text-gray-800 mb-4">รายการจองล่าสุด</h4>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead className="bg-gray-100">
+                <tr>
+                  {['รายชื่อลูกค้า', 'แพ็กเกจ', 'วันที่จอง', 'สถานะ', 'ราคารวม'].map((header) => (
+                    <th key={header} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {data.bookings.slice(0, 10).map((booking, index) => (
+                  <tr key={index} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-4 whitespace-nowrap">{`${booking.fname} ${booking.lname}`}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{booking.package?.name}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{dayjs(booking.createdAt).format('DD/MM/YYYY')}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        booking.booking_status === 'pending' 
+                          ? 'bg-yellow-100 text-yellow-800' 
+                          : booking.booking_status === 'confirmed' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {booking.booking_status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-green-600 font-semibold">฿{booking.total_price?.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-
-      <div className="mt-6">
-        <h4 className="text-lg font-semibold">Latest 10 Bookings</h4>
-        <table className="min-w-full table-auto mt-4">
-          <thead>
-            <tr>
-            <th className="px-4 py-2 text-left">ID</th>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Booking Date</th>
-              <th className="px-4 py-2 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bookings.slice(0, 10).map((booking, index) => (
-              <tr key={index}>
-                <td className="px-4 py-2">{booking.customerName}</td>
-                <td className="px-4 py-2">{booking.date}</td>
-                <td className="px-4 py-2">{booking.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   )
